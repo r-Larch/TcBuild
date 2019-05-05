@@ -15,12 +15,12 @@ Install-Package TcBuild
 
 ## Possible Plugins
 
-|  Plugin           |  Total Commander name  |
-|-------------------|------------------------|
-| FileSystem Plugin |    .wfx - plugin       |
-| Content Plugin    |    .wdx - plugin       |
-| Lister Plugin     |    .wlx - plugin       |
-| Packer Plugin     |    .wcx - plugin       |
+|  Plugin           |  Total Commander name  | Example                                                             |
+|-------------------|------------------------|---------------------------------------------------------------------|
+| FileSystem Plugin |    .wfx - plugin       | [TcPlugin.AzureBlob](https://github.com/r-Larch/TcPlugin.AzureBlob) |
+| Content Plugin    |    .wdx - plugin       | comming soon                                                        |
+| Lister Plugin     |    .wlx - plugin       | comming soon                                                        |
+| Packer Plugin     |    .wcx - plugin       | comming soon                                                        |
 
 See [Total Commander plugin types](https://www.ghisler.ch/wiki/index.php/Plugin#Plugin_types).
 
