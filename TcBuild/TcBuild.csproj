@@ -8,6 +8,7 @@
     <Description>Tool to build Total Commander Plugins</Description>
     <!--<DevelopmentDependency>true</DevelopmentDependency>-->
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!--<IsTool>true</IsTool>-->
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -46,11 +47,11 @@
 
   <ItemGroup>
     <!-- bin's for build target -->
-    <Content Include="$(OutputPath)\*.dll">
+    <Content Include="$(OutputPath)*.dll">
       <Pack>true</Pack>
       <PackagePath>bin\$(TargetFramework)</PackagePath>
     </Content>
-    <Content Include="$(OutputPath)\*.pdb">
+    <Content Include="$(OutputPath)*.pdb">
       <Pack>true</Pack>
       <PackagePath>bin\$(TargetFramework)</PackagePath>
     </Content>
@@ -58,7 +59,7 @@
 
   <ItemGroup>
     <!-- references for target project -->
-    <Content Include="$(OutputPath)\TcPluginBase.dll">
+    <Content Include="$(OutputPath)TcPluginBase.dll">
       <Pack>true</Pack>
       <PackagePath>ref\$(TargetFramework)</PackagePath>
     </Content>

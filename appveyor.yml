@@ -1,4 +1,4 @@
-image: Visual Studio 2017
+image: Visual Studio 2019 Preview
 
 configuration: Release
 platform: Any CPU
@@ -30,3 +30,5 @@ artifacts:
 #  api_key:
 #    secure: jUwBx2bcWtQ1/dBA9rYvLAFv7br1ADIaDTJKe0VnsWOgp85CWCa6SYFahIY+Gzvc
 #  skip_symbols: true
+
+## TODO wait for "Visual Studio 2019" image because the preview and all older images have no support for the build task files
