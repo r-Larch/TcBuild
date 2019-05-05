@@ -1,0 +1,14 @@
+image: Visual Studio 2019 Preview
+# skip_commits:
+#   message: /Merge pull request.*/
+configuration: Release
+platform: Any CPU
+before_build:
+- cmd: nuget restore
+build:
+  verbosity: minimal
+# test:
+#   assemblies:
+#     - '**\*Tests.dll'
+artifacts:
+- path: nugets\**\*.nupkg
