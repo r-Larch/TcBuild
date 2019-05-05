@@ -3,6 +3,9 @@
 
 TcBuild is a tool to build Total Commander plugins that are written in .NET
 
+[![Build status](https://ci.appveyor.com/api/projects/status/a93fev9ym9leg16h?svg=true)](https://ci.appveyor.com/project/r-Larch/tcbuild)
+[![Build status](https://ci.appveyor.com/api/projects/status/a93fev9ym9leg16h/branch/master?svg=true)](https://ci.appveyor.com/project/r-Larch/tcbuild/branch/master)
+
 
 ## Nuget
 

@@ -1,14 +1,33 @@
 image: Visual Studio 2019 Preview
-# skip_commits:
-#   message: /Merge pull request.*/
+
 configuration: Release
 platform: Any CPU
+
 before_build:
 - cmd: nuget restore
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj;**\*.props'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
 build:
   verbosity: minimal
+
 # test:
 #   assemblies:
 #     - '**\*Tests.dll'
+
 artifacts:
 - path: nugets\**\*.nupkg
+
+deploy:
+  provider: NuGet
+  api_key:
+    secure: jUwBx2bcWtQ1/dBA9rYvLAFv7br1ADIaDTJKe0VnsWOgp85CWCa6SYFahIY+Gzvc
+  skip_symbols: true
+#  artifact: nugets\**\*.nupkg

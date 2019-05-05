@@ -2,6 +2,7 @@
 <Project>
   <PropertyGroup>
     <Version>0.1.0-beta.1</Version>
+    <Copyright>Copyright © 2019 René Larch &amp; 2015-16 Oleg Yuvashev</Copyright>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
     <NoWarn>CS1591;CS0618</NoWarn>
