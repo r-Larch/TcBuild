@@ -18,6 +18,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A3137D0-160E-41CA-8B09-7E82D59EC05B}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcPluginBase", "TcPluginBase\TcPluginBase.csproj", "{CF8CF6DE-6F50-4578-A431-1F87661ED977}"
