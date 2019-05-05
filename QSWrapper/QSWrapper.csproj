@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <!--<OutputPath>..\Build\</OutputPath>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" />
+  </ItemGroup>
+
+</Project>

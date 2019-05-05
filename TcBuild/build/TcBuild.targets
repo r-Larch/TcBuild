@@ -1,0 +1,46 @@
+﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TcBuildPath Condition="$(TcBuildPath) == ''">$(MSBuildThisFileDirectory)..\</TcBuildPath>
+    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\net472</TcBuildAssemblyDirectory>
+    <TcPluginBase>$(TcBuildPath)ref\net472\TcPluginBase.dll</TcPluginBase>
+    <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuild.dll</TcBuildAssembly>
+
+    <MsBuildMajorVersion>$([System.Version]::Parse($(MSBuildVersion)).Major)</MsBuildMajorVersion>
+  </PropertyGroup>
+
+  <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
+
+  <Target Name="ILMerge">
+    <!-- merges the TcPluginBase.dll into the Target-dll -->
+    <Exec Command="$(ILRepack) /out:$(TargetPath) $(TargetPath) $(TcPluginBase)" />
+  </Target>
+
+  <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
+  <Target
+    Name="TcBuildTarget"
+    BeforeTargets="PostBuildEvent"
+    Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true"
+    DependsOnTargets="$(TcBuildDependsOnTargets);ILMerge">
+
+    <Error Condition="($(MsBuildMajorVersion) &lt; 16) And $([MSBuild]::IsOsPlatform(OSX)) != true"
+           Text="TcBuild is only supported on MSBuild 16 and above. Current version: $(MsBuildMajorVersion)." />
+
+    <TcBuild.TcBuildTask
+      Configuration="$(Configuration)"
+      AssemblyFile="$(TargetPath)"
+      IntermediateDirectory="$(TargetDir)"
+      ProjectDirectory="$(MSBuildProjectDirectory)"
+      ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
+      MSBuildFrameworkToolsPath="$(MSBuildFrameworkToolsPath)"
+      FrameworkSDKRoot="$(FrameworkSDKRoot)">
+
+      <!--<Output TODO can be used to set extension ??
+        TaskParameter="MyOutputPropertyName"
+        PropertyName="XmlPropertyName" />-->
+
+    </TcBuild.TcBuildTask>
+
+  </Target>
+
+</Project>
