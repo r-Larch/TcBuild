@@ -20,6 +20,7 @@ namespace TcBuild {
         public DirectoryInfo IntermediateDirectory { get; set; }
         public List<FileInfo> ReferenceFiles { get; set; }
         public bool IsRelease { get; set; }
+        public DirectoryInfo CacheDir { get; set; }
 
 
         public Processor(ILogger log, Tools tools)
@@ -208,7 +209,7 @@ namespace TcBuild {
             var exportedMethods = new AssemblyParser(wrapperType.Assembly).GetExportedMethods();
             exportedMethods = exportedMethods.Where(_ => !methodsToRemoveFromWrapper.Contains(_.ExportName)).ToArray();
 
-            var wrapper = GetMsilFile(wrapperType.Assembly, removePluginBaseRef: true);
+            var wrapper = GetMsilFile(wrapperType.Assembly, removePluginBaseRef: true, cache: true);
 
             var dllExportAttribute = $".custom instance void {typeof(DllExportAttribute).FullName}";
 
@@ -233,8 +234,13 @@ namespace TcBuild {
         }
 
 
-        private MsilFile GetMsilFile(Assembly assembly, bool removePluginBaseRef = false)
+        private MsilFile GetMsilFile(Assembly assembly, bool removePluginBaseRef = false, bool cache = false)
         {
+            var cacheFile = new FileInfo(Path.Combine(CacheDir.FullName, Path.GetFileName(assembly.Location) + ".il"));
+            if (cache && cacheFile.Exists) {
+                return new MsilFile(cacheFile);
+            }
+
             var dir = new DirectoryInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
             try {
                 dir.Create();
@@ -246,6 +252,10 @@ namespace TcBuild {
                     var src = File.ReadAllText(source.FullName);
                     src = src.Replace("[TcPluginBase]", "");
                     File.WriteAllText(source.FullName, src);
+                }
+
+                if (cache) {
+                    source.CopyTo(cacheFile.FullName);
                 }
 
                 var msilFile = new MsilFile(source);

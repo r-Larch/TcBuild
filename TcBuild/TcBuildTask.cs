@@ -25,6 +25,8 @@ namespace TcBuild {
         public string FrameworkSDKRoot { get; set; }
         [Required]
         public string Configuration { get; set; }
+        [Required]
+        public string CacheDir { get; set; }
 
         //[Output]
         //public string TargetExt { get; private set; }
@@ -46,9 +48,15 @@ namespace TcBuild {
                 _log
             );
 
+            var cacheDir = new DirectoryInfo(CacheDir);
+            if (!cacheDir.Exists) {
+                cacheDir.Create();
+            }
+
             var processor = new Processor(_log, tools) {
                 AssemblyFile = new FileInfo(AssemblyFile),
                 IntermediateDirectory = new DirectoryInfo(IntermediateDirectory),
+                CacheDir = cacheDir,
                 ReferenceFiles = ReferenceCopyLocalFiles.Select(_ => new FileInfo(_.ItemSpec)).ToList(),
                 IsRelease = Configuration == "Release",
             };

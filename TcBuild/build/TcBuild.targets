@@ -7,6 +7,8 @@
     <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuild.dll</TcBuildAssembly>
 
     <MsBuildMajorVersion>$([System.Version]::Parse($(MSBuildVersion)).Major)</MsBuildMajorVersion>
+
+    <CacheDir>$(IntermediateOutputPath)$(MSBuildProjectFile).TcBuild.cache</CacheDir>
   </PropertyGroup>
 
   <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
@@ -33,7 +35,8 @@
       ProjectDirectory="$(MSBuildProjectDirectory)"
       ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
       MSBuildFrameworkToolsPath="$(MSBuildFrameworkToolsPath)"
-      FrameworkSDKRoot="$(FrameworkSDKRoot)">
+      FrameworkSDKRoot="$(FrameworkSDKRoot)"
+      CacheDir="$(CacheDir)">
 
       <!--<Output TODO can be used to set extension ??
         TaskParameter="MyOutputPropertyName"
@@ -41,6 +44,13 @@
 
     </TcBuild.TcBuildTask>
 
+  </Target>
+
+  <PropertyGroup>
+    <CleanDependsOn>TcBuildClean;$(CleanDependsOn);</CleanDependsOn>
+  </PropertyGroup>
+  <Target Name="TcBuildClean">
+    <RemoveDir Directories="$(CacheDir)" />
   </Target>
 
 </Project>
