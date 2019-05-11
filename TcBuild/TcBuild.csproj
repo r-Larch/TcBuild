@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -9,16 +9,13 @@
     <!--<DevelopmentDependency>true</DevelopmentDependency>-->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <!--<IsTool>true</IsTool>-->
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
+    <!--<DebugType>embedded</DebugType>-->
+    <!--<DebugSymbols>true</DebugSymbols>-->
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="None" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.0.461" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
@@ -38,28 +35,19 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- bin's for build target -->
-    <Content Include="$(OutputPath)*.dll">
-      <Pack>true</Pack>
-      <PackagePath>bin\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include="$(OutputPath)*.pdb">
-      <Pack>true</Pack>
-      <PackagePath>bin\$(TargetFramework)</PackagePath>
-    </Content>
-  </ItemGroup>
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeFilesInPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+  <Target Name="IncludeFilesInPackage">
+    <ItemGroup>
+      <!-- bin's for build target -->
+      <TfmSpecificPackageFile Include="$(OutputPath)\*.dll" PackagePath="bin\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\*.pdb" PackagePath="bin\$(TargetFramework)" />
 
-  <ItemGroup>
-    <!-- references for target project -->
-    <Content Include="$(OutputPath)TcPluginBase.dll">
-      <Pack>true</Pack>
-      <PackagePath>ref\$(TargetFramework)</PackagePath>
-    </Content>
-    <Content Include="$(OutputPath)TcPluginBase.pdb">
-      <Pack>true</Pack>
-      <PackagePath>ref\$(TargetFramework)</PackagePath>
-    </Content>
-  </ItemGroup>
+      <!-- references for target project -->
+      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="ref\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.pdb" PackagePath="ref\$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
 
 </Project>

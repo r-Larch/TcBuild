@@ -28,7 +28,7 @@
   <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
   <Target
     Name="TcBuildTarget"
-    BeforeTargets="PostBuildEvent"
+    AfterTargets="Build"
     Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true"
     DependsOnTargets="$(TcBuildDependsOnTargets);ILRepack">
 
