@@ -13,17 +13,24 @@
 
   <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
 
-  <Target Name="ILMerge">
+
+  <Target Name="ILRepack" AfterTargets="Build">
     <!-- merges the TcPluginBase.dll into the Target-dll -->
-    <Exec Command="$(ILRepack) /out:$(TargetPath) $(TargetPath) $(TcPluginBase)" />
+    <ILRepack
+      OutputType="$(OutputType)"
+      MainAssembly="$(TargetPath)"
+      OutputAssembly="$(TargetPath)"
+      InputAssemblies="$(TargetPath);$(TcPluginBase)"
+      WorkingDirectory="$(TargetDir)" />
   </Target>
+
 
   <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
   <Target
     Name="TcBuildTarget"
     BeforeTargets="PostBuildEvent"
     Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true"
-    DependsOnTargets="$(TcBuildDependsOnTargets);ILMerge">
+    DependsOnTargets="$(TcBuildDependsOnTargets);ILRepack">
 
     <Error Condition="($(MsBuildMajorVersion) &lt; 16) And $([MSBuild]::IsOsPlatform(OSX)) != true"
            Text="TcBuild is only supported on MSBuild 16 and above. Current version: $(MsBuildMajorVersion)." />

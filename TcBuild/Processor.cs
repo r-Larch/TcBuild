@@ -46,7 +46,7 @@ namespace TcBuild {
 
 
             // process
-            _tools.Disassemble(AssemblyFile, sourceFile);
+            _tools.Disassemble(AssemblyFile, sourceFile, emitDebugSymbols: !IsRelease);
             ProcessSource(sourceFile, sourceOutFile, pluginType, excludedMethods);
 
 
@@ -246,7 +246,7 @@ namespace TcBuild {
                 dir.Create();
 
                 var source = new FileInfo(Path.Combine(dir.FullName, "input.il"));
-                _tools.Disassemble(new FileInfo(assembly.Location), source);
+                _tools.Disassemble(new FileInfo(assembly.Location), source, emitDebugSymbols: !IsRelease);
 
                 if (removePluginBaseRef) {
                     var src = File.ReadAllText(source.FullName);

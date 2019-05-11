@@ -38,7 +38,7 @@ namespace TcBuild {
         }
 
 
-        public void Disassemble(FileInfo assemblyFile, FileInfo sourcePath)
+        public void Disassemble(FileInfo assemblyFile, FileInfo sourcePath, bool emitDebugSymbols = true)
         {
             var list = new List<string>();
 
@@ -46,9 +46,10 @@ namespace TcBuild {
             //list.Add("/quoteallnames");
             list.Add("/unicode");
             list.Add("/nobar");
-            //if (InputValues.EmitDebugSymbols) {
-            //    list.Add("/linenum");
-            //}
+            if (emitDebugSymbols) {
+                list.Add("/linenum");
+            }
+
             list.Add($"/out:{Quote(sourcePath.FullName)}");
 
             var args = string.Join(" ", list);

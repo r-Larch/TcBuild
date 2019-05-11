@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -14,19 +14,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ILRepack" Version="2.0.16" PrivateAssets="None" />
+    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="None" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05" PrivateAssets="All" />
   </ItemGroup>
 
-  <!--<ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+  <ItemGroup>
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.0.461" PrivateAssets="All" />
-  </ItemGroup>-->
-  <ItemGroup Condition="$(TargetFramework) == 'net472'">
-    <Reference Include="Microsoft.Build" />
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="System.IO.Compression" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\QSWrapper\QSWrapper.csproj" PrivateAssets="All" />
@@ -60,6 +53,10 @@
   <ItemGroup>
     <!-- references for target project -->
     <Content Include="$(OutputPath)TcPluginBase.dll">
+      <Pack>true</Pack>
+      <PackagePath>ref\$(TargetFramework)</PackagePath>
+    </Content>
+    <Content Include="$(OutputPath)TcPluginBase.pdb">
       <Pack>true</Pack>
       <PackagePath>ref\$(TargetFramework)</PackagePath>
     </Content>
