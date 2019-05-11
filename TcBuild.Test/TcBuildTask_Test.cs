@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Xunit;
@@ -29,10 +30,16 @@ namespace TcBuild.Test {
             var cacheDir = GetNewTempDir();
             var outDir = GetNewTempDir();
 
+            var assemblyFile = new FileInfo(typeof(TcBuildTask_Test).Assembly.Location);
+            // copy files to controlled outputDir
+            CopyDirectory(assemblyFile.Directory, outDir);
+            assemblyFile = new FileInfo(Path.Combine(outDir.FullName, assemblyFile.Name));
+
+
             try {
                 var task = new TcBuildTask {
                     Configuration = "Debug",
-                    AssemblyFile = typeof(TcBuildTask_Test).Assembly.Location,
+                    AssemblyFile = assemblyFile.FullName,
                     IntermediateDirectory = outDir.FullName,
                     ProjectDirectory = "/ignored",
                     ReferenceCopyLocalFiles = AppDomain.CurrentDomain.GetAssemblies().Select(_ => new TaskItem(_.Location)).Cast<ITaskItem>().ToArray(),
@@ -43,15 +50,40 @@ namespace TcBuild.Test {
                     BuildEngine = new FakeBuildEngine(_output)
                 };
 
+                //var pdbFile = new FileInfo(assemblyFile.FullName.Replace(".dll", ".pdb"));
+                //Assert.Contains(outDir.GetFiles(), _ => _.Name == pdbFile.Name);
+                var hash = GetFileHash(task.AssemblyFile);
+                //var pdbHash = GetFileHash(pdbFile.FullName);
+
                 var success = task.Execute();
+
+                var hashAfter = GetFileHash(task.AssemblyFile);
+                //Assert.Contains(outDir.GetFiles(), _ => _.Name == pdbFile.Name);
+                //var pdbHashAfter = GetFileHash(pdbFile.FullName);
+
+                Assert.True(hash.SequenceEqual(hashAfter));
+                //Assert.True(pdbHash.SequenceEqual(pdbHashAfter));
 
                 ValidateOutput(task, outDir, cacheDir);
 
                 Assert.True(success);
             }
             finally {
-                cacheDir.Delete(true);
-                outDir.Delete(true);
+                try {
+                    cacheDir.Delete(true);
+                    outDir.Delete(true);
+                }
+                catch {
+                    // ignore
+                }
+            }
+        }
+
+        private void CopyDirectory(DirectoryInfo dir, DirectoryInfo outDir)
+        {
+            var prefix = dir.FullName.TrimEnd('\\') + '\\';
+            foreach (var file in dir.GetFiles("*", SearchOption.AllDirectories)) {
+                file.CopyTo(Path.Combine(outDir.FullName, file.FullName.Replace(prefix, "")));
             }
         }
 
@@ -60,8 +92,10 @@ namespace TcBuild.Test {
         {
             _output.WriteLine("-----  ValidateOutput  -----");
 
-            foreach (var outputFile in outDir.GetFiles()) {
+            foreach (var outputFile in outDir.GetFiles("*", SearchOption.AllDirectories)) {
                 _output.WriteLine($"  out: {outputFile.FullName}");
+
+                // print .zip contents
                 if (outputFile.FullName.EndsWith(".zip")) {
                     using (var fs = outputFile.OpenRead()) {
                         foreach (var entry in new ZipArchive(fs, ZipArchiveMode.Read).Entries.OrderBy(_ => _.FullName)) {
@@ -70,16 +104,21 @@ namespace TcBuild.Test {
                     }
                 }
             }
-
-            foreach (var outputFile in new FileInfo(task.AssemblyFile).Directory.GetFiles()) {
-                _output.WriteLine($"  bin: {outputFile.FullName}");
-            }
         }
 
 
         private static DirectoryInfo GetNewTempDir()
         {
-            return new DirectoryInfo(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+            return new DirectoryInfo(Path.GetTempPath()).CreateSubdirectory(Guid.NewGuid().ToString());
+        }
+
+
+        private static byte[] GetFileHash(string file)
+        {
+            using (var fs = new FileInfo(file).OpenRead())
+            using (var algorithm = HashAlgorithm.Create("md5")) {
+                return algorithm.ComputeHash(fs);
+            }
         }
     }
 }

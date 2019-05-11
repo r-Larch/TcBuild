@@ -35,7 +35,7 @@ namespace TcBuild {
             // parse
             var (pluginType, excludedMethods) = AnalyzeAssembly(AssemblyFile);
 
-            var outDir = IntermediateDirectory;
+            var outDir = IntermediateDirectory.CreateSubdirectory("out");
             var workDir = IntermediateDirectory.CreateSubdirectory(nameof(TcBuild));
             var sourceFile = new FileInfo(Path.Combine(workDir.FullName, "input.il"));
             var sourceOutFile = new FileInfo(Path.Combine(workDir.FullName, "output.il"));
