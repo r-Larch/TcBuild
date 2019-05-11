@@ -41,8 +41,8 @@
   <Target Name="IncludeFilesInPackage">
     <ItemGroup>
       <!-- bin's for build target -->
-      <TfmSpecificPackageFile Include="$(OutputPath)\*.dll" PackagePath="bin\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\*.pdb" PackagePath="bin\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="bin\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\*.pdb" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="bin\$(TargetFramework)" />
 
       <!-- references for target project -->
       <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="ref\$(TargetFramework)" />
