@@ -52,29 +52,29 @@ namespace TcBuild {
 
             // create: x86
             _tools.Assemble(sourceOutFile, outFile, false, IsRelease);
-            _log.LogInfo($"{AssemblyFile.FullName} -> {outFile.FullName}");
+            _log.LogInfo($"{outFile.FullName}");
 
             // create: x64
             _tools.Assemble(sourceOutFile, outFile64, true, IsRelease);
-            _log.LogInfo($"{AssemblyFile.FullName} -> {outFile64.FullName}");
+            _log.LogInfo($"{outFile64.FullName}");
 
 
             // .config
             var config = new FileInfo(AssemblyFile.FullName + ".config");
             if (config.Exists) {
                 _log.LogInfo($"create config files");
-                config.CopyTo(outFile.FullName + ".config", overwrite: true);
-                config.CopyTo(outFile64.FullName + ".config", overwrite: true);
+                config.CopyTo(configFile.FullName, overwrite: true);
+                config.CopyTo(configFile64.FullName, overwrite: true);
                 config.Delete();
             }
 
 
             // Zip
             if (pluginType != PluginType.QuickSearch) {
-                _log.LogInfo("\nInstallation archive\n====================");
-
                 var zipFile = new FileInfo(Path.Combine(outDir.FullName, Path.ChangeExtension(AssemblyFile.Name, ".zip")));
                 var iniFile = new FileInfo(Path.Combine(workDir.FullName, "pluginst.inf"));
+
+                _log.LogInfo(zipFile.FullName);
 
                 CreatePluginstFile(iniFile, outFile, pluginType);
 
@@ -230,7 +230,7 @@ namespace TcBuild {
             inFile.AddClasses(wrapper.Classes);
             inFile.SaveTo(sourceOutFile);
 
-            _log.LogInfo($"{AssemblyFile.FullName} -> {sourceOutFile.FullName}");
+            _log.LogInfo($"{sourceOutFile.FullName}");
         }
 
 

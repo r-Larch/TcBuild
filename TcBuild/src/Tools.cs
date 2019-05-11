@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Text;
 
 
 namespace TcBuild {
@@ -83,8 +85,9 @@ namespace TcBuild {
                 args.Add($"/optimize");
             }
 
-            if (!TryRun(_ilasmPath, string.Join(" ", args.ToArray()))) {
-                throw new Exception("ilasm.exe has failed assembling generated source!");
+            var arguments = string.Join(" ", args.ToArray());
+            if (!TryRun(_ilasmPath, arguments)) {
+                throw new Exception($"ilasm.exe has failed assembling generated source!\r\n{_ilasmPath} {arguments}");
             }
         }
 
@@ -95,7 +98,7 @@ namespace TcBuild {
                 zipFile.Delete();
                 using (var fs = zipFile.OpenWrite())
                 using (var zip = new ZipArchive(fs, ZipArchiveMode.Create)) {
-                    foreach (var file in files) {
+                    foreach (var file in files.Where(_ => _.Exists)) {
                         using (var entry = zip.CreateEntry(file.Name).Open())
                         using (var fileContents = file.OpenRead()) {
                             fileContents.CopyTo(entry);
@@ -118,16 +121,36 @@ namespace TcBuild {
         }
 
 
-        private static bool TryRun(string exe, string args)
+        private bool TryRun(string exe, string args)
         {
             var process = new Process {
                 StartInfo = new ProcessStartInfo(exe, args) {
-                    WindowStyle = ProcessWindowStyle.Hidden
-                }
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                },
+            };
+
+            process.OutputDataReceived += (sender, eventArgs) => {
+                _log.LogDebug($"    {eventArgs.Data}");
+            };
+
+            var error = new StringBuilder();
+            process.ErrorDataReceived += (sender, eventArgs) => {
+                error.AppendLine(eventArgs.Data);
             };
 
             if (process.Start()) {
+                process.BeginOutputReadLine();
+                process.BeginErrorReadLine();
                 process.WaitForExit();
+
+                var log = error.ToString().Trim(' ', '\r', '\n', '\t');
+                if (!string.IsNullOrEmpty(log)) {
+                    _log.LogError(log);
+                }
             }
 
             return process.ExitCode == 0;

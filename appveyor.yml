@@ -18,9 +18,9 @@ dotnet_csproj:
 build:
   verbosity: minimal
 
-# test:
-#   assemblies:
-#     - '**\*Tests.dll'
+test:
+  assemblies:
+    - '**\*Test.dll'
 
 artifacts:
 - path: nugets\**\*.nupkg
