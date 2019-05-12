@@ -93,7 +93,7 @@ namespace TcBuild {
                             configFile,
                             outFile64,
                             configFile64,
-                        }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml"))
+                        }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml" && _.Name != "TcPluginBase.dll"))
                     );
                     if (!success) {
                         _log.LogWarning("ZIP Archiver is not found - Installation Archive is not created.");
