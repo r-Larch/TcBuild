@@ -45,60 +45,70 @@ namespace TcBuild {
             var configFile = new FileInfo(outFile.FullName + ".config");
             var configFile64 = new FileInfo(outFile64.FullName + ".config");
 
+            try {
+                token.ThrowIfCancellationRequested();
 
-            // process
-            _tools.Disassemble(AssemblyFile, sourceFile, emitDebugSymbols: !IsRelease);
-            ProcessSource(sourceFile, sourceOutFile, pluginType, excludedMethods);
+                // process
+                _tools.Disassemble(AssemblyFile, sourceFile, emitDebugSymbols: !IsRelease);
+                ProcessSource(sourceFile, sourceOutFile, pluginType, excludedMethods);
 
+                token.ThrowIfCancellationRequested();
 
-            // create: x86
-            _tools.Assemble(sourceOutFile, outFile, false, IsRelease);
-            _log.LogInfo($"{outFile.FullName}");
+                // create: x86
+                _tools.Assemble(sourceOutFile, outFile, false, IsRelease);
+                _log.LogInfo($"{outFile.FullName}");
 
-            // create: x64
-            _tools.Assemble(sourceOutFile, outFile64, true, IsRelease);
-            _log.LogInfo($"{outFile64.FullName}");
+                token.ThrowIfCancellationRequested();
 
+                // create: x64
+                _tools.Assemble(sourceOutFile, outFile64, true, IsRelease);
+                _log.LogInfo($"{outFile64.FullName}");
 
-            // .config
-            var config = new FileInfo(TargetFile.FullName + ".config");
-            if (config.Exists) {
-                _log.LogInfo($"create config files");
-                config.CopyTo(configFile.FullName, overwrite: true);
-                config.CopyTo(configFile64.FullName, overwrite: true);
-                //config.Delete();
-            }
+                token.ThrowIfCancellationRequested();
 
-
-            // Zip
-            if (pluginType != PluginType.QuickSearch) {
-                var zipFile = new FileInfo(Path.Combine(outDir.FullName, Path.ChangeExtension(TargetFile.Name, ".zip")));
-                var iniFile = new FileInfo(Path.Combine(workDir.FullName, "pluginst.inf"));
-
-                _log.LogInfo(zipFile.FullName);
-
-                CreatePluginstFile(iniFile, outFile, pluginType);
-
-                var success = _tools.CreateZip(zipFile,
-                    new[] {
-                        iniFile,
-                        outFile,
-                        configFile,
-                        outFile64,
-                        configFile64,
-                    }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml"))
-                );
-                if (!success) {
-                    _log.LogWarning("ZIP Archiver is not found - Installation Archive is not created.");
+                // .config
+                var config = new FileInfo(TargetFile.FullName + ".config");
+                if (config.Exists) {
+                    _log.LogInfo($"create config files");
+                    config.CopyTo(configFile.FullName, overwrite: true);
+                    config.CopyTo(configFile64.FullName, overwrite: true);
+                    //config.Delete();
                 }
+
+                token.ThrowIfCancellationRequested();
+
+                // Zip
+                if (pluginType != PluginType.QuickSearch) {
+                    var zipFile = new FileInfo(Path.Combine(outDir.FullName, Path.ChangeExtension(TargetFile.Name, ".zip")));
+                    var iniFile = new FileInfo(Path.Combine(workDir.FullName, "pluginst.inf"));
+
+                    _log.LogInfo(zipFile.FullName);
+
+                    CreatePluginstFile(iniFile, outFile, pluginType);
+
+                    var success = _tools.CreateZip(zipFile,
+                        new[] {
+                            iniFile,
+                            outFile,
+                            configFile,
+                            outFile64,
+                            configFile64,
+                        }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml"))
+                    );
+                    if (!success) {
+                        _log.LogWarning("ZIP Archiver is not found - Installation Archive is not created.");
+                    }
+                }
+
+                token.ThrowIfCancellationRequested();
+
+                return Task.FromResult(true);
             }
-
-
-            // Cleanup
-            //AssemblyFile.Delete();
-            workDir.Delete(true);
-
-            return Task.FromResult(true);
+            finally {
+                // Cleanup
+                //AssemblyFile.Delete();
+                workDir.Delete(true);
+            }
         }
 
 
