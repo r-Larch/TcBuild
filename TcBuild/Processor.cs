@@ -93,7 +93,12 @@ namespace TcBuild {
                             configFile,
                             outFile64,
                             configFile64,
-                        }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml" && _.Name != "TcPluginBase.dll"))
+                        }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml" && _.Name != "TcPluginBase.dll")
+                            // Hotfix until my pull request gets merged: https://github.com/peters/ILRepack.MSBuild.Task/pull/42
+                            .Where(_ => _.Name != "Microsoft.Build.Framework.dll")
+                            .Where(_ => _.Name != "Microsoft.Build.Utilities.Core.dll")
+                            .Where(_ => _.Name != "System.Collections.Immutable.dll")
+                        )
                     );
                     if (!success) {
                         _log.LogWarning("ZIP Archiver is not found - Installation Archive is not created.");
