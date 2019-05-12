@@ -14,6 +14,8 @@ namespace TcBuild {
         [Required]
         public string AssemblyFile { get; set; }
         [Required]
+        public string TargetFile { get; set; }
+        [Required]
         public string ProjectDirectory { get; set; }
         [Required]
         public string IntermediateDirectory { get; set; }
@@ -54,6 +56,7 @@ namespace TcBuild {
             }
 
             var processor = new Processor(_log, tools) {
+                TargetFile = new FileInfo(TargetFile),
                 AssemblyFile = new FileInfo(AssemblyFile),
                 IntermediateDirectory = new DirectoryInfo(IntermediateDirectory),
                 CacheDir = cacheDir,

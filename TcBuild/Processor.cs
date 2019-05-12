@@ -17,6 +17,7 @@ namespace TcBuild {
         private readonly ILogger _log;
         private readonly Tools _tools;
         public FileInfo AssemblyFile { get; set; }
+        public FileInfo TargetFile { get; set; }
         public DirectoryInfo IntermediateDirectory { get; set; }
         public List<FileInfo> ReferenceFiles { get; set; }
         public bool IsRelease { get; set; }
@@ -60,18 +61,18 @@ namespace TcBuild {
 
 
             // .config
-            var config = new FileInfo(AssemblyFile.FullName + ".config");
+            var config = new FileInfo(TargetFile.FullName + ".config");
             if (config.Exists) {
                 _log.LogInfo($"create config files");
                 config.CopyTo(configFile.FullName, overwrite: true);
                 config.CopyTo(configFile64.FullName, overwrite: true);
-                config.Delete();
+                //config.Delete();
             }
 
 
             // Zip
             if (pluginType != PluginType.QuickSearch) {
-                var zipFile = new FileInfo(Path.Combine(outDir.FullName, Path.ChangeExtension(AssemblyFile.Name, ".zip")));
+                var zipFile = new FileInfo(Path.Combine(outDir.FullName, Path.ChangeExtension(TargetFile.Name, ".zip")));
                 var iniFile = new FileInfo(Path.Combine(workDir.FullName, "pluginst.inf"));
 
                 _log.LogInfo(zipFile.FullName);
@@ -135,7 +136,7 @@ namespace TcBuild {
 
         private string GetOutputFileName(PluginType pluginType, bool x64)
         {
-            var name = pluginType == PluginType.QuickSearch ? "tcmatch" : Path.GetFileNameWithoutExtension(AssemblyFile.Name);
+            var name = pluginType == PluginType.QuickSearch ? "tcmatch" : Path.GetFileNameWithoutExtension(TargetFile.Name);
             var extension = "." + TcUtils.PluginExtensions[pluginType];
 
             if (x64) {

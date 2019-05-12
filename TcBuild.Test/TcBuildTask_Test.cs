@@ -40,6 +40,7 @@ namespace TcBuild.Test {
                 var task = new TcBuildTask {
                     Configuration = "Debug",
                     AssemblyFile = assemblyFile.FullName,
+                    TargetFile = assemblyFile.FullName,
                     IntermediateDirectory = outDir.FullName,
                     ProjectDirectory = "/ignored",
                     ReferenceCopyLocalFiles = AppDomain.CurrentDomain.GetAssemblies().Select(_ => new TaskItem(_.Location)).Cast<ITaskItem>().ToArray(),

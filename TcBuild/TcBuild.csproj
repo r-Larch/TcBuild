@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -45,8 +45,8 @@
       <TfmSpecificPackageFile Include="$(OutputPath)\*.pdb" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="bin\$(TargetFramework)" />
 
       <!-- references for target project -->
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="ref\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.pdb" PackagePath="ref\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="lib\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.pdb" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
   </Target>
 

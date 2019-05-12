@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -29,7 +29,7 @@
   </PropertyGroup>
   <Target Name="ILRepack" AfterTargets="Build">
     <!-- merges the TcPluginBase.dll into the Target-dll -->
-    <ILRepack OutputType="$(OutputType)" MainAssembly="$(TargetPath)" OutputAssembly="$(TargetPath)" InputAssemblies="$(TargetPath);$(TcPluginBase)" WorkingDirectory="$(TargetDir)" />
+    <ILRepack OutputType="$(OutputType)" MainAssembly="$(TargetPath)" OutputAssembly="$(TargetPath)" InputAssemblies="$(TargetPath);$(TcPluginBase)" WorkingDirectory="$(TargetDir)" Internalize="false" />
   </Target>
 
 </Project>

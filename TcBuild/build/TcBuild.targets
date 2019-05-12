@@ -1,14 +1,14 @@
-﻿<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
     <TcBuildPath Condition="$(TcBuildPath) == ''">$(MSBuildThisFileDirectory)..\</TcBuildPath>
     <TcBuildAssemblyDirectory>$(TcBuildPath)bin\net472</TcBuildAssemblyDirectory>
-    <TcPluginBase>$(TcBuildPath)ref\net472\TcPluginBase.dll</TcPluginBase>
+    <TcPluginBase>$(TcBuildPath)lib\net472\TcPluginBase.dll</TcPluginBase>
     <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuild.dll</TcBuildAssembly>
 
     <MsBuildMajorVersion>$([System.Version]::Parse($(MSBuildVersion)).Major)</MsBuildMajorVersion>
 
-    <CacheDir>$(IntermediateOutputPath)$(MSBuildProjectFile).TcBuild.cache</CacheDir>
+    <CacheDir>$(IntermediateOutputPath)$(MSBuildProjectFile).TcBuild.cache\</CacheDir>
   </PropertyGroup>
 
   <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
@@ -19,9 +19,10 @@
     <ILRepack
       OutputType="$(OutputType)"
       MainAssembly="$(TargetPath)"
-      OutputAssembly="$(TargetPath)"
+      OutputAssembly="IlRepack-Merged.dll"
       InputAssemblies="$(TargetPath);$(TcPluginBase)"
-      WorkingDirectory="$(TargetDir)" />
+      WorkingDirectory="$(TargetDir)"
+      Internalize="false" />
   </Target>
 
 
@@ -37,7 +38,8 @@
 
     <TcBuild.TcBuildTask
       Configuration="$(Configuration)"
-      AssemblyFile="$(TargetPath)"
+      AssemblyFile="$(TargetDir)IlRepack-Merged.dll"
+      TargetFile="$(TargetPath)"
       IntermediateDirectory="$(TargetDir)"
       ProjectDirectory="$(MSBuildProjectDirectory)"
       ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
