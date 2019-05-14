@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 
 
 namespace TcPluginBase.Tools {
@@ -24,20 +24,33 @@ namespace TcPluginBase.Tools {
             var types = typeof(TPlugin).GetInterfaces().Select(_ => _.Name);
             TcTrace.TraceOut(TraceLevel.Warning, $"[{name}]{pluginClass.FullName}", $"{string.Join(",", types)} plugin load");
 
-            var settings = GetSettings();
+            var settings = GetSettings(pluginClass.Assembly);
 
-            var ctor = pluginClass.GetConstructor(new[] {typeof(StringDictionary)});
+            var ctor = pluginClass.GetConstructor(new[] {typeof(Settings)});
             var tcPlugin = (TPlugin) ctor.Invoke(new object[] {settings});
             return tcPlugin;
         }
 
 
-        private static StringDictionary GetSettings()
+        private static Settings GetSettings(Assembly assembly)
         {
-            var settings = new StringDictionary();
+            var settings = new Settings();
+
+            // load global settings
             var appSettings = ConfigurationManager.AppSettings;
             foreach (var key in appSettings.AllKeys) {
                 settings.Add(key, appSettings[key]);
+            }
+
+            // and add plugin settings
+            var sett = ConfigurationManager.OpenExeConfiguration(assembly.Location).AppSettings.Settings;
+            foreach (var key in appSettings.AllKeys) {
+                if (settings.ContainsKey(key)) {
+                    settings[key] = sett[key].Value;
+                }
+                else {
+                    settings.Add(key, appSettings[key]);
+                }
             }
 
             return settings;

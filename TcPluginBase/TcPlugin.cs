@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Remoting.Lifetime;
@@ -24,7 +23,7 @@ namespace TcPluginBase {
         protected static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         protected string PluginFolder { get; }
 
-        public TcPlugin(StringDictionary pluginSettings = null)
+        public TcPlugin(Settings pluginSettings = null)
         {
             PluginNumber = -1;
             _mainThreadId = Thread.CurrentThread.ManagedThreadId;

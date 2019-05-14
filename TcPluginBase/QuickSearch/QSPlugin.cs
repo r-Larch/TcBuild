@@ -1,11 +1,8 @@
-﻿using System.Collections.Specialized;
-
-
-namespace TcPluginBase.QuickSearch {
+﻿namespace TcPluginBase.QuickSearch {
     public class QuickSearchPlugin : TcPlugin, IQuickSearchPlugin {
         #region Constructors
 
-        public QuickSearchPlugin(StringDictionary pluginSettings) : base(pluginSettings)
+        public QuickSearchPlugin(Settings pluginSettings) : base(pluginSettings)
         {
         }
 

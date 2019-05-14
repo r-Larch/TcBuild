@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 
 
 namespace TcPluginBase.Packer {
@@ -15,7 +14,7 @@ namespace TcPluginBase.Packer {
 
         #region Constructors
 
-        public PackerPlugin(StringDictionary pluginSettings) : base(pluginSettings)
+        public PackerPlugin(Settings pluginSettings) : base(pluginSettings)
         {
             BackgroundFlags = PackBackgroundFlags.None;
             Capabilities = PackerCapabilities.None;
@@ -105,6 +104,7 @@ namespace TcPluginBase.Packer {
         #endregion Callback Procedures
 
         public PackerPassword Password { get; protected set; }
+
         public virtual void CreatePassword(int cryptoNumber, int flags)
         {
             if (Password == null) {

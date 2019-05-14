@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Drawing;
 
@@ -38,7 +37,7 @@ namespace TcPluginBase.Lister {
 
         #region Constructors
 
-        public ListerPlugin(StringDictionary pluginSettings) : base(pluginSettings)
+        public ListerPlugin(Settings pluginSettings) : base(pluginSettings)
         {
             BitmapBackgroundColor = Color.White;
             ListerHandle = IntPtr.Zero;

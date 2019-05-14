@@ -1,13 +1,10 @@
-﻿using System.Collections.Specialized;
-
-
-namespace TcPluginBase.Content {
+﻿namespace TcPluginBase.Content {
     public class ContentPlugin : TcPlugin, IContentPlugin {
         public virtual string DetectString { get; set; }
         public override string TraceTitle => Title;
 
 
-        public ContentPlugin(StringDictionary pluginSettings) : base(pluginSettings)
+        public ContentPlugin(Settings pluginSettings) : base(pluginSettings)
         {
         }
 

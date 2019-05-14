@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using TcPluginBase;
@@ -9,7 +8,7 @@ using TcPluginBase.FileSystem;
 
 namespace TcBuild.Test.PluginImplementation {
     public class FsPluginTest : FsPlugin {
-        public FsPluginTest(StringDictionary pluginSettings) : base(pluginSettings)
+        public FsPluginTest(Settings pluginSettings) : base(pluginSettings)
         {
         }
 
@@ -69,19 +68,34 @@ namespace TcBuild.Test.PluginImplementation {
 
         public override FileSystemExitCode RenMovFile(string oldName, string newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
-            return FileSystemExitCode.NotSupported;
+            try {
+                return FileSystemExitCode.NotSupported;
+            }
+            catch (OperationCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
         }
 
 
         public override FileSystemExitCode GetFile(string remoteName, ref string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
         {
-            return FileSystemExitCode.NotSupported;
+            try {
+                return FileSystemExitCode.NotSupported;
+            }
+            catch (OperationCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
         }
 
 
         public override FileSystemExitCode PutFile(string localName, ref string remoteName, CopyFlags copyFlags)
         {
-            return FileSystemExitCode.NotSupported;
+            try {
+                return FileSystemExitCode.NotSupported;
+            }
+            catch (OperationCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
         }
 
 

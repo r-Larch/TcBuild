@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Threading;
@@ -18,7 +17,7 @@ namespace TcPluginBase.FileSystem {
         public bool WriteStatusInfo { get; }
 
 
-        public FsPlugin(StringDictionary pluginSettings) : base(pluginSettings)
+        public FsPlugin(Settings pluginSettings) : base(pluginSettings)
         {
             PluginNumber = -1;
             //SetPluginFolder("iconFolder", Path.Combine(PluginFolder, "img"));
@@ -159,17 +158,20 @@ namespace TcPluginBase.FileSystem {
 
         #region Callback Procedures
 
-        protected int ProgressProc(string source, string destination, int percentDone)
+        // TODO overwrite with ThreadKeeper
+        protected virtual int ProgressProc(string source, string destination, int percentDone)
         {
             return OnTcPluginEvent(new ProgressEventArgs(PluginNumber, source, destination, percentDone));
         }
 
-        protected void LogProc(LogMsgType msgType, string logText)
+        // TODO overwrite with ThreadKeeper
+        protected virtual void LogProc(LogMsgType msgType, string logText)
         {
             OnTcPluginEvent(new LogEventArgs(PluginNumber, (int) msgType, logText));
         }
 
-        protected bool RequestProc(RequestType requestType, string customTitle, string customText, ref string returnedText, int maxLen)
+        // TODO overwrite with ThreadKeeper
+        protected virtual bool RequestProc(RequestType requestType, string customTitle, string customText, ref string returnedText, int maxLen)
         {
             var e = new RequestEventArgs(PluginNumber, (int) requestType, customTitle, customText, returnedText, maxLen);
             if (OnTcPluginEvent(e) != 0) {
@@ -188,6 +190,17 @@ namespace TcPluginBase.FileSystem {
         {
             if (Password == null) {
                 Password = new FsPassword(this, cryptoNumber, flags);
+            }
+        }
+
+
+        private IntPtr _mainWindowHandle = IntPtr.Zero;
+        public IntPtr MainWindowHandle {
+            get => _mainWindowHandle;
+            set {
+                if (_mainWindowHandle == IntPtr.Zero) {
+                    _mainWindowHandle = value;
+                }
             }
         }
 
