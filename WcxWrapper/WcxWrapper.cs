@@ -18,7 +18,7 @@ namespace WcxWrapper {
 
         private static string _callSignature;
         private static PackerPlugin _plugin;
-        private static PackerPlugin Plugin => _plugin ?? (_plugin = (PackerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.Packer));
+        private static PackerPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<PackerPlugin>(typeof(PluginClassPlaceholder)));
 
 
         private PackerWrapper()

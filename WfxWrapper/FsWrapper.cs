@@ -17,34 +17,12 @@ namespace WfxWrapper {
             AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(FsWrapper).Assembly.Location).AssemblyResolve;
         }
 
-        #region Variables
 
-        private static FsPlugin _plugin;
         private static string _callSignature;
-        private static bool _unloaded;
-
-        #endregion Variables
-
-        #region Properties
-
-        private static FsPlugin Plugin {
-            get {
-                if (_plugin == null) {
-                    _plugin = (FsPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.FileSystem);
-                    _unloaded = (_plugin == null);
-                }
-
-                return _plugin;
-            }
-        }
-
+        private static FsPlugin _plugin;
+        private static FsPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<FsPlugin>(typeof(PluginClassPlaceholder)));
         private static ContentPlugin ContentPlugin => Plugin.ContentPlugin;
 
-        #endregion Properties
-
-        private FsWrapper()
-        {
-        }
 
         #region File System Plugin Exported Functions
 
@@ -674,10 +652,6 @@ namespace WfxWrapper {
         [DllExport(EntryPoint = "FsStatusInfoW")]
         public static void StatusInfoW([MarshalAs(UnmanagedType.LPWStr)] string remoteDir, int startEnd, int operation)
         {
-            if (_unloaded) {
-                return;
-            }
-
             try {
 #if TRACE
                 _callSignature = $"{((InfoOperation) operation).ToString()} - '{remoteDir}': {((InfoStartEnd) startEnd).ToString()}";

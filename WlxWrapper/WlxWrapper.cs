@@ -17,7 +17,7 @@ namespace WlxWrapper {
 
         private static string _callSignature;
         private static ListerPlugin _plugin;
-        private static ListerPlugin Plugin => _plugin ?? (_plugin = (ListerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.Lister));
+        private static ListerPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<ListerPlugin>(typeof(PluginClassPlaceholder)));
 
 
         private static IListerHandlerBuilder ListerHandlerBuilder => GetListerHandlerBuilder(Plugin);

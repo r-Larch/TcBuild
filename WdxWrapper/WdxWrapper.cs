@@ -15,7 +15,7 @@ namespace WdxWrapper {
 
         private static string _callSignature;
         private static ContentPlugin _plugin;
-        private static ContentPlugin Plugin => _plugin ?? (_plugin = (ContentPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.Content));
+        private static ContentPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<ContentPlugin>(typeof(PluginClassPlaceholder)));
 
 
         private ContentWrapper()

@@ -15,7 +15,7 @@ namespace QSWrapper {
 
         private static string _callSignature;
         private static QuickSearchPlugin _plugin;
-        private static QuickSearchPlugin Plugin => _plugin ?? (_plugin = (QuickSearchPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.QuickSearch));
+        private static QuickSearchPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<QuickSearchPlugin>(typeof(PluginClassPlaceholder)));
 
 
         private QuickSearchWrapper()

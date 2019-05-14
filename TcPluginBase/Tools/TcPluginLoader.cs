@@ -1,28 +1,30 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 
 
 namespace TcPluginBase.Tools {
     [Serializable]
     internal static class TcPluginLoader {
-        public static TcPlugin GetTcPlugin(Type pluginClass, PluginType pluginType)
+        public static TPlugin GetTcPlugin<TPlugin>(Type pluginClass) where TPlugin : TcPlugin
         {
-            var tcPlugin = CreatePluginInstance(pluginClass, pluginType);
+            var tcPlugin = CreatePluginInstance<TPlugin>(pluginClass);
             tcPlugin.TcPluginEventHandler += TcCallback.HandleTcPluginEvent;
 
             return tcPlugin;
         }
 
 
-        private static TcPlugin CreatePluginInstance(Type pluginClass, PluginType pluginType)
+        private static TPlugin CreatePluginInstance<TPlugin>(Type pluginClass)
         {
             TcTrace.TraceDelimiter();
             var name = pluginClass.Assembly.GetName().Name;
-            TcTrace.TraceOut(TraceLevel.Warning, $"[{name}]{pluginClass.FullName}", $"{TcUtils.PluginNames[pluginType]} plugin load");
+            var types = typeof(TPlugin).GetInterfaces().Select(_ => _.Name);
+            TcTrace.TraceOut(TraceLevel.Warning, $"[{name}]{pluginClass.FullName}", $"{string.Join(",", types)} plugin load");
 
             var ctor = pluginClass.GetConstructor(new[] {typeof(StringDictionary)});
-            var tcPlugin = (TcPlugin) ctor.Invoke(new object[] {new StringDictionary()});
+            var tcPlugin = (TPlugin) ctor.Invoke(new object[] {new StringDictionary()});
             return tcPlugin;
         }
 

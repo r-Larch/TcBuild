@@ -190,23 +190,24 @@ namespace TcBuild {
             }
 
             // check pluginType
+            Type pluginClass;
             var pluginTypes = implementations.Select(_ => _.Key).ToArray();
             switch (pluginTypes.Length) {
                 case 0:
                     throw new Exception("No Plugin implementation found!!");
                 case 1:
                     // this is valid
+                    pluginClass = implementations.FirstOrDefault().Value.Single();
                     break;
                 case 2 when pluginTypes.Contains(PluginType.FileSystem) && pluginTypes.Contains(PluginType.Content):
                     pluginTypes = new[] {PluginType.FileSystem};
-
+                    pluginClass = implementations.FirstOrDefault(_ => _.Key == PluginType.FileSystem).Value.Single();
                     break;
                 default:
                     throw new Exception("Too Many or invalid combination of Plugin implementations found!!");
             }
 
             var plgType = pluginTypes[0];
-            var pluginClass = implementations.FirstOrDefault().Value.Single();
 
             return (plgType, excludedMethods.Distinct().ToArray(), pluginClass.FullName, pluginClass.Assembly.GetName());
         }
