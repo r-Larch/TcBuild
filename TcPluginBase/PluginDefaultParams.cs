@@ -7,10 +7,10 @@ namespace TcPluginBase {
     [Serializable]
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct PluginDefaultParams {
-        public int size;
-        public Int32 pluginInterfaceVersionLow;
-        public Int32 pluginInterfaceVersionHi;
+        public int Size;
+        public Int32 PluginInterfaceVersionLow;
+        public Int32 PluginInterfaceVersionHi;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH_ANSI)]
-        public string defaultIniName;
+        public string DefaultIniName;
     }
 }

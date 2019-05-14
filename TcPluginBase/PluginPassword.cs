@@ -2,7 +2,7 @@
 
 
 namespace TcPluginBase {
-    // Class, used to store passwords in the TC secure password store, 
+    // Class, used to store passwords in the TC secure password store,
     // retrieve them back, or copy them to a new store.
     // It's a parent class for FsPassword and PackerPassword classes.
     [Serializable]

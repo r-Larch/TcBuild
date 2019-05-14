@@ -31,7 +31,6 @@ namespace TcPluginBase {
         public virtual string TraceTitle => MasterPlugin == null ? Title : MasterPlugin.TraceTitle;
 
         public StringDictionary Settings { get; private set; }
-        public PluginPassword Password { get; protected set; }
 
         public bool WriteTrace { get; private set; }
         public bool ShowErrorDialog { get; set; }
@@ -84,38 +83,13 @@ namespace TcPluginBase {
 
         #endregion Plugin Event Handler
 
-        #region Trace Handler
-
-        protected void TraceProc(TraceLevel level, string text)
-        {
-#if TRACE
-            PluginDomainTraceHandler(this, new TraceEventArgs(level, text));
-#endif
-        }
-
-#if TRACE
-        protected static void PluginDomainTraceHandler(object sender, TraceEventArgs e)
-        {
-            if (!(sender is TcPlugin tp)) {
-                return;
-            }
-
-            TcTrace.TraceOut(e.Level, e.Text, tp.TraceTitle);
-        }
-#endif
-
-        #endregion Trace Handler
 
         #region Other Methods
 
-        public virtual void OnTcTrace(TraceLevel level, string text)
-        {
-        }
-
-        public virtual void CreatePassword(int cryptoNumber, int flags)
-        {
-            Password = null;
-        }
+        //public virtual void CreatePassword(int cryptoNumber, int flags)
+        //{
+        //    Password = null;
+        //}
 
         //protected void SetPluginFolder(string folderKey, string defaultFolder)
         //{

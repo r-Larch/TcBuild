@@ -104,7 +104,8 @@ namespace TcPluginBase.Packer {
 
         #endregion Callback Procedures
 
-        public override void CreatePassword(int cryptoNumber, int flags)
+        public PackerPassword Password { get; protected set; }
+        public virtual void CreatePassword(int cryptoNumber, int flags)
         {
             if (Password == null) {
                 Password = new PackerPassword(this, cryptoNumber, flags);

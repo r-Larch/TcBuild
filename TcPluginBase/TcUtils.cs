@@ -10,20 +10,31 @@ using FileTime = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 
 namespace TcPluginBase {
-    public static class TcUtils {
-        const uint EmptyDateTimeHi = 0xFFFFFFFF;
-        const uint EmptyDateTimeLo = 0xFFFFFFFE;
+    [Serializable]
+    internal enum PluginType {
+        Content,
+        FileSystem,
+        Lister,
+        Packer,
+        QuickSearch,
+        Unknown
+    }
+
+    internal static class TcUtils {
+        private const uint EmptyDateTimeHi = 0xFFFFFFFF;
+        private const uint EmptyDateTimeLo = 0xFFFFFFFE;
 
         #region Common Dictionaries
 
-        public static Dictionary<PluginType, string> PluginInterfaces = new Dictionary<PluginType, string> {
+        internal static Dictionary<PluginType, string> PluginInterfaces = new Dictionary<PluginType, string> {
             {PluginType.Content, typeof(IContentPlugin).FullName},
             {PluginType.FileSystem, typeof(IFsPlugin).FullName},
             {PluginType.Lister, typeof(IListerPlugin).FullName},
             {PluginType.Packer, typeof(IPackerPlugin).FullName},
             {PluginType.QuickSearch, typeof(IQuickSearchPlugin).FullName}
         };
-        public static Dictionary<PluginType, Type> PluginInterfaceTypes = new Dictionary<PluginType, Type> {
+
+        internal static Dictionary<PluginType, Type> PluginInterfaceTypes = new Dictionary<PluginType, Type> {
             {PluginType.Content, typeof(IContentPlugin)},
             {PluginType.FileSystem, typeof(IFsPlugin)},
             {PluginType.Lister, typeof(IListerPlugin)},
@@ -31,7 +42,7 @@ namespace TcPluginBase {
             {PluginType.QuickSearch, typeof(IQuickSearchPlugin)}
         };
 
-        public static Dictionary<PluginType, string> PluginNames = new Dictionary<PluginType, string> {
+        internal static Dictionary<PluginType, string> PluginNames = new Dictionary<PluginType, string> {
             {PluginType.Content, "Content "},
             {PluginType.FileSystem, "File System "},
             {PluginType.Lister, "Lister "},
@@ -39,7 +50,7 @@ namespace TcPluginBase {
             {PluginType.QuickSearch, "QuickSearch "}
         };
 
-        public static readonly Dictionary<PluginType, string> PluginExtensions = new Dictionary<PluginType, string> {
+        internal static readonly Dictionary<PluginType, string> PluginExtensions = new Dictionary<PluginType, string> {
             {PluginType.Content, "wdx"},
             {PluginType.FileSystem, "wfx"},
             {PluginType.Lister, "wlx"},
@@ -47,7 +58,7 @@ namespace TcPluginBase {
             {PluginType.QuickSearch, "dll"}
         };
 
-        public static string[] BaseTypes = {
+        internal static string[] BaseTypes = {
             typeof(ContentPlugin).FullName,
             typeof(FsPlugin).FullName,
             typeof(ListerPlugin).FullName,
@@ -59,35 +70,32 @@ namespace TcPluginBase {
 
         #region Long Conversion Methods
 
-        public static int GetHigh(long value)
+        internal static int GetHigh(long value)
         {
             return (int) (value >> 32);
         }
 
-        public static int GetLow(long value)
+        internal static int GetLow(long value)
         {
             return (int) (value & uint.MaxValue);
         }
 
-        //public static long GetLong(int high, int low)
+        //internal static long GetLong(int high, int low)
         //{
         //    return ((long) high << 32) + low;
         //}
 
-        [CLSCompliant(false)]
-        public static uint GetUHigh(ulong value)
+        internal static uint GetUHigh(ulong value)
         {
             return (uint) (value >> 32);
         }
 
-        [CLSCompliant(false)]
-        public static uint GetULow(ulong value)
+        internal static uint GetULow(ulong value)
         {
             return (uint) (value & uint.MaxValue);
         }
 
-        [CLSCompliant(false)]
-        public static ulong GetULong(uint high, uint low)
+        internal static ulong GetULong(uint high, uint low)
         {
             return ((ulong) high << 32) + low;
         }
@@ -96,7 +104,7 @@ namespace TcPluginBase {
 
         #region DateTime Conversion Methods
 
-        public static FileTime GetFileTime(DateTime? dateTime)
+        internal static FileTime GetFileTime(DateTime? dateTime)
         {
             var longTime =
                 (dateTime.HasValue && dateTime.Value != DateTime.MinValue)
@@ -108,8 +116,7 @@ namespace TcPluginBase {
             };
         }
 
-        [CLSCompliant(false)]
-        public static ulong GetULong(DateTime? dateTime)
+        internal static ulong GetULong(DateTime? dateTime)
         {
             if (dateTime.HasValue && dateTime.Value != DateTime.MinValue) {
                 ulong ulongTime = Convert.ToUInt64(dateTime.Value.ToFileTime());
@@ -119,7 +126,7 @@ namespace TcPluginBase {
             return GetULong(EmptyDateTimeHi, EmptyDateTimeLo);
         }
 
-        public static DateTime? FromFileTime(FileTime fileTime)
+        internal static DateTime? FromFileTime(FileTime fileTime)
         {
             try {
                 long longTime = Convert.ToInt64(fileTime);
@@ -130,21 +137,20 @@ namespace TcPluginBase {
             }
         }
 
-        //[CLSCompliant(false)]
-        //public static DateTime? FromULong(ulong fileTime) {
+        //internal static DateTime? FromULong(ulong fileTime) {
         //    long longTime = Convert.ToInt64(fileTime);
-        //    return longTime != 0 
+        //    return longTime != 0
         //        ? DateTime.FromFileTime(longTime) : (DateTime?)null;
         //}
 
-        public static DateTime? ReadDateTime(IntPtr addr)
+        internal static DateTime? ReadDateTime(IntPtr addr)
         {
             return addr == IntPtr.Zero
                 ? (DateTime?) null
                 : DateTime.FromFileTime(Marshal.ReadInt64(addr));
         }
 
-        public static int GetArchiveHeaderTime(DateTime dt)
+        internal static int GetArchiveHeaderTime(DateTime dt)
         {
             if (dt.Year < 1980 || dt.Year > 2100)
                 return 0;
@@ -161,14 +167,14 @@ namespace TcPluginBase {
 
         #region Unmanaged String Methods
 
-        public static string ReadStringAnsi(IntPtr addr)
+        internal static string ReadStringAnsi(IntPtr addr)
         {
             return (addr == IntPtr.Zero)
                 ? string.Empty
                 : Marshal.PtrToStringAnsi(addr);
         }
 
-        public static List<string> ReadStringListAnsi(IntPtr addr)
+        internal static List<string> ReadStringListAnsi(IntPtr addr)
         {
             List<string> result = new List<string>();
             if (addr != IntPtr.Zero) {
@@ -184,14 +190,14 @@ namespace TcPluginBase {
             return result;
         }
 
-        public static string ReadStringUni(IntPtr addr)
+        internal static string ReadStringUni(IntPtr addr)
         {
             return (addr == IntPtr.Zero)
                 ? string.Empty
                 : Marshal.PtrToStringUni(addr);
         }
 
-        public static List<string> ReadStringListUni(IntPtr addr)
+        internal static List<string> ReadStringListUni(IntPtr addr)
         {
             List<string> result = new List<string>();
             if (addr != IntPtr.Zero) {
@@ -207,7 +213,7 @@ namespace TcPluginBase {
             return result;
         }
 
-        public static void WriteStringAnsi(string str, IntPtr addr, int length)
+        internal static void WriteStringAnsi(string str, IntPtr addr, int length)
         {
             if (String.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);
@@ -226,7 +232,7 @@ namespace TcPluginBase {
             }
         }
 
-        public static void WriteStringUni(string str, IntPtr addr, int length)
+        internal static void WriteStringUni(string str, IntPtr addr, int length)
         {
             if (String.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);

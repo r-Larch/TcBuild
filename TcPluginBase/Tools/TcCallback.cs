@@ -7,7 +7,7 @@ using TcPluginBase.Packer;
 
 
 namespace TcPluginBase.Tools {
-    public static class TcCallback {
+    internal static class TcCallback {
         #region Constants
 
         //public const string PluginCallbackDataName = "PluginCallbackData";

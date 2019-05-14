@@ -99,8 +99,8 @@ namespace TcPluginBase.Lister {
 
         #region Callback Procedures
 
-        // Use following methods to send WM_COMMAND message to the parent window 
-        // to set a new percentage value in Lister's title bar, 
+        // Use following methods to send WM_COMMAND message to the parent window
+        // to set a new percentage value in Lister's title bar,
         // or to check some menu items like fonts or word wrap mode.
         // (See WM_COMMAND in "Lister Plugin Interface" help file)
 
@@ -157,7 +157,8 @@ namespace TcPluginBase.Lister {
                 NativeMethods.PostMessage(ParentHandle, NativeMethods.WM_COMMAND, new IntPtr(wParam), ListerHandle);
 #if TRACE
                 if (WriteTrace) {
-                    TraceProc(TraceLevel.Info, $"  << Callback: ({ListerHandle}) {message.ToString()} = {value}");
+                    TcTrace.TraceOut(TraceLevel.Info, $"  << Callback: ({ListerHandle}) {message.ToString()} = {value}", null);
+
                 }
 #endif
             }

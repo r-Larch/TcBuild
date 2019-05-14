@@ -182,7 +182,9 @@ namespace TcPluginBase.FileSystem {
 
         #endregion Callback Procedures
 
-        public override void CreatePassword(int cryptoNumber, int flags)
+        public FsPassword Password { get; protected set; }
+
+        public virtual void CreatePassword(int cryptoNumber, int flags)
         {
             if (Password == null) {
                 Password = new FsPassword(this, cryptoNumber, flags);

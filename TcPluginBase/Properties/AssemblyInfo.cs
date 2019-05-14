@@ -9,3 +9,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("WlxWrapper")]
 [assembly: InternalsVisibleTo("WcxWrapper")]
 [assembly: InternalsVisibleTo("QsWrapper")]
+
+[assembly: InternalsVisibleTo("TcBuild")]

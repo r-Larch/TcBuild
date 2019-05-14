@@ -4,8 +4,7 @@
 namespace TcPluginBase.FileSystem {
     [Serializable]
     public class FsPassword : PluginPassword {
-        public FsPassword(TcPlugin plugin, int cryptoNumber, int flags)
-            : base(plugin, cryptoNumber, flags)
+        public FsPassword(TcPlugin plugin, int cryptoNumber, int flags) : base(plugin, cryptoNumber, flags)
         {
         }
 

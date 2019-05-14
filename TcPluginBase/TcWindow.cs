@@ -8,7 +8,7 @@ namespace TcPluginBase {
     public class TcWindow : IWin32Window {
         private const int TcMessageId = 1024 + 51;
 
-        public IntPtr Handle { get; private set; }
+        public IntPtr Handle { get; }
 
         public TcWindow(IntPtr handle)
         {

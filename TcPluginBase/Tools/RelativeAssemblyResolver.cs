@@ -6,7 +6,7 @@ using System.Reflection;
 
 
 namespace TcPluginBase.Tools {
-    public class RelativeAssemblyResolver {
+    internal class RelativeAssemblyResolver {
         private readonly IEnumerable<FileInfo> _dlls;
 
 

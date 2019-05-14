@@ -2,8 +2,8 @@
 
 
 namespace TcPluginBase.QuickSearch {
-    // Enumerations below are managed wrappers for corresponding integer flags used in 
-    // QuickSearch "plugin" (tcmatch.dll) 
+    // Enumerations below are managed wrappers for corresponding integer flags used in
+    // QuickSearch "plugin" (tcmatch.dll)
 
     // Used as parameter type for MatchGetSetOptions method
     [Flags]

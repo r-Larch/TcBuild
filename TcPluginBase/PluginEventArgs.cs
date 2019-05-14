@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 
 
 namespace TcPluginBase {
@@ -17,10 +16,10 @@ namespace TcPluginBase {
     public class CryptEventArgs : PluginEventArgs {
         #region Properties
 
-        public int PluginNumber { get; private set; }
-        public int CryptoNumber { get; private set; }
-        public int Mode { get; private set; }
-        public string StoreName { get; private set; }
+        public int PluginNumber { get; }
+        public int CryptoNumber { get; }
+        public int Mode { get; }
+        public string StoreName { get; }
         public string Password { get; set; }
 
         #endregion Properties
@@ -32,22 +31,6 @@ namespace TcPluginBase {
             Mode = mode;
             StoreName = storeName;
             Password = password;
-        }
-    }
-
-    [Serializable]
-    public class TraceEventArgs : EventArgs {
-        #region Properties
-
-        public TraceLevel Level { get; private set; }
-        public string Text { get; private set; }
-
-        #endregion Properties
-
-        public TraceEventArgs(TraceLevel level, string text)
-        {
-            Level = level;
-            Text = text;
         }
     }
 }

@@ -2,11 +2,11 @@
 
 
 namespace TcPluginBase.FileSystem {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in 
-    // TC "FS-Plugin writer's guide" (www.ghisler.com/plugins.htm) 
+    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // TC "FS-Plugin writer's guide" (www.ghisler.com/plugins.htm)
 
     // Some enum members are marked "!!! Used for .NET interface only !!!").
-    // They are processed in WfxWrapper and doesn't return to TC. 
+    // They are processed in WfxWrapper and doesn't return to TC.
 
 
     // Type for property BackgroundFlags used to return value for FsGetBackgroundFlags WFX wrapper method
@@ -87,9 +87,9 @@ namespace TcPluginBase.FileSystem {
     public enum PreviewBitmapResult {
         None = 0, // There is no preview bitmap.
         Extracted, // The image was extracted and is returned in ReturnedBitmap.
-        ExtractYourself, // Tells the caller to extract the image by itself. 
-        ExtractYourselfAndDelete, // Tells the caller to extract the image by itself, and then delete the temporary image file. 
-        Cache = 256 // This value must be ADDED to one of the above values if the caller should cache the image. 
+        ExtractYourself, // Tells the caller to extract the image by itself.
+        ExtractYourselfAndDelete, // Tells the caller to extract the image by itself, and then delete the temporary image file.
+        Cache = 256 // This value must be ADDED to one of the above values if the caller should cache the image.
     }
 
     // Used as parameter type for RequestProc callback method
@@ -125,15 +125,15 @@ namespace TcPluginBase.FileSystem {
         Attrib, // Change attributes/times, may include subdirs.
         MkDir, // Create a single directory.
         Exec, // Start a single remote item, or a command line.
-        CalcSize, // Calculating size of subdir (user pressed SPACE).        
-        Search, // Searching for file names only (using FsFindFirst/NextFile/Close).        
-        SearchText, // Searching for file contents (using also FsGetFile() calls).        
-        SyncSearch, // Synchronize dirs searches subdirs for info.        
-        SyncGet, // Synchronize: Downloading files from plugin.        
-        SyncPut, // Synchronize: Uploading files to plugin.        
-        SyncDelete, // Synchronize: Deleting files from plugin.        
-        GetMultiThread, // Get multiple files, may include subdirs. Executes in background thread.            
-        PutMultiThread // Put multiple files, may include subdirs. Executes in background thread.                        
+        CalcSize, // Calculating size of subdir (user pressed SPACE).
+        Search, // Searching for file names only (using FsFindFirst/NextFile/Close).
+        SearchText, // Searching for file contents (using also FsGetFile() calls).
+        SyncSearch, // Synchronize dirs searches subdirs for info.
+        SyncGet, // Synchronize: Downloading files from plugin.
+        SyncPut, // Synchronize: Uploading files to plugin.
+        SyncDelete, // Synchronize: Deleting files from plugin.
+        GetMultiThread, // Get multiple files, may include subdirs. Executes in background thread.
+        PutMultiThread // Put multiple files, may include subdirs. Executes in background thread.
     }
 
     // Used as parameter type for StatusInfo method

@@ -64,7 +64,7 @@ namespace TcPluginBase.Tools {
 
     #region Lister Delegates
 
-    // There are no delegates for Lister plugins on plugin level. 
+    // There are no delegates for Lister plugins on plugin level.
 
     #endregion Lister Delegates
 }

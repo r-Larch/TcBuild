@@ -1,7 +1,6 @@
 namespace TcPluginBase.Packer {
     public class PackerPassword : PluginPassword {
-        public PackerPassword(TcPlugin plugin, int cryptoNumber, int flags)
-            : base(plugin, cryptoNumber, flags)
+        public PackerPassword(TcPlugin plugin, int cryptoNumber, int flags) : base(plugin, cryptoNumber, flags)
         {
         }
 
