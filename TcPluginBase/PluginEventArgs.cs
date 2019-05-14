@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     [Serializable]
     public class PluginEventArgs : EventArgs {
         public int Result { get; set; }

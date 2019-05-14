@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     // Indicates that the attributed method will be exposed to unmanaged code as a static entry point.
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public sealed class DllExportAttribute : Attribute {

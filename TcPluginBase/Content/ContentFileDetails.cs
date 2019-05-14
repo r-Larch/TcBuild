@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase.Content {
+namespace TcPluginBase.Content {
     // Used as parameter type for CompareFiles method
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using OY.TotalCommander.TcPluginBase.Content;
-using OY.TotalCommander.TcPluginBase.FileSystem;
-using OY.TotalCommander.TcPluginBase.Lister;
-using OY.TotalCommander.TcPluginBase.Packer;
-using OY.TotalCommander.TcPluginBase.QuickSearch;
+using TcPluginBase.Content;
+using TcPluginBase.FileSystem;
+using TcPluginBase.Lister;
+using TcPluginBase.Packer;
+using TcPluginBase.QuickSearch;
 using FileTime = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     public static class TcUtils {
         const uint EmptyDateTimeHi = 0xFFFFFFFF;
         const uint EmptyDateTimeLo = 0xFFFFFFFE;

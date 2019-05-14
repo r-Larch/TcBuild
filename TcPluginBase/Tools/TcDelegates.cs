@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginTools {
+namespace TcPluginBase.Tools {
     #region FS Plugin Delegates
 
     [Serializable]

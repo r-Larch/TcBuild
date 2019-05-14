@@ -2,7 +2,7 @@ using System;
 using System.Windows.Forms;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     // Total Commander window, can be used as parent for any plugin child windows.
     [Serializable]
     public class TcWindow : IWin32Window {

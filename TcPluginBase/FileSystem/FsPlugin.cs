@@ -3,10 +3,10 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Threading;
-using OY.TotalCommander.TcPluginBase.Content;
+using TcPluginBase.Content;
 
 
-namespace OY.TotalCommander.TcPluginBase.FileSystem {
+namespace TcPluginBase.FileSystem {
     public class FsPlugin : TcPlugin, IFsPlugin {
         public ContentPlugin ContentPlugin { get; set; }
 

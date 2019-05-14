@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.FileSystem {
+namespace TcPluginBase.FileSystem {
     // Enumerations below are managed wrappers for corresponding integer flags discribed in 
     // TC "FS-Plugin writer's guide" (www.ghisler.com/plugins.htm) 
 

@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase.Packer {
+namespace TcPluginBase.Packer {
     // Used as parameter type for ReadHeader method
     [CLSCompliant(false)]
     [Serializable]

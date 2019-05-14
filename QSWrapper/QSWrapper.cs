@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using LarchSys.Core;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.QuickSearch;
-using OY.TotalCommander.TcPluginTools;
+using TcPluginBase;
+using TcPluginBase.QuickSearch;
+using TcPluginBase.Tools;
 
 
-namespace OY.TotalCommander.QSWrapper {
+namespace QSWrapper {
     public class QuickSearchWrapper {
         static QuickSearchWrapper()
         {
             AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(QuickSearchWrapper).Assembly.Location).AssemblyResolve;
         }
 
-        private static QuickSearchPlugin _plugin;
         private static string _callSignature;
-
-        private static QuickSearchPlugin Plugin => _plugin ?? (_plugin = (QuickSearchPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.QuickSearch));
+        private static QuickSearchPlugin _plugin;
+        private static QuickSearchPlugin Plugin => _plugin ?? (_plugin = (QuickSearchPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.QuickSearch));
 
 
         private QuickSearchWrapper()

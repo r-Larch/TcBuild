@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.Lister {
+namespace TcPluginBase.Lister {
     // Enumerations below are managed wrappers for corresponding integer flags discribed in 
     // TC "LS-Plugin writer's guide" (www.ghisler.com/plugins.htm) 
 

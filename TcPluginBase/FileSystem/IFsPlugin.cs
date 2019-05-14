@@ -3,7 +3,7 @@ using System.Drawing;
 using System.IO;
 
 
-namespace OY.TotalCommander.TcPluginBase.FileSystem {
+namespace TcPluginBase.FileSystem {
     [CLSCompliant(false)]
     public interface IFsPlugin {
         #region Mandatory Methods

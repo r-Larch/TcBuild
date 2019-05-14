@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace OY.TotalCommander.TcPluginBase.Packer {
+namespace TcPluginBase.Packer {
     [CLSCompliant(false)]
     public interface IPackerPlugin {
         #region Mandatory Methods

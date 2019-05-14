@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 
 
-namespace OY.TotalCommander.TcPluginBase.QuickSearch {
+namespace TcPluginBase.QuickSearch {
     public class QuickSearchPlugin : TcPlugin, IQuickSearchPlugin {
         #region Constructors
 

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using OY.TotalCommander.TcPluginBase;
 
 
-namespace OY.TotalCommander.TcPluginTools {
+namespace TcPluginBase.Tools {
     internal partial class ErrorDialog : Form {
         private ErrorDialog()
         {

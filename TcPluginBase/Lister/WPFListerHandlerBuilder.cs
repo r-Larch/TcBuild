@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xaml;
 // Integration with WinForms
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
@@ -9,7 +8,7 @@ using System.Windows.Input;
 using WPFUserControl = System.Windows.Controls.UserControl;
 
 
-namespace OY.TotalCommander.TcPluginBase.Lister {
+namespace TcPluginBase.Lister {
     public class WPFListerHandlerBuilder : IListerHandlerBuilder {
         public ListerPlugin Plugin { get; set; }
 
@@ -26,7 +25,7 @@ namespace OY.TotalCommander.TcPluginBase.Lister {
         };
 
         private static readonly List<Key> SentToParentCtrlKeys = new List<Key>() {
-            Key.P //, Key.A, Key.C, 
+            Key.P //, Key.A, Key.C,
         };
 
         private void wpfControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

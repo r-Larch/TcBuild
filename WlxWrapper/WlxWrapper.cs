@@ -2,24 +2,23 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using LarchSys.Core;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.Lister;
-using OY.TotalCommander.TcPluginTools;
+using TcPluginBase;
+using TcPluginBase.Lister;
+using TcPluginBase.Tools;
 
 
-namespace OY.TotalCommander.WlxWrapper {
+namespace WlxWrapper {
     public class ListerWrapper {
         static ListerWrapper()
         {
             AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(ListerWrapper).Assembly.Location).AssemblyResolve;
         }
 
-        private static ListerPlugin _plugin;
+
         private static string _callSignature;
+        private static ListerPlugin _plugin;
+        private static ListerPlugin Plugin => _plugin ?? (_plugin = (ListerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.Lister));
 
-
-        private static ListerPlugin Plugin => _plugin ?? (_plugin = (ListerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.Lister));
 
         private static IListerHandlerBuilder ListerHandlerBuilder => GetListerHandlerBuilder(Plugin);
 

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.Content {
+namespace TcPluginBase.Content {
     [Serializable]
     public class ContentProgressEventArgs : PluginEventArgs {
         #region Properties

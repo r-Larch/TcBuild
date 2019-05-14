@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Specialized;
-using System.Globalization;
+﻿using System.Collections.Specialized;
 
 
-namespace OY.TotalCommander.TcPluginBase.Content {
+namespace TcPluginBase.Content {
     public class ContentPlugin : TcPlugin, IContentPlugin {
         public virtual string DetectString { get; set; }
         public override string TraceTitle => Title;

@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.Packer {
+namespace TcPluginBase.Packer {
     // Enumerations below are managed wrappers for corresponding integer flags discribed in 
     // TC "WCX Writer's Reference" (see "Packer extensions" -> "Interface description" on www.ghisler.com/plugins.htm) 
 

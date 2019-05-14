@@ -1,10 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Security.Permissions;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     [Serializable]
     [ComVisible(true)]
     public class MethodNotSupportedException : Exception {

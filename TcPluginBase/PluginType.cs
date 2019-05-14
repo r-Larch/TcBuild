@@ -1,7 +1,7 @@
 using System;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     [Serializable]
     public enum PluginType {
         Content,

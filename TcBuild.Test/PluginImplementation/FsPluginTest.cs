@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.FileSystem;
+using TcPluginBase;
+using TcPluginBase.FileSystem;
 
 
 namespace TcBuild.Test.PluginImplementation {

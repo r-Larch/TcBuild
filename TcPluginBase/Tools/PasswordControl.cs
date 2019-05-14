@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Windows.Forms;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.FileSystem;
-using OY.TotalCommander.TcPluginBase.Packer;
+using TcPluginBase.FileSystem;
+using TcPluginBase.Packer;
 
 
-namespace OY.TotalCommander.TcPluginTools {
+namespace TcPluginBase.Tools {
     public partial class PasswordControl : UserControl {
         public string Password {
             get => txtPassword.Text;

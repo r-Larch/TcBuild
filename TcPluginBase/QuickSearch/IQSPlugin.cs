@@ -1,4 +1,4 @@
-namespace OY.TotalCommander.TcPluginBase.QuickSearch {
+namespace TcPluginBase.QuickSearch {
     public interface IQuickSearchPlugin {
         #region Mandatory Methods
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 
-namespace OY.TotalCommander.TcPluginBase.Lister {
+namespace TcPluginBase.Lister {
     [Serializable]
     public class WFListerHandlerBuilder : IListerHandlerBuilder {
         public ListerPlugin Plugin { get; set; }

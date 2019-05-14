@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     public static class TcTrace {
 #if TRACE
         public const string TraceDateTimeFormat = "MM/dd/yy HH:mm:ss.fff ";

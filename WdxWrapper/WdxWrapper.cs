@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using LarchSys.Core;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.Content;
-using OY.TotalCommander.TcPluginTools;
+using TcPluginBase;
+using TcPluginBase.Content;
+using TcPluginBase.Tools;
 
 
-namespace OY.TotalCommander.WdxWrapper {
+namespace WdxWrapper {
     public class ContentWrapper {
         static ContentWrapper()
         {
@@ -17,7 +15,7 @@ namespace OY.TotalCommander.WdxWrapper {
 
         private static string _callSignature;
         private static ContentPlugin _plugin;
-        private static ContentPlugin Plugin => _plugin ?? (_plugin = (ContentPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.Content));
+        private static ContentPlugin Plugin => _plugin ?? (_plugin = (ContentPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.Content));
 
 
         private ContentWrapper()

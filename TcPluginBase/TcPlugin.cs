@@ -7,7 +7,7 @@ using System.Security.Permissions;
 using System.Threading;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     [Serializable]
     public class TcPlugin : MarshalByRefObject {
         protected static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);

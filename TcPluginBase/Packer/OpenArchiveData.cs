@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase.Packer {
+namespace TcPluginBase.Packer {
     // Used as parameter type for OpenArchive method
     [Serializable]
     public class OpenArchiveData {

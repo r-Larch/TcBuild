@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 
 
-namespace LarchSys.Core {
+namespace TcPluginBase.Tools {
     public class RelativeAssemblyResolver {
         private readonly IEnumerable<FileInfo> _dlls;
 

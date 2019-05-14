@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.FileSystem {
+namespace TcPluginBase.FileSystem {
     [Serializable]
     public class LogEventArgs : PluginEventArgs {
         #region Properties

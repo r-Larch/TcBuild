@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.QuickSearch {
+namespace TcPluginBase.QuickSearch {
     // Enumerations below are managed wrappers for corresponding integer flags used in 
     // QuickSearch "plugin" (tcmatch.dll) 
 

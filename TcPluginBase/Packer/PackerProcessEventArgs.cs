@@ -1,7 +1,7 @@
 ﻿using System;
 
 
-namespace OY.TotalCommander.TcPluginBase.Packer {
+namespace TcPluginBase.Packer {
     [Serializable]
     public class PackerProcessEventArgs : PluginEventArgs {
         #region Properties

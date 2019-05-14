@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 
 
-namespace OY.TotalCommander.TcPluginBase.Lister {
+namespace TcPluginBase.Lister {
     public class ListerPlugin : TcPlugin, IListerPlugin {
         #region Constants
 

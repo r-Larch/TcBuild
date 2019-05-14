@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using OY.TotalCommander.TcPluginBase;
+using TcPluginBase;
 using Xunit;
 using Xunit.Abstractions;
 

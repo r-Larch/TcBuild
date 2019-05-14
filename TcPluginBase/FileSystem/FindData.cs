@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 
-namespace OY.TotalCommander.TcPluginBase.FileSystem {
+namespace TcPluginBase.FileSystem {
     // Used as parameter type for FindFirst and FindNext methods
     [CLSCompliant(false)]
     [Serializable]

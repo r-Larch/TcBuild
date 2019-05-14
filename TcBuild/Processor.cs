@@ -7,8 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using LarchSys.Core;
-using OY.TotalCommander.TcPluginBase;
+using TcPluginBase;
+using TcPluginBase.Tools;
 using Task = System.Threading.Tasks.Task;
 
 
@@ -213,11 +213,11 @@ namespace TcBuild {
 
 
         private readonly Dictionary<PluginType, Type> Wrapper = new Dictionary<PluginType, Type> {
-            {PluginType.Content, typeof(OY.TotalCommander.WdxWrapper.ContentWrapper)},
-            {PluginType.FileSystem, typeof(OY.TotalCommander.WfxWrapper.FsWrapper)},
-            {PluginType.Lister, typeof(OY.TotalCommander.WlxWrapper.ListerWrapper)},
-            {PluginType.Packer, typeof(OY.TotalCommander.WcxWrapper.PackerWrapper)},
-            {PluginType.QuickSearch, typeof(OY.TotalCommander.QSWrapper.QuickSearchWrapper)}
+            {PluginType.Content, typeof(WdxWrapper.ContentWrapper)},
+            {PluginType.FileSystem, typeof(WfxWrapper.FsWrapper)},
+            {PluginType.Lister, typeof(WlxWrapper.ListerWrapper)},
+            {PluginType.Packer, typeof(WcxWrapper.PackerWrapper)},
+            {PluginType.QuickSearch, typeof(QSWrapper.QuickSearchWrapper)}
         };
 
 

@@ -1,8 +1,7 @@
-using System;
 using System.Drawing;
 
 
-namespace OY.TotalCommander.TcPluginBase.Lister {
+namespace TcPluginBase.Lister {
     public interface IListerPlugin {
         #region Mandatory Methods
 

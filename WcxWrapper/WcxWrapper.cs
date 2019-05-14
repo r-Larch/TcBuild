@@ -3,31 +3,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using LarchSys.Core;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.Packer;
-using OY.TotalCommander.TcPluginTools;
+using TcPluginBase;
+using TcPluginBase.Packer;
+using TcPluginBase.Tools;
 
 
-namespace OY.TotalCommander.WcxWrapper {
+namespace WcxWrapper {
     public class PackerWrapper {
         static PackerWrapper()
         {
             AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(PackerWrapper).Assembly.Location).AssemblyResolve;
         }
 
-        #region Variables
 
-        private static PackerPlugin _plugin;
         private static string _callSignature;
+        private static PackerPlugin _plugin;
+        private static PackerPlugin Plugin => _plugin ?? (_plugin = (PackerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.Packer));
 
-        #endregion Variables
-
-        #region Properties
-
-        private static PackerPlugin Plugin => _plugin ?? (_plugin = (PackerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.Packer));
-
-        #endregion Properties
 
         private PackerWrapper()
         {

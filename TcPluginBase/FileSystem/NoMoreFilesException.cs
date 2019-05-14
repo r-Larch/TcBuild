@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
 
-namespace OY.TotalCommander.TcPluginBase.FileSystem {
+namespace TcPluginBase.FileSystem {
     [Serializable]
     [ComVisible(true)]
     public class NoMoreFilesException : Exception {

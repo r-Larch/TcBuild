@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     // see help for CA1060
     [CLSCompliant(false)]
     public static class NativeMethods {

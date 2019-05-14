@@ -1,4 +1,4 @@
-﻿namespace OY.TotalCommander.TcPluginBase {
+﻿namespace TcPluginBase {
     public enum CryptResult {
         OK = 0, // Success.
         PasswordNotFound, // Password not found in password store.

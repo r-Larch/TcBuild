@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 
 
-namespace OY.TotalCommander.TcPluginBase.Packer {
+namespace TcPluginBase.Packer {
     public class PackerPlugin : TcPlugin, IPackerPlugin {
         #region Properties
 

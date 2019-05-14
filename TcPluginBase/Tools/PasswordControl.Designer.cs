@@ -1,4 +1,4 @@
-﻿namespace OY.TotalCommander.TcPluginTools
+﻿namespace TcPluginBase.Tools
 {
     partial class PasswordControl
     {

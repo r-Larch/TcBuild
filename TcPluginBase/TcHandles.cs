@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     internal class RefCountObject {
         public object Obj { get; private set; }
         public int RefCount { get; private set; }

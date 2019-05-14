@@ -1,15 +1,12 @@
 ﻿using System;
-#if TRACE
 using System.Diagnostics;
-#endif
 using System.Runtime.InteropServices;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.Content;
-using OY.TotalCommander.TcPluginBase.FileSystem;
-using OY.TotalCommander.TcPluginBase.Packer;
+using TcPluginBase.Content;
+using TcPluginBase.FileSystem;
+using TcPluginBase.Packer;
 
 
-namespace OY.TotalCommander.TcPluginTools {
+namespace TcPluginBase.Tools {
     public static class TcCallback {
         #region Constants
 
@@ -26,8 +23,6 @@ namespace OY.TotalCommander.TcPluginTools {
         #region Variables
 
 #if TRACE
-        //private static bool writeTrace;
-
         // to trace Progress callback
         const int ProgressTraceChunk = 25;
         private static int prevPercDone = -ProgressTraceChunk - 1;
@@ -37,46 +32,6 @@ namespace OY.TotalCommander.TcPluginTools {
 
 
         #region Main Handler
-
-//        // This handler is called in main AppDomain
-//        public static void TcPluginCallbackHandler()
-//        {
-//            var domain = AppDomain.CurrentDomain;
-//            string pluginId;
-//            try {
-//                pluginId = (string) domain.GetData(PluginCallbackDataName);
-//            }
-//            finally {
-//                domain.SetData(PluginCallbackDataName, null);
-//            }
-
-//            var tp = TcPluginLoader.GetTcPluginById(pluginId);
-//            if (tp == null) {
-//                throw new InvalidOperationException("Callback: Plugin not found.");
-//            }
-
-//            if (!domain.Equals(tp.MainDomain)) {
-//                throw new InvalidOperationException("Callback: Domain error.");
-//            }
-//#if TRACE
-//            writeTrace = tp.WriteTrace;
-//#endif
-//            var callbackDataBufferName = tp.DataBufferName;
-//            try {
-//                var o = domain.GetData(callbackDataBufferName);
-//                if (!(o is PluginEventArgs)) {
-//                    throw new ArgumentException("Callback: Wrong argument.");
-//                }
-
-//                HandleTcPluginEvent(tp, o as PluginEventArgs);
-//            }
-//            finally {
-//#if TRACE
-//                writeTrace = false;
-//#endif
-//            }
-//        }
-
 
         public static void HandleTcPluginEvent(object sender, PluginEventArgs e)
         {
@@ -357,7 +312,7 @@ namespace OY.TotalCommander.TcPluginTools {
                         : fsCryptCallback(e.PluginNumber, e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen);
                 }
 
-                // tracing                    
+                // tracing
 #if TRACE
                 var traceStr = $"OnCrypt ({e.PluginNumber}, {e.CryptoNumber}, {e.Mode}): {e.StoreName}";
 #endif
@@ -371,7 +326,7 @@ namespace OY.TotalCommander.TcPluginTools {
                 else
                     e.Password = string.Empty;
 
-                // tracing                    
+                // tracing
 #if TRACE
                 TraceOut(TraceLevel.Info, $"{traceStr} - {((CryptResult) e.Result).ToString()}.", Callback);
 #endif

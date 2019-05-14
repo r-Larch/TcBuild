@@ -4,14 +4,13 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
-using LarchSys.Core;
-using OY.TotalCommander.TcPluginBase;
-using OY.TotalCommander.TcPluginBase.Content;
-using OY.TotalCommander.TcPluginBase.FileSystem;
-using OY.TotalCommander.TcPluginTools;
+using TcPluginBase;
+using TcPluginBase.Content;
+using TcPluginBase.FileSystem;
+using TcPluginBase.Tools;
 
 
-namespace OY.TotalCommander.WfxWrapper {
+namespace WfxWrapper {
     public class FsWrapper {
         static FsWrapper()
         {
@@ -31,7 +30,7 @@ namespace OY.TotalCommander.WfxWrapper {
         private static FsPlugin Plugin {
             get {
                 if (_plugin == null) {
-                    _plugin = (FsPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.FileSystem);
+                    _plugin = (FsPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder), PluginType.FileSystem);
                     _unloaded = (_plugin == null);
                 }
 
@@ -283,7 +282,7 @@ namespace OY.TotalCommander.WfxWrapper {
 
         #region FsGetFile
 
-        [DllExport(EntryPoint = "FsGetFile"), SecurityPermissionAttribute(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [DllExport(EntryPoint = "FsGetFile"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static int GetFile([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
         {
             var locName = Marshal.PtrToStringAnsi(localName);
@@ -596,7 +595,7 @@ namespace OY.TotalCommander.WfxWrapper {
 
         #region FsSetTime
 
-        [DllExport(EntryPoint = "FsSetTime"), SecurityPermissionAttribute(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [DllExport(EntryPoint = "FsSetTime"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool SetTime([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
         {
@@ -698,7 +697,7 @@ namespace OY.TotalCommander.WfxWrapper {
         #region FsExtractCustomIcon
 
         [DllExport(EntryPoint = "FsExtractCustomIcon")]
-        [SecurityPermissionAttribute(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static int ExtractCustomIcon(IntPtr remoteName, int extractFlags, IntPtr theIcon)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);

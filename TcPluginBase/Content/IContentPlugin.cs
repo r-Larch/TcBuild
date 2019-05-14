@@ -1,4 +1,4 @@
-﻿namespace OY.TotalCommander.TcPluginBase.Content {
+﻿namespace TcPluginBase.Content {
     public interface IContentPlugin {
         #region Mandatory Methods
 

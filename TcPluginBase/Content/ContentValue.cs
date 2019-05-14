@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase.Content {
+namespace TcPluginBase.Content {
     [Serializable]
     public class ContentValue {
         private bool changed;

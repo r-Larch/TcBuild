@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase {
+namespace TcPluginBase {
     // This structure is used in SetDefaultParams method (all TC plugins)
     [Serializable]
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

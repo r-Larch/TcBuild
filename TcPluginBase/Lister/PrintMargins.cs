@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace OY.TotalCommander.TcPluginBase.Lister {
+namespace TcPluginBase.Lister {
     // Used as parameter type for Print method
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
