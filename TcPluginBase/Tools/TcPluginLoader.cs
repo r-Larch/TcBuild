@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 
@@ -23,9 +24,23 @@ namespace TcPluginBase.Tools {
             var types = typeof(TPlugin).GetInterfaces().Select(_ => _.Name);
             TcTrace.TraceOut(TraceLevel.Warning, $"[{name}]{pluginClass.FullName}", $"{string.Join(",", types)} plugin load");
 
+            var settings = GetSettings();
+
             var ctor = pluginClass.GetConstructor(new[] {typeof(StringDictionary)});
-            var tcPlugin = (TPlugin) ctor.Invoke(new object[] {new StringDictionary()});
+            var tcPlugin = (TPlugin) ctor.Invoke(new object[] {settings});
             return tcPlugin;
+        }
+
+
+        private static StringDictionary GetSettings()
+        {
+            var settings = new StringDictionary();
+            var appSettings = ConfigurationManager.AppSettings;
+            foreach (var key in appSettings.AllKeys) {
+                settings.Add(key, appSettings[key]);
+            }
+
+            return settings;
         }
 
 
@@ -36,7 +51,7 @@ namespace TcPluginBase.Tools {
             TcTrace.TraceError($"{callSignature}: {ex.Message}", pluginTitle);
 #endif
             if (plugin == null || plugin.ShowErrorDialog) {
-                ErrorDialog.Show(callSignature, ex /*, plugin?.MainWindowHandle ?? default*/);
+                ErrorDialog.Show(callSignature, ex);
             }
 
             // TODO: add - unload plugin AppDomain on critical error (configurable)

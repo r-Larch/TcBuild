@@ -25,12 +25,11 @@ namespace WlxWrapper {
         private static IListerHandlerBuilder GetListerHandlerBuilder(ListerPlugin listerPlugin)
         {
             try {
-                var guiType = listerPlugin.Settings["guiType"];
-                if (string.IsNullOrEmpty(guiType) || guiType == ListerPlugin.WFListerHandlerBuilderName) {
+                var guiType = listerPlugin.GuiType;
+                if (guiType == GuiType.WinForms) {
                     return new WFListerHandlerBuilder {Plugin = listerPlugin};
                 }
-
-                if (guiType == ListerPlugin.WPFListerHandlerBuilderName) {
+                else {
                     return new WPFListerHandlerBuilder {Plugin = listerPlugin};
                 }
             }

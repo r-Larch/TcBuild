@@ -11,14 +11,9 @@ namespace TcPluginBase.Tools {
             InitializeComponent();
         }
 
-        public static void Show(string callSignature, Exception ex /*, IntPtr parentHWnd = default*/)
+        public static void Show(string callSignature, Exception ex)
         {
             using (var dialog = new ErrorDialog()) {
-                // setParent just causes problems
-                //if (parentHWnd != IntPtr.Zero) {
-                //    NativeMethods.SetParent(dialog.Handle, parentHWnd);
-                //}
-
                 if (!string.IsNullOrEmpty(callSignature)) {
                     dialog.lblException.Text = callSignature;
                 }

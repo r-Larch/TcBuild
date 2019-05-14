@@ -10,47 +10,34 @@ using System.Threading;
 namespace TcPluginBase {
     [Serializable]
     public class TcPlugin : MarshalByRefObject {
-        protected static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-        public PluginDefaultParams DefaultParams { get; set; }
-
-        private IntPtr _mainWindowHandle = IntPtr.Zero;
-        public IntPtr MainWindowHandle {
-            get => _mainWindowHandle;
-            set {
-                if (_mainWindowHandle == IntPtr.Zero) {
-                    _mainWindowHandle = value;
-                }
-            }
-        }
-
-        public TcPlugin MasterPlugin { get; set; }
-        public int PluginNumber { get; set; }
+        public int PluginNumber { get; internal set; }
+        public PluginDefaultParams DefaultParams { get; internal set; }
 
         public string Title { get; set; }
-        public virtual string TraceTitle => MasterPlugin == null ? Title : MasterPlugin.TraceTitle;
-
-        public StringDictionary Settings { get; private set; }
-
-        public bool WriteTrace { get; private set; }
+        public virtual string TraceTitle => Title;
+        public ILogger Log { get; set; }
+        public bool WriteTrace { get; set; }
         public bool ShowErrorDialog { get; set; }
 
         private readonly int _mainThreadId;
         protected bool IsBackgroundThread => Thread.CurrentThread.ManagedThreadId != _mainThreadId;
-        protected string PluginFolder { get; private set; }
-
+        protected static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+        protected string PluginFolder { get; }
 
         public TcPlugin(StringDictionary pluginSettings = null)
         {
             PluginNumber = -1;
             _mainThreadId = Thread.CurrentThread.ManagedThreadId;
+
+            PluginFolder = new FileInfo(GetType().Assembly.Location).DirectoryName;
+
             if (pluginSettings != null) {
-                Settings = pluginSettings;
-                PluginFolder = pluginSettings["pluginFolder"];
                 Title = pluginSettings["pluginTitle"];
                 ShowErrorDialog = !Convert.ToBoolean(pluginSettings["hideErrorDialog"]);
                 WriteTrace = Convert.ToBoolean(pluginSettings["writeTrace"]);
             }
+
+            Log = new Logger(TraceTitle);
         }
 
 
@@ -70,14 +57,14 @@ namespace TcPluginBase {
 
         #endregion
 
+
         #region Plugin Event Handler
 
         public event EventHandler<PluginEventArgs> TcPluginEventHandler;
 
         public virtual int OnTcPluginEvent(PluginEventArgs e)
         {
-            var handler = TcPluginEventHandler;
-            handler?.Invoke(this, e);
+            TcPluginEventHandler?.Invoke(this, e);
             return e.Result;
         }
 
@@ -86,20 +73,11 @@ namespace TcPluginBase {
 
         #region Other Methods
 
-        //public virtual void CreatePassword(int cryptoNumber, int flags)
-        //{
-        //    Password = null;
-        //}
-
         //protected void SetPluginFolder(string folderKey, string defaultFolder)
         //{
-        //    var folderName = Settings.ContainsKey(folderKey) ? Settings[folderKey] : defaultFolder;
-        //    if (!string.IsNullOrEmpty(folderName)) {
-        //        folderName = folderName
+        //        folder = folder
         //            .Replace("%TC%", TcFolder)
         //            .Replace("%PLUGIN%", PluginFolder);
-        //        Settings[folderKey] = folderName;
-        //    }
         //}
 
         #endregion Other Methods

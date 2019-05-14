@@ -94,7 +94,7 @@ namespace TcPluginBase.FileSystem {
 
     // Used as parameter type for RequestProc callback method
     public enum RequestType {
-        DomainInfo = -1, // !!! Used for .NET interface only !!!
+        //DomainInfo = -1, // !!! Used for .NET interface only !!!
         // Asks information about .NET application domains in current TC process
         // and assemblies loaded to them. Can be used for debugging.
 
@@ -106,6 +106,8 @@ namespace TcPluginBase.FileSystem {
         PasswordFirewall, // Asks for a Password for a firewall.
         TargetDir, // Asks for a Local Directory (with browse button).
         Url, // Asks for an URL.
+
+        // no ReturnedText
         MsgOk, // Shows MessageBox with OK button.
         MsgYesNo, // Shows MessageBox with Yes/No buttons.
         MsgOkCancel // Shows MessageBox with OK/Cancel buttons.

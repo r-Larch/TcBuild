@@ -166,7 +166,7 @@ namespace TcPluginBase.Tools {
                         e.Result = requestCallback(e.PluginNumber, e.RequestType, e.CustomTitle, e.CustomText, retText, e.MaxLen) ? 1 : 0;
                     }
 #if TRACE
-                    var traceStr = $"OnRequest ({e.PluginNumber}, {((RequestType) e.RequestType).ToString()}): {e.ReturnedText}";
+                    var traceStr = $"OnRequest ({e.PluginNumber}, {(RequestType) e.RequestType}): {e.ReturnedText}";
 #endif
                     if (e.Result != 0 && retText != IntPtr.Zero) {
                         e.ReturnedText = (requestCallbackW != null) ? Marshal.PtrToStringUni(retText) : Marshal.PtrToStringAnsi(retText);

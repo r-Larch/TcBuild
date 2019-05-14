@@ -253,7 +253,7 @@ namespace TcBuild {
             exportedMethods = exportedMethods.Where(_ => !methodsToRemoveFromWrapper.Contains(_.ExportName)).ToArray();
 
             var wrapper = GetMsilFile(wrapperType.Assembly.Location, cache: false, il => il
-                .Replace("[TcPluginBase]OY.TotalCommander.TcPluginBase.PluginClassPlaceholder", $"[{pluginAssemblyName}]{pluginClass}")
+                .Replace("[TcPluginBase]TcPluginBase.PluginClassPlaceholder", $"[{pluginAssemblyName}]{pluginClass}")
                 .Replace("[TcPluginBase]", "")
             );
 

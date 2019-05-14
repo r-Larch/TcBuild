@@ -5,12 +5,18 @@ using System.Drawing;
 
 
 namespace TcPluginBase.Lister {
+    public enum GuiType {
+        WinForms = 0,
+        WPF
+    }
+
     public class ListerPlugin : TcPlugin, IListerPlugin {
         #region Constants
 
         // Lister handler builder load
-        public const string WFListerHandlerBuilderName = "WinForms";
-        public const string WPFListerHandlerBuilderName = "WPF";
+        //public const string WFListerHandlerBuilderName = "WinForms";
+        //public const string WPFListerHandlerBuilderName = "WPF";
+        public GuiType GuiType = GuiType.WinForms;
 
         #endregion Constants
 
@@ -158,7 +164,6 @@ namespace TcPluginBase.Lister {
 #if TRACE
                 if (WriteTrace) {
                     TcTrace.TraceOut(TraceLevel.Info, $"  << Callback: ({ListerHandle}) {message.ToString()} = {value}", null);
-
                 }
 #endif
             }
