@@ -39,7 +39,7 @@ namespace OY.TotalCommander.TcPluginTools {
             pluginSettings["pluginFolder"] = Path.GetDirectoryName(assemblyFile);
             TraceOut($"Plugin: {assembly.FullName}.", "Start");
 
-            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(assemblyFile).AssemblyResolve;
+            //AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(assemblyFile).AssemblyResolve;
 
             var className = pluginSettings["pluginClass"]
                             ?? GetClassName(assembly, pluginType)

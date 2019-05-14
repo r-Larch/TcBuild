@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Runtime.InteropServices;
+using LarchSys.Core;
 using OY.TotalCommander.TcPluginBase;
 using OY.TotalCommander.TcPluginBase.Lister;
 using OY.TotalCommander.TcPluginTools;
@@ -10,11 +10,16 @@ using OY.TotalCommander.TcPluginTools;
 
 namespace OY.TotalCommander.WlxWrapper {
     public class ListerWrapper {
+        static ListerWrapper()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(ListerWrapper).Assembly.Location).AssemblyResolve;
+        }
+
         private static ListerPlugin _plugin;
         private static string _callSignature;
 
 
-        private static ListerPlugin Plugin => _plugin ?? (_plugin = (ListerPlugin) TcPluginLoader.GetTcPlugin(Assembly.GetExecutingAssembly().GetName(), PluginType.Lister));
+        private static ListerPlugin Plugin => _plugin ?? (_plugin = (ListerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.Lister));
 
         private static IListerHandlerBuilder ListerHandlerBuilder => GetListerHandlerBuilder(Plugin);
 

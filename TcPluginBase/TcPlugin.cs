@@ -10,9 +10,7 @@ using System.Threading;
 namespace OY.TotalCommander.TcPluginBase {
     [Serializable]
     public class TcPlugin : MarshalByRefObject {
-        private static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-        public string DataBufferName { get; private set; }
+        protected static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
         public PluginDefaultParams DefaultParams { get; set; }
 
@@ -27,7 +25,6 @@ namespace OY.TotalCommander.TcPluginBase {
         }
 
         public TcPlugin MasterPlugin { get; set; }
-        //public string PluginId { get; private set; }
         public int PluginNumber { get; set; }
 
         public string Title { get; set; }
@@ -46,8 +43,6 @@ namespace OY.TotalCommander.TcPluginBase {
 
         public TcPlugin(StringDictionary pluginSettings = null)
         {
-            //PluginId = Guid.NewGuid().ToString();
-            //DataBufferName = Guid.NewGuid().ToString();
             PluginNumber = -1;
             _mainThreadId = Thread.CurrentThread.ManagedThreadId;
             if (pluginSettings != null) {
@@ -122,16 +117,16 @@ namespace OY.TotalCommander.TcPluginBase {
             Password = null;
         }
 
-        protected void SetPluginFolder(string folderKey, string defaultFolder)
-        {
-            var folderName = Settings.ContainsKey(folderKey) ? Settings[folderKey] : defaultFolder;
-            if (!string.IsNullOrEmpty(folderName)) {
-                folderName = folderName
-                    .Replace("%TC%", TcFolder)
-                    .Replace("%PLUGIN%", PluginFolder);
-                Settings[folderKey] = folderName;
-            }
-        }
+        //protected void SetPluginFolder(string folderKey, string defaultFolder)
+        //{
+        //    var folderName = Settings.ContainsKey(folderKey) ? Settings[folderKey] : defaultFolder;
+        //    if (!string.IsNullOrEmpty(folderName)) {
+        //        folderName = folderName
+        //            .Replace("%TC%", TcFolder)
+        //            .Replace("%PLUGIN%", PluginFolder);
+        //        Settings[folderKey] = folderName;
+        //    }
+        //}
 
         #endregion Other Methods
     }

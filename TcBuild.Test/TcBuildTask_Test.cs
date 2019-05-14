@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using OY.TotalCommander.TcPluginBase;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -40,7 +41,8 @@ namespace TcBuild.Test {
                 var task = new TcBuildTask {
                     Configuration = "Debug",
                     AssemblyFile = assemblyFile.FullName,
-                    TargetFile = assemblyFile.FullName,
+                    //TargetFile = assemblyFile.FullName,
+                    TcPluginBase = typeof(DllExportAttribute).Assembly.Location,
                     IntermediateDirectory = outDir.FullName,
                     ProjectDirectory = "/ignored",
                     ReferenceCopyLocalFiles = AppDomain.CurrentDomain.GetAssemblies().Select(_ => new TaskItem(_.Location)).Cast<ITaskItem>().ToArray(),
@@ -72,7 +74,7 @@ namespace TcBuild.Test {
             finally {
                 try {
                     cacheDir.Delete(true);
-                    outDir.Delete(true);
+                    //outDir.Delete(true);
                 }
                 catch {
                     // ignore

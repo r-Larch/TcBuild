@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
+using LarchSys.Core;
 using OY.TotalCommander.TcPluginBase;
 using OY.TotalCommander.TcPluginBase.Packer;
 using OY.TotalCommander.TcPluginTools;
@@ -11,6 +11,11 @@ using OY.TotalCommander.TcPluginTools;
 
 namespace OY.TotalCommander.WcxWrapper {
     public class PackerWrapper {
+        static PackerWrapper()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(PackerWrapper).Assembly.Location).AssemblyResolve;
+        }
+
         #region Variables
 
         private static PackerPlugin _plugin;
@@ -20,7 +25,7 @@ namespace OY.TotalCommander.WcxWrapper {
 
         #region Properties
 
-        private static PackerPlugin Plugin => _plugin ?? (_plugin = (PackerPlugin) TcPluginLoader.GetTcPlugin(Assembly.GetExecutingAssembly().GetName(), PluginType.Packer));
+        private static PackerPlugin Plugin => _plugin ?? (_plugin = (PackerPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.Packer));
 
         #endregion Properties
 

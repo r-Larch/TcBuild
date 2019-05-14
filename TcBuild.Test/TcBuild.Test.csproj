@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
@@ -11,8 +11,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-
-    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="None" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,13 +21,5 @@
   <ItemGroup>
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <TcPluginBase>$(TargetDir)TcPluginBase.dll</TcPluginBase>
-  </PropertyGroup>
-  <Target Name="ILRepack" AfterTargets="Build">
-    <!-- merges the TcPluginBase.dll into the Target-dll -->
-    <ILRepack OutputType="$(OutputType)" MainAssembly="$(TargetPath)" OutputAssembly="$(TargetPath)" InputAssemblies="$(TargetPath);$(TcPluginBase)" WorkingDirectory="$(TargetDir)" Internalize="false" />
-  </Target>
 
 </Project>

@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
+using LarchSys.Core;
 using OY.TotalCommander.TcPluginBase;
 using OY.TotalCommander.TcPluginBase.Content;
 using OY.TotalCommander.TcPluginBase.FileSystem;
@@ -13,6 +13,11 @@ using OY.TotalCommander.TcPluginTools;
 
 namespace OY.TotalCommander.WfxWrapper {
     public class FsWrapper {
+        static FsWrapper()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(FsWrapper).Assembly.Location).AssemblyResolve;
+        }
+
         #region Variables
 
         private static FsPlugin _plugin;
@@ -26,7 +31,7 @@ namespace OY.TotalCommander.WfxWrapper {
         private static FsPlugin Plugin {
             get {
                 if (_plugin == null) {
-                    _plugin = (FsPlugin) TcPluginLoader.GetTcPlugin(Assembly.GetExecutingAssembly().GetName(), PluginType.FileSystem);
+                    _plugin = (FsPlugin) TcPluginLoader.GetTcPlugin(typeof(PluginClassPlaceholder).Assembly.GetName(), PluginType.FileSystem);
                     _unloaded = (_plugin == null);
                 }
 
@@ -46,16 +51,16 @@ namespace OY.TotalCommander.WfxWrapper {
 
         //Order of TC calls to FS Plugin methods (before first call to FsFindFirst(W)):
         // - FsGetDefRootName (Is called once, when user installs the plugin in Total Commander)
-        // - FsContentGetSupportedField - can be called before FsInit if custom columns set is determined 
-        //                                and plugin panel is visible 
+        // - FsContentGetSupportedField - can be called before FsInit if custom columns set is determined
+        //                                and plugin panel is visible
         // - FsInit
         // - FsInitW
         // - FsSetDefaultParams
         // - FsSetCryptCallbackW
         // - FsSetCryptCallback
         // - FsExecuteFile(W) (with verb = "MODE I")
-        // - FsContentGetDefaultView(W) - can be called here if custom column set is not determined 
-        //                                and plugin panel is visible 
+        // - FsContentGetDefaultView(W) - can be called here if custom column set is not determined
+        //                                and plugin panel is visible
         // - first call to file list cycle:
         //     FsFindFirst - FsFindNext - FsFindClose
         // - FsLinksToLocalFiles
@@ -268,6 +273,7 @@ namespace OY.TotalCommander.WfxWrapper {
                 TraceCall(TraceLevel.Warning, Plugin.Title);
             }
             catch (Exception ex) {
+                TcUtils.WriteStringAnsi(ex.Message, rootName, maxLen);
                 ProcessException(ex);
             }
         }
@@ -723,7 +729,7 @@ namespace OY.TotalCommander.WfxWrapper {
         public static ExtractIconResult ExtractIconInternal(ref string remoteName, int extractFlags, IntPtr theIcon)
         {
             const uint imageTypeIcon = 1; //  IMAGE_ICON
-            const uint loadImageFlags = 0x10 + 0x8000; //  LR_LOADFROMFILE | LR_SHARED 
+            const uint loadImageFlags = 0x10 + 0x8000; //  LR_LOADFROMFILE | LR_SHARED
 
             var result = ExtractIconResult.UseDefault;
             var flags = (ExtractIconFlags) extractFlags;
@@ -737,7 +743,7 @@ namespace OY.TotalCommander.WfxWrapper {
                         result = ExtractIconResult.UseDefault;
                     }
                     else {
-                        // use LoadImage, it produces better results than LoadIcon 
+                        // use LoadImage, it produces better results than LoadIcon
                         var extrIcon = (flags & ExtractIconFlags.Small) == ExtractIconFlags.Small
                             ? NativeMethods.LoadImage(IntPtr.Zero, remoteName, imageTypeIcon, 16, 16, loadImageFlags)
                             : NativeMethods.LoadImage(IntPtr.Zero, remoteName, imageTypeIcon, 0, 0, loadImageFlags);

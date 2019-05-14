@@ -14,7 +14,7 @@ namespace TcBuild {
         [Required]
         public string AssemblyFile { get; set; }
         [Required]
-        public string TargetFile { get; set; }
+        public string TcPluginBase { get; set; }
         [Required]
         public string ProjectDirectory { get; set; }
         [Required]
@@ -56,8 +56,8 @@ namespace TcBuild {
             }
 
             var processor = new Processor(_log, tools) {
-                TargetFile = new FileInfo(TargetFile),
                 AssemblyFile = new FileInfo(AssemblyFile),
+                TcPluginBase = new FileInfo(TcPluginBase),
                 IntermediateDirectory = new DirectoryInfo(IntermediateDirectory),
                 CacheDir = cacheDir,
                 ReferenceFiles = ReferenceCopyLocalFiles.Select(_ => new FileInfo(_.ItemSpec)).ToList(),

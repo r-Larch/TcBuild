@@ -5,16 +5,18 @@ using System.Linq;
 
 
 namespace TcBuild {
-    internal class MsilFile {
+    internal class MsilFile : IDisposable {
         private readonly FileInfo _sourceFile;
+        private readonly DirectoryInfo _dir;
 
         private List<CodeBlock> Blocks { get; set; }
         public IEnumerable<ClassBlock> Classes => Blocks.OfType<ClassBlock>();
         public IEnumerable<AssemblyBlock> Assemblies => Blocks.OfType<AssemblyBlock>();
 
-        public MsilFile(FileInfo sourceFile)
+        public MsilFile(FileInfo sourceFile, DirectoryInfo dir = null)
         {
             _sourceFile = sourceFile;
+            _dir = dir;
             Parse();
         }
 
@@ -46,6 +48,12 @@ namespace TcBuild {
         {
             var index = Blocks.FindLastIndex(block => block is ClassBlock);
             Blocks.InsertRange(index + 1, classes);
+        }
+
+        public void AddAssembly(AssemblyBlock assembly)
+        {
+            var index = Blocks.FindLastIndex(block => block is AssemblyBlock);
+            Blocks.Insert(index + 1, assembly);
         }
 
 
@@ -164,14 +172,22 @@ namespace TcBuild {
         }
 
 
-        public void SaveTo(FileInfo file)
+        public FileInfo SaveTo(string fileName)
         {
+            var file = new FileInfo(Path.Combine(_sourceFile.Directory.FullName, fileName));
             using (var fs = file.OpenWrite())
             using (var sw = new StreamWriter(fs)) {
                 foreach (var codeBlock in Blocks) {
                     sw.WriteLine(codeBlock.ToString());
                 }
             }
+
+            return file;
+        }
+
+        public void Dispose()
+        {
+            _dir?.Delete(true);
         }
     }
 

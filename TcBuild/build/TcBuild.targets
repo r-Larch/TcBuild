@@ -13,33 +13,20 @@
 
   <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
 
-
-  <Target Name="ILRepack" AfterTargets="Build">
-    <!-- merges the TcPluginBase.dll into the Target-dll -->
-    <ILRepack
-      OutputType="$(OutputType)"
-      MainAssembly="$(TargetPath)"
-      OutputAssembly="IlRepack-Merged.dll"
-      InputAssemblies="$(TargetPath);$(TcPluginBase)"
-      WorkingDirectory="$(TargetDir)"
-      Internalize="false" />
-  </Target>
-
-
   <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
   <Target
     Name="TcBuildTarget"
     AfterTargets="Build"
     Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true"
-    DependsOnTargets="$(TcBuildDependsOnTargets);ILRepack">
+    DependsOnTargets="$(TcBuildDependsOnTargets)">
 
     <Error Condition="($(MsBuildMajorVersion) &lt; 16) And $([MSBuild]::IsOsPlatform(OSX)) != true"
            Text="TcBuild is only supported on MSBuild 16 and above. Current version: $(MsBuildMajorVersion)." />
 
     <TcBuild.TcBuildTask
       Configuration="$(Configuration)"
-      AssemblyFile="$(TargetDir)IlRepack-Merged.dll"
-      TargetFile="$(TargetPath)"
+      AssemblyFile="$(TargetPath)"
+      TcPluginBase="$(TcPluginBase)"
       IntermediateDirectory="$(TargetDir)"
       ProjectDirectory="$(MSBuildProjectDirectory)"
       ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
