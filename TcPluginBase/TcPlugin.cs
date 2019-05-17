@@ -36,7 +36,7 @@ namespace TcPluginBase {
                 WriteTrace = Convert.ToBoolean(pluginSettings["writeTrace"]);
             }
 
-            Log = new Logger(TraceTitle);
+            Log = new Logger(() => TraceTitle);
         }
 
 

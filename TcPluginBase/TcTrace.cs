@@ -6,13 +6,12 @@ using System.Threading;
 namespace TcPluginBase {
     internal static class TcTrace {
 #if TRACE
-        private const string TraceDateTimeFormat = "MM/dd/yy HH:mm:ss.fff ";
 
         private static readonly TraceSwitch TcPluginTraceSwitch = new TraceSwitch("DotNetPlugins", "All .NET plugins", "Warning");
 
         internal static void TraceError(string text, string pluginTitle)
         {
-            TraceOut(TraceLevel.Error, text, $"ERROR ({pluginTitle})");
+            TraceOut(TraceLevel.Error, text, pluginTitle);
         }
 
         internal static void TraceOut(TraceLevel level, string text, string category)
@@ -33,13 +32,20 @@ namespace TcPluginBase {
                     Trace.IndentLevel--;
                 }
 
-                Trace.WriteLine($"[T{Thread.CurrentThread.ManagedThreadId}] {text}", timeStr + " - " + category);
+                var levelStr = level.ToString()
+                    .Replace("Verbose", "Debug")
+                    .Replace("Warning", "Warn ")
+                    .Replace("Info", "Info ");
+
+                Trace.WriteLine($"[A{AppDomain.CurrentDomain.Id}|T{Thread.CurrentThread.ManagedThreadId}] {text}", timeStr + " - " + levelStr + " - " + category);
 
                 if (indent > 0) {
                     Trace.IndentLevel++;
                 }
             }
         }
+
+        private const string TraceDateTimeFormat = "MM/dd/yy HH:mm:ss.fff ";
 
         private static string GetTraceTimeString()
         {
