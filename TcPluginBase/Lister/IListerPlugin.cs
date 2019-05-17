@@ -5,7 +5,7 @@ namespace TcPluginBase.Lister {
     public interface IListerPlugin {
         #region Mandatory Methods
 
-        //[TcMethod("ListLoad", "ListLoadW")]
+        [TcMethod("ListLoad", "ListLoadW", Mandatory = true)]
         object Load(string fileToLoad, ShowFlags showFlags);
 
         #endregion Mandatory Methods

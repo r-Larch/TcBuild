@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using TcPluginBase.Content;
 
 
@@ -11,36 +13,62 @@ namespace TcPluginBase.FileSystem {
 
         public virtual string RootName { get; set; }
         public override string TraceTitle => Title;
-        public virtual FsBackgroundFlags BackgroundFlags { get; set; } = FsBackgroundFlags.None;
-        public virtual bool IsTempFilePanel { get; set; } = false;
-
-        public bool WriteStatusInfo { get; }
+        public FsBackgroundFlags BackgroundFlags { get; set; } = FsBackgroundFlags.Download | FsBackgroundFlags.Upload;
+        public bool IsTempFilePanel { get; set; }
+        public bool WriteStatusInfo { get; set; }
 
 
         public FsPlugin(Settings pluginSettings) : base(pluginSettings)
         {
-            PluginNumber = -1;
-            //SetPluginFolder("iconFolder", Path.Combine(PluginFolder, "img"));
             WriteStatusInfo = Convert.ToBoolean(pluginSettings["writeStatusInfo"]);
         }
 
-        #region IFsPlugin Members
 
         #region Mandatory Methods
+
+        // TODO use IAsyncEnumerable when C# 8
+        // TODO return new []{ new FindData("..", FileAttributes.Directory) } when path == empty directory
+        [CLSCompliant(false)]
+        public virtual IEnumerable<FindData> GetFiles(string path)
+        {
+            return new FindData[0];
+        }
 
         [CLSCompliant(false)]
         public virtual object FindFirst(string path, out FindData findData)
         {
+            var enumerable = GetFiles(path);
+            if (enumerable != null) {
+                var enumerator = enumerable.GetEnumerator();
+                if (enumerator.MoveNext()) {
+                    findData = enumerator.Current;
+                    return enumerator;
+                }
+            }
+
+            // empty list
             findData = null;
-            return false;
+            return null;
         }
 
         [CLSCompliant(false)]
         public virtual bool FindNext(ref object o, out FindData findData)
         {
+            if (o is IEnumerator<FindData> fsEnum) {
+                if (fsEnum.MoveNext()) {
+                    var current = fsEnum.Current;
+                    if (current != null) {
+                        findData = current;
+                        return true;
+                    }
+                }
+            }
+
+            // end of sequence
             findData = null;
             return false;
         }
+
 
         public virtual int FindClose(object o)
         {
@@ -52,14 +80,100 @@ namespace TcPluginBase.FileSystem {
         #region Optional Methods
 
         [CLSCompliant(false)]
-        public virtual FileSystemExitCode GetFile(string remoteName, ref string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
+        public virtual FileSystemExitCode GetFile(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
         {
-            return FileSystemExitCode.NotSupported;
+            try {
+                // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
+                using (var exec = new ThreadKeeper()) {
+                    void Progress(int percentDone)
+                    {
+                        exec.RunInMainThread(() => {
+                            if (ProgressProc(remoteName, localName, percentDone) == 1) {
+                                exec.Cancel();
+                            }
+                        });
+                    }
+
+                    var ret = exec.ExecAsync(asyncFunc: (token) => GetFileAsync(remoteName, localName, copyFlags, remoteInfo, Progress, token));
+
+                    return ret;
+                }
+            }
+            catch (TaskCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
+            catch (OperationCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
+            catch (AggregateException e) {
+                if (HasCanceledException(e)) {
+                    return FileSystemExitCode.UserAbort;
+                }
+
+                throw;
+            }
         }
 
-        public virtual FileSystemExitCode PutFile(string localName, ref string remoteName, CopyFlags copyFlags)
+
+        public virtual FileSystemExitCode PutFile(string localName, string remoteName, CopyFlags copyFlags)
         {
-            return FileSystemExitCode.NotSupported;
+            try {
+                // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
+                using (var exec = new ThreadKeeper()) {
+                    void Progress(int percentDone)
+                    {
+                        exec.RunInMainThread(() => {
+                            if (ProgressProc(localName, remoteName, percentDone) == 1) {
+                                exec.Cancel();
+                            }
+                        });
+                    }
+
+                    var ret = exec.ExecAsync(asyncFunc: (token) => PutFileAsync(localName, remoteName, copyFlags, Progress, token));
+
+                    return ret;
+                }
+            }
+            catch (TaskCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
+            catch (OperationCanceledException) {
+                return FileSystemExitCode.UserAbort;
+            }
+            catch (AggregateException e) {
+                if (HasCanceledException(e)) {
+                    return FileSystemExitCode.UserAbort;
+                }
+
+                throw;
+            }
+        }
+
+
+        private static bool HasCanceledException(AggregateException e)
+        {
+            foreach (var exception in e.InnerExceptions) {
+                switch (exception) {
+                    case AggregateException agg:
+                        return HasCanceledException(agg);
+                    case TaskCanceledException _:
+                    case OperationCanceledException _:
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        [CLSCompliant(false)]
+        public virtual Task<FileSystemExitCode> GetFileAsync(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
+        {
+            return Task.FromResult(FileSystemExitCode.NotSupported);
+        }
+
+        public virtual Task<FileSystemExitCode> PutFileAsync(string localName, string remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
+        {
+            return Task.FromResult(FileSystemExitCode.NotSupported);
         }
 
         [CLSCompliant(false)]
@@ -154,23 +268,19 @@ namespace TcPluginBase.FileSystem {
 
         #endregion Optional Methods
 
-        #endregion IFsPlugin Members
 
         #region Callback Procedures
 
-        // TODO overwrite with ThreadKeeper
         protected virtual int ProgressProc(string source, string destination, int percentDone)
         {
             return OnTcPluginEvent(new ProgressEventArgs(PluginNumber, source, destination, percentDone));
         }
 
-        // TODO overwrite with ThreadKeeper
         protected virtual void LogProc(LogMsgType msgType, string logText)
         {
             OnTcPluginEvent(new LogEventArgs(PluginNumber, (int) msgType, logText));
         }
 
-        // TODO overwrite with ThreadKeeper
         protected virtual bool RequestProc(RequestType requestType, string customTitle, string customText, ref string returnedText, int maxLen)
         {
             var e = new RequestEventArgs(PluginNumber, (int) requestType, customTitle, customText, returnedText, maxLen);

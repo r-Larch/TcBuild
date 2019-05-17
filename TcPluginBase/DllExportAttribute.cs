@@ -23,6 +23,7 @@ namespace TcPluginBase {
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
     public class TcMethodAttribute : Attribute {
         public string[] MethodNames { get; }
+        public bool Mandatory { get; set; }
 
         public TcMethodAttribute(string method)
         {
@@ -42,6 +43,11 @@ namespace TcPluginBase {
         public TcMethodAttribute(string method1, string method2, string method3, string method4)
         {
             MethodNames = new[] {method1, method2, method3, method4};
+        }
+
+        public TcMethodAttribute(string method1, string method2, string method3, string method4, string method5)
+        {
+            MethodNames = new[] {method1, method2, method3, method4, method5};
         }
     }
 }

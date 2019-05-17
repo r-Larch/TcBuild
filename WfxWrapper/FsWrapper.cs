@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -292,7 +292,7 @@ namespace WfxWrapper {
             _callSignature = $"GetFile '{remoteName}' => '{localName}' ({copyFlags.ToString()})";
             var remoteInfo = new RemoteInfo(rmtInfo);
             try {
-                result = Plugin.GetFile(remoteName, ref localName, copyFlags, remoteInfo);
+                result = Plugin.GetFile(remoteName, localName, copyFlags, remoteInfo);
 
                 TraceCall(TraceLevel.Info, result.ToString());
             }
@@ -340,7 +340,7 @@ namespace WfxWrapper {
             FileSystemExitCode result;
             _callSignature = $"PutFile '{localName}' => '{remoteName}' ({copyFlags.ToString()})";
             try {
-                result = Plugin.PutFile(localName, ref remoteName, copyFlags);
+                result = Plugin.PutFile(localName, remoteName, copyFlags);
 
                 TraceCall(TraceLevel.Info, result.ToString());
             }

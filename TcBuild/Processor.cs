@@ -36,13 +36,22 @@ namespace TcBuild {
             // parse
             var (pluginType, excludedMethods, pluginClass, pluginAssemblyName) = AnalyzeAssembly(AssemblyFile);
 
+            _log.LogMessage($"PluginAssembly: {pluginAssemblyName.FullName}");
+            _log.LogMessage($"Type:           {pluginType}");
+            _log.LogMessage($"Class:          {pluginClass}");
+            _log.LogInfo($"ExcludedMethods:");
+            foreach (var method in excludedMethods) {
+                _log.LogInfo($"    {method}");
+            }
+
             var outDir = IntermediateDirectory.CreateSubdirectory("out");
             var workDir = IntermediateDirectory.CreateSubdirectory(nameof(TcBuild));
 
             var outFile = new FileInfo(Path.Combine(outDir.FullName, GetOutputFileName(pluginType, x64: false)));
             var outFile64 = new FileInfo(Path.Combine(outDir.FullName, GetOutputFileName(pluginType, x64: true)));
-            var configFile = new FileInfo(outFile.FullName + ".config");
-            var configFile64 = new FileInfo(outFile64.FullName + ".config");
+
+            // .config
+            var config = new FileInfo(AssemblyFile.FullName + ".config");
 
             try {
                 token.ThrowIfCancellationRequested();
@@ -65,17 +74,6 @@ namespace TcBuild {
 
                 token.ThrowIfCancellationRequested();
 
-                // .config
-                var config = new FileInfo(AssemblyFile.FullName + ".config");
-                if (config.Exists) {
-                    _log.LogInfo($"create config files");
-                    config.CopyTo(configFile.FullName, overwrite: true);
-                    config.CopyTo(configFile64.FullName, overwrite: true);
-                    //config.Delete();
-                }
-
-                token.ThrowIfCancellationRequested();
-
                 // Zip
                 if (pluginType != PluginType.QuickSearch) {
                     var zipFile = new FileInfo(Path.Combine(outDir.FullName, Path.ChangeExtension(AssemblyFile.Name, ".zip")));
@@ -89,16 +87,15 @@ namespace TcBuild {
                         new[] {
                             iniFile,
                             outFile,
-                            configFile,
                             outFile64,
-                            configFile64,
+                            config,
                             AssemblyFile,
                             new FileInfo(Path.ChangeExtension(AssemblyFile.FullName, ".pdb")),
                         }.Concat(ReferenceFiles.Where(_ => _.Extension != ".xml" && _.Name != "TcPluginBase.dll")
                             // Hotfix until my pull request gets merged: https://github.com/peters/ILRepack.MSBuild.Task/pull/42
-                            .Where(_ => _.Name != "Microsoft.Build.Framework.dll")
-                            .Where(_ => _.Name != "Microsoft.Build.Utilities.Core.dll")
-                            .Where(_ => _.Name != "System.Collections.Immutable.dll")
+                            //.Where(_ => _.Name != "Microsoft.Build.Framework.dll")
+                            //.Where(_ => _.Name != "Microsoft.Build.Utilities.Core.dll")
+                            //.Where(_ => _.Name != "System.Collections.Immutable.dll")
                         )
                     );
                     if (!success) {
@@ -168,7 +165,7 @@ namespace TcBuild {
         }
 
 
-        private (PluginType PluginType, string[] ExcludedMethods, string pluginClass, AssemblyName pluginAssemblyName) AnalyzeAssembly(FileInfo assemblyFile)
+        internal (PluginType PluginType, string[] ExcludedMethods, string pluginClass, AssemblyName pluginAssemblyName) AnalyzeAssembly(FileInfo assemblyFile)
         {
             AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(assemblyFile.FullName).AssemblyResolve;
             var assembly = Assembly.LoadFile(assemblyFile.FullName);
@@ -198,6 +195,12 @@ namespace TcBuild {
                 case 1:
                     // this is valid
                     pluginClass = implementations.FirstOrDefault().Value.Single();
+
+                    if (pluginTypes[0] == PluginType.FileSystem) {
+                        // exclude ContentPlugin methods from FileSystem plugin
+                        excludedMethods.AddRange(parser.GetExcludedMethods(null, PluginType.Content));
+                    }
+
                     break;
                 case 2 when pluginTypes.Contains(PluginType.FileSystem) && pluginTypes.Contains(PluginType.Content):
                     pluginTypes = new[] {PluginType.FileSystem};

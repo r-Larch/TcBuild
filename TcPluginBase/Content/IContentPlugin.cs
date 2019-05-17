@@ -2,10 +2,10 @@
     public interface IContentPlugin {
         #region Mandatory Methods
 
-        //[TcMethod("ContentGetSupportedField", "FsContentGetSupportedField")]
+        [TcMethod("ContentGetSupportedField", "FsContentGetSupportedField", Mandatory = true)]
         ContentFieldType GetSupportedField(int fieldIndex, out string fieldName, out string units, int maxLen);
 
-        //[TcMethod("ContentGetValueW", "ContentGetValue", "FsContentGetValue", "FsContentGetValueW")]
+        [TcMethod("ContentGetValueW", "ContentGetValue", "FsContentGetValue", "FsContentGetValueW", Mandatory = true)]
         GetValueResult GetValue(string fileName, int fieldIndex, int unitIndex, int maxLen, GetValueFlags flags, out string fieldValue, out ContentFieldType fieldType);
 
         #endregion Mandatory Methods

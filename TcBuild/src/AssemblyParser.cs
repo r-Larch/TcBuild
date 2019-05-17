@@ -58,29 +58,33 @@ namespace TcBuild {
         {
             var iPlugin = TcUtils.PluginInterfaceTypes[pluginType];
 
-            var optionalMethods = iPlugin.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Select(_ => new {
-                PluginMethod = _.Name,
-                Exports = _.GetCustomAttribute<TcMethodAttribute>(false)?.MethodNames ?? new string[0],
+            var methods = iPlugin.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Select(_ => {
+                var attr = _.GetCustomAttribute<TcMethodAttribute>(false);
+                return new {
+                    PluginMethod = _.Name,
+                    IsMandatory = attr?.Mandatory ?? false,
+                    Exports = attr?.MethodNames ?? new string[0],
+                };
             }).ToList();
+
+            // to remove ContentPlugin from FsWrapper
+            if (pluginClass == null && pluginType == PluginType.Content) {
+                return methods.SelectMany(_ => _.Exports).ToArray();
+            }
 
             var typeMethods = pluginClass.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Select(method => method.Name).ToList();
 
-            var exports = new List<string>();
-            foreach (var optionalMethod in optionalMethods) {
-                if (typeMethods.Contains(optionalMethod.PluginMethod)) {
-                    // implemented
-                    foreach (var export in optionalMethod.Exports) {
-                        exports.Remove(export);
-                    }
-                }
-                else {
-                    // not implemented
-                    exports.AddRange(optionalMethod.Exports);
-                }
-            }
+            // exports to keep
+            var mandatory = methods.Where(_ => _.IsMandatory).SelectMany(_ => _.Exports);
+            var implemented = methods.Where(_ => typeMethods.Contains(_.PluginMethod)).SelectMany(_ => _.Exports);
 
             // all exports that have no corresponding implementation
-            return exports.ToArray();
+            var exportsToRemove = methods
+                .SelectMany(_ => _.Exports)
+                .Where(_ => !mandatory.Contains(_))
+                .Where(_ => !implemented.Contains(_));
+
+            return exportsToRemove.ToArray();
         }
 
 

@@ -16,9 +16,9 @@ namespace TcBuild {
             _currentOperationName = null;
         }
 
-        public virtual void LogMessage(string message, int level)
+        public virtual void LogMessage(string message)
         {
-            BuildEngine.LogMessageEvent(new BuildMessageEventArgs(GetIndent() + PrependMessage(message), "", SenderName, (MessageImportance) level));
+            BuildEngine.LogMessageEvent(new BuildMessageEventArgs(GetIndent() + PrependMessage(message), "", SenderName, MessageImportance.High));
         }
 
         public virtual void LogDebug(string message)
@@ -82,7 +82,7 @@ namespace TcBuild {
         void ClearOperationName();
         void LogDebug(string message);
         void LogInfo(string message);
-        void LogMessage(string message, int level);
+        void LogMessage(string message);
         void LogWarning(string message);
         void LogWarning(string message, string file, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber);
         void LogError(string message, string file, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber);

@@ -7,16 +7,16 @@ namespace TcPluginBase.Packer {
     public interface IPackerPlugin {
         #region Mandatory Methods
 
-        //[TcMethod("OpenArchive", "OpenArchiveW")]
+        [TcMethod("OpenArchive", "OpenArchiveW", Mandatory = true)]
         object OpenArchive(ref OpenArchiveData archiveData);
 
-        //[TcMethod("ReadHeaderEx", "ReadHeaderExW")]
+        [TcMethod("ReadHeaderEx", "ReadHeaderExW", Mandatory = true)]
         PackerResult ReadHeader(ref object arcData, out HeaderData headerData);
 
-        //[TcMethod("ProcessFile", "ProcessFileW")]
+        [TcMethod("ProcessFile", "ProcessFileW", Mandatory = true)]
         PackerResult ProcessFile(object arcData, ProcessFileOperation operation, string destFile);
 
-        //[TcMethod("CloseArchive")]
+        [TcMethod("CloseArchive", Mandatory = true)]
         PackerResult CloseArchive(object arcData);
 
         #endregion Mandatory Methods

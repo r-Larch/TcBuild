@@ -2,50 +2,31 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using TcPluginBase;
 using TcPluginBase.FileSystem;
 
 
 namespace TcBuild.Test.PluginImplementation {
     public class FsPluginTest : FsPlugin {
-        public FsPluginTest(Settings pluginSettings) : base(pluginSettings)
+        protected FsPluginTest(Settings pluginSettings) : base(pluginSettings)
         {
         }
 
-        public IEnumerable<FindData> GetFiles(string path)
+        public override IEnumerable<FindData> GetFiles(string path)
         {
-            return new FindData[0];
+            return base.GetFiles(path);
         }
 
-        public override object FindFirst(string path, out FindData findData)
+        public override Task<FileSystemExitCode> PutFileAsync(string localName, string remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
         {
-            var enumerator = GetFiles(path).GetEnumerator();
-
-            if (enumerator.MoveNext()) {
-                findData = enumerator.Current;
-                return enumerator;
-            }
-
-            // empty list
-            findData = null;
-            return null;
+            return base.PutFileAsync(localName, remoteName, copyFlags, setProgress, token);
         }
 
-        public override bool FindNext(ref object o, out FindData findData)
+        public override Task<FileSystemExitCode> GetFileAsync(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
-            if (o is IEnumerator<FindData> fsEnum) {
-                if (fsEnum.MoveNext()) {
-                    var current = fsEnum.Current;
-                    if (current != null) {
-                        findData = current;
-                        return true;
-                    }
-                }
-            }
-
-            // end of sequence
-            findData = null;
-            return false;
+            return base.GetFileAsync(remoteName, localName, copyFlags, remoteInfo, setProgress, token);
         }
 
 
@@ -68,34 +49,7 @@ namespace TcBuild.Test.PluginImplementation {
 
         public override FileSystemExitCode RenMovFile(string oldName, string newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
-            try {
-                return FileSystemExitCode.NotSupported;
-            }
-            catch (OperationCanceledException) {
-                return FileSystemExitCode.UserAbort;
-            }
-        }
-
-
-        public override FileSystemExitCode GetFile(string remoteName, ref string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
-        {
-            try {
-                return FileSystemExitCode.NotSupported;
-            }
-            catch (OperationCanceledException) {
-                return FileSystemExitCode.UserAbort;
-            }
-        }
-
-
-        public override FileSystemExitCode PutFile(string localName, ref string remoteName, CopyFlags copyFlags)
-        {
-            try {
-                return FileSystemExitCode.NotSupported;
-            }
-            catch (OperationCanceledException) {
-                return FileSystemExitCode.UserAbort;
-            }
+            return FileSystemExitCode.NotSupported;
         }
 
 
@@ -146,6 +100,12 @@ namespace TcBuild.Test.PluginImplementation {
         public override bool SetTime(string remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime)
         {
             return false;
+        }
+
+
+        public override int OnTcPluginEvent(PluginEventArgs e)
+        {
+            return base.OnTcPluginEvent(e);
         }
     }
 }
