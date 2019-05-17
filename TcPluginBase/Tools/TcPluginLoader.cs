@@ -37,19 +37,18 @@ namespace TcPluginBase.Tools {
             var settings = new Settings();
 
             // load global settings
-            var appSettings = ConfigurationManager.AppSettings;
-            foreach (var key in appSettings.AllKeys) {
-                settings.Add(key, appSettings[key]);
+            foreach (var key in ConfigurationManager.AppSettings.AllKeys) {
+                settings.Add(key, ConfigurationManager.AppSettings[key]);
             }
 
             // and add plugin settings
-            var sett = ConfigurationManager.OpenExeConfiguration(assembly.Location).AppSettings.Settings;
+            var appSettings = ConfigurationManager.OpenExeConfiguration(assembly.Location).AppSettings.Settings;
             foreach (var key in appSettings.AllKeys) {
                 if (settings.ContainsKey(key)) {
-                    settings[key] = sett[key].Value;
+                    settings[key] = appSettings[key].Value;
                 }
                 else {
-                    settings.Add(key, appSettings[key]);
+                    settings.Add(key, appSettings[key].Value);
                 }
             }
 
