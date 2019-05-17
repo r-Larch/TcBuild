@@ -11,3 +11,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("QsWrapper")]
 
 [assembly: InternalsVisibleTo("TcBuild")]
+[assembly: InternalsVisibleTo("TcBuild.Test")]
