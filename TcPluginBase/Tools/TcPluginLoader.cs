@@ -3,13 +3,19 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 
 namespace TcPluginBase.Tools {
     [Serializable]
     internal static class TcPluginLoader {
+        /// <summary>
+        /// This is the TcPluginBase EntryPoint!
+        /// </summary>
         public static TPlugin GetTcPlugin<TPlugin>(Type pluginClass) where TPlugin : TcPlugin
         {
+            RegisterUnhandledExceptionHandler();
+
             var tcPlugin = CreatePluginInstance<TPlugin>(pluginClass);
             tcPlugin.TcPluginEventHandler += TcCallback.HandleTcPluginEvent;
 
@@ -65,8 +71,20 @@ namespace TcPluginBase.Tools {
             if (plugin == null || plugin.ShowErrorDialog) {
                 ErrorDialog.Show(callSignature, ex);
             }
+        }
 
-            // TODO: add - unload plugin AppDomain on critical error (configurable)
+
+        private static bool _handlerRegistered;
+
+        private static void RegisterUnhandledExceptionHandler()
+        {
+            if (!_handlerRegistered) {
+                AppDomain.CurrentDomain.UnhandledException += (sender, args) => {
+                    Trace.WriteLine($"[T{Thread.CurrentThread.ManagedThreadId}] AppDomain.UnhandledException: " + args.ExceptionObject.ToString());
+                    Trace.Flush();
+                };
+                _handlerRegistered = true;
+            }
         }
     }
 }
