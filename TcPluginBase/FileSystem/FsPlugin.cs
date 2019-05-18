@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -16,6 +16,13 @@ namespace TcPluginBase.FileSystem {
         public FsBackgroundFlags BackgroundFlags { get; set; } = FsBackgroundFlags.Download | FsBackgroundFlags.Upload;
         public bool IsTempFilePanel { get; set; }
         public bool WriteStatusInfo { get; set; }
+
+
+        /// <summary>
+        /// Gets set by FsSetCryptCallback
+        /// You can use it to save and load passwords
+        /// </summary>
+        public FsPassword Password { get; set; }
 
 
         public FsPlugin(Settings pluginSettings) : base(pluginSettings)

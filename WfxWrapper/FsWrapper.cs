@@ -211,7 +211,9 @@ namespace WfxWrapper {
             _callSignature = "SetCryptCallback";
             try {
                 TcCallback.SetFsPluginCallbacks(null, null, null, null, null, null, cryptProc, null);
-                Plugin.CreatePassword(cryptNumber, flags);
+                if (Plugin.Password == null) {
+                    Plugin.Password = new FsPassword(Plugin, cryptNumber, flags);
+                }
 
                 TraceCall(TraceLevel.Warning, $"CryptoNumber={cryptNumber}, Flags={flags}, {cryptProc.Method.MethodHandle.GetFunctionPointer().ToString("X")}");
             }
@@ -226,7 +228,10 @@ namespace WfxWrapper {
             _callSignature = "SetCryptCallbackW";
             try {
                 TcCallback.SetFsPluginCallbacks(null, null, null, null, null, null, null, cryptProcW);
-                Plugin.CreatePassword(cryptNumber, flags);
+                if (Plugin.Password == null) {
+                    Plugin.Password = new FsPassword(Plugin, cryptNumber, flags);
+                }
+
                 TraceCall(TraceLevel.Warning, $"CryptoNumber={cryptNumber}, Flags={flags}, {cryptProcW.Method.MethodHandle.GetFunctionPointer().ToString("X")}");
             }
             catch (Exception ex) {

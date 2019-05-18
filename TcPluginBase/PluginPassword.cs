@@ -18,46 +18,63 @@ namespace TcPluginBase {
             _flags = (CryptFlags) flags;
         }
 
-        public bool TcMasterPasswordDefined => (_flags & CryptFlags.MasterPassSet) == CryptFlags.MasterPassSet;
+        public bool TcMasterPasswordDefined => _flags.HasFlag(CryptFlags.MasterPassSet);
 
         // Convert result returned by TC to CryptResult. Must be overridden in derived classes.
         protected abstract CryptResult GetCryptResult(int tcCryptResult);
 
         #region Public Methods
 
-        // Save password to password store.
+        /// <summary>
+        /// Save password to password store.
+        /// </summary>
+        /// <param name="store"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
         public CryptResult Save(string store, string password)
         {
             return Crypt(CryptMode.SavePassword, store, ref password);
         }
 
-        // Load password from password store.
+        /// <summary>
+        /// Load password from password store.
+        /// and automatically prompt the user for MasterPassword.
+        /// </summary>
         public CryptResult Load(string store, ref string password)
         {
             password = string.Empty;
             return Crypt(CryptMode.LoadPassword, store, ref password);
         }
 
-        // Load password from password store only if master password has already been entered.
+        /// <summary>
+        /// Load password from password store only if master password has already been entered.
+        /// Use <see cref="Load"/> to automatically prompt the user for MasterPassword.
+        /// </summary>
         public CryptResult LoadNoUI(string store, ref string password)
         {
             password = string.Empty;
             return Crypt(CryptMode.LoadPasswordNoUI, store, ref password);
         }
 
-        // Copy password to new store.
+        /// <summary>
+        /// Copy password to new store.
+        /// </summary>
         public CryptResult Copy(string sourceStore, string targetStore)
         {
             return Crypt(CryptMode.CopyPassword, sourceStore, ref targetStore);
         }
 
-        // Copy password to new store and delete the source password.
+        /// <summary>
+        /// Copy password to new store and delete the source password.
+        /// </summary>
         public CryptResult Move(string sourceStore, string targetStore)
         {
             return Crypt(CryptMode.MovePassword, sourceStore, ref targetStore);
         }
 
-        // Delete the password of the given store.
+        /// <summary>
+        /// Delete the password of the given store.
+        /// </summary>
         public CryptResult Delete(string store)
         {
             var password = string.Empty;
@@ -87,7 +104,6 @@ namespace TcPluginBase {
             return result;
         }
 
-        #region Private Enumerations
 
         [Flags]
         private enum CryptFlags {
@@ -103,7 +119,5 @@ namespace TcPluginBase {
             MovePassword,
             DeletePassword
         }
-
-        #endregion Private Enumerations
     }
 }
