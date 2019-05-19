@@ -25,5 +25,11 @@ namespace TcPluginBase {
         {
             NativeMethods.PostMessage(handle, TcMessageId, (IntPtr) wParam, IntPtr.Zero);
         }
+
+        public void OpenTcPluginHome()
+        {
+            const int cmOpenNetwork = 2125;
+            SendMessage(Handle, cmOpenNetwork);
+        }
     }
 }
