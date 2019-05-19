@@ -2,10 +2,12 @@
 
 
 namespace TcPluginBase.Lister {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in 
-    // TC "LS-Plugin writer's guide" (www.ghisler.com/plugins.htm) 
+    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // TC "LS-Plugin writer's guide" (www.ghisler.com/plugins.htm)
 
-    // Used as parameter type for SendCommand method
+    /// <summary>
+    /// Used as parameter type for SendCommand method
+    /// </summary>
     public enum ListerCommand {
         Copy = 1,
         NewParams,
@@ -13,7 +15,9 @@ namespace TcPluginBase.Lister {
         SetPercent
     }
 
-    // Used as parameter type for ListerPluginEvent callback method
+    /// <summary>
+    /// Used as parameter type for ListerPluginEvent callback method
+    /// </summary>
     public enum ListerMessage {
         Percent = 0xFFFE,
         FontStyle = 0xFFFD,
@@ -23,19 +27,25 @@ namespace TcPluginBase.Lister {
         ImageCenter = 0xFFF9
     }
 
-    // Used as result type for most Lister plugin methods
+    /// <summary>
+    /// Used as result type for most Lister plugin methods
+    /// </summary>
     public enum ListerResult {
         OK = 0,
         Error
     }
 
-    // Used as parameter type for Print method
+    /// <summary>
+    /// Used as parameter type for Print method
+    /// </summary>
     [Flags]
     public enum PrintFlags {
         None = 0
     }
 
-    // Used as parameter type for SearchText method
+    /// <summary>
+    /// Used as parameter type for SearchText method
+    /// </summary>
     [Flags]
     public enum SearchParameter {
         None = 0,
@@ -45,7 +55,9 @@ namespace TcPluginBase.Lister {
         Backwards = 8
     }
 
-    // Used as parameter type for Load, LoadNext and SendCommand methods
+    /// <summary>
+    /// Used as parameter type for Load, LoadNext and SendCommand methods
+    /// </summary>
     [Flags]
     public enum ShowFlags {
         None = 0,

@@ -10,50 +10,48 @@ namespace TcPluginBase.FileSystem {
     // Some enum members are marked "!!! Used for .NET interface only !!!").
     // They are processed in WfxWrapper and doesn't return to TC.
 
-
-    // Type for property BackgroundFlags used to return value for FsGetBackgroundFlags WFX wrapper method
+    /// <summary> Type for property BackgroundFlags used to return value for FsGetBackgroundFlags WFX wrapper method </summary>
     [Flags]
     public enum FsBackgroundFlags {
         None = 0,
-        Download = 1, // Plugin supports downloads in background.
-        Upload = 2, // Plugin supports uploads in background.
-        AskUser = 4 // Plugin requires separate connection for background transfers -> ask user first.
+        /// <summary> Plugin supports downloads in background. </summary>
+        Download = 1,
+        /// <summary> Plugin supports uploads in background. </summary>
+        Upload = 2,
+        /// <summary> Plugin requires separate connection for background transfers -> ask user first. </summary>
+        AskUser = 4
     }
 
-    // Used as parameter type for GetFile and PutFile methods
+    /// <summary> Used as parameter type for GetFile and PutFile methods </summary>
     [Flags]
     public enum CopyFlags {
         None = 0,
-        Overwrite = 1, // If set, overwrite any existing file without asking. If not set, simply fail copying.
-        Resume = 2, // Resume an aborted or failed transfer.
-        Move = 4, // The plugin needs to delete the remote file after uploading
-        ExistsSameCase = 8, // The remote file exists and has the same case (upper/lowercase) as the local file.
-        ExistsDifferentCase = 0x10 // The remote file exists and has different case (upper/lowercase) than the local file.
+        /// <summary> If set, overwrite any existing file without asking. If not set, simply fail copying.</summary>
+        Overwrite = 1,
+        /// <summary> Resume an aborted or failed transfer.</summary>
+        Resume = 2,
+        /// <summary> The plugin needs to delete the remote file after uploading </summary>
+        Move = 4,
+        /// <summary> The remote file exists and has the same case (upper/lowercase) as the local file. </summary>
+        ExistsSameCase = 8,
+        /// <summary> The remote file exists and has different case (upper/lowercase) than the local file. </summary>
+        ExistsDifferentCase = 0x10
     }
 
 
-    /// <summary>
-    /// Used as result type for ExecuteOpen, ExecuteProperties, and ExecuteCommand methods
-    /// </summary>
+    /// <summary> Used as result type for ExecuteOpen, ExecuteProperties, and ExecuteCommand methods </summary>
     public struct ExecResult {
-        /// <summary>
-        /// Command was executed successfully, no further action is needed.
-        /// </summary>
+        /// <summary> Command was executed successfully, no further action is needed. </summary>
         public static ExecResult Ok => new ExecResult(ExecEnum.OK);
 
-        /// <summary>
-        /// Execution failed.
-        /// </summary>
+        /// <summary> Execution failed. </summary>
         public static ExecResult Error => new ExecResult(ExecEnum.Error);
 
-        /// <summary>
-        /// Total Commander should download the file and execute it locally.
-        /// </summary>
+        /// <summary> Total Commander should download the file and execute it locally. </summary>
         public static ExecResult Yourself => new ExecResult(ExecEnum.Yourself);
 
-        /// <summary>
-        /// It was a (symbolic) link or .lnk file pointing to <param name="symlinkTarget"></param>.
-        /// </summary>
+        /// <summary> It was a (symbolic) link or .lnk file pointing to another file or directory. </summary>
+        /// <param name="symlinkTarget">The file or directory where the symlink points to.</param>
         public static ExecResult SymLink(RemotePath symlinkTarget) => new ExecResult(ExecEnum.SymLink, symlinkTarget);
 
 
@@ -75,22 +73,20 @@ namespace TcPluginBase.FileSystem {
     }
 
 
-    // Used as parameter type for ExtractCustomIcon method
+    /// <summary> Used as parameter type for ExtractCustomIcon method </summary>
     [Flags]
     public enum ExtractIconFlags {
         None = 0,
-        Small, // Requests the small 16x16 icon.
-        Background // The function is called from the background thread.
+        /// <summary> Requests the small 16x16 icon. </summary>
+        Small,
+        /// <summary> The function is called from the background thread. </summary>
+        Background
     }
 
 
-    /// <summary>
-    /// Used as result type for ExtractCustomIcon method
-    /// </summary>
+    /// <summary> Used as result type for ExtractCustomIcon method </summary>
     public struct ExtractIconResult {
-        /// <summary>
-        /// No icon is returned. Total Commander should show the default icon for this file type.
-        /// </summary>
+        /// <summary> No icon is returned. Total Commander should show the default icon for this file type. </summary>
         public static ExtractIconResult UseDefault => new ExtractIconResult {Value = ExtractIconEnum.UseDefault};
 
         /// <summary>
@@ -164,40 +160,51 @@ namespace TcPluginBase.FileSystem {
         }
     }
 
-    // Used as result type for GetFile, PutFile and RenMovFile methods
+    /// <summary> Used as result type for <see cref="FsPlugin.GetFile"/>, <see cref="FsPlugin.PutFile"/> and <see cref="FsPlugin.RenMovFile"/> methods </summary>
     public enum FileSystemExitCode {
-        OK = 0, // The file was copied OK.
-        FileExists, // The target file (local or remote) already exists, and resume isn't supported.
-        FileNotFound, // The source file (local or remote) couldn't be found or opened.
-        ReadError, // There was an error reading from the source file (local or remote).
-        WriteError, // There was an error writing to the target file (local or remote), e.g. disk full.
-        UserAbort, // Copying was aborted by the user (through ProgressProc).
-        NotSupported, // The operation is not supported (e.g. resume).
-        ExistsResumeAllowed // The target file (local or remote) already exists, and resume is supported. Not used for RenMovFile.
+        /// <summary> The file was copied OK. </summary>
+        OK = 0,
+        /// <summary> The target file (local or remote) already exists, and resume isn't supported. </summary>
+        FileExists,
+        /// <summary> The source file (local or remote) couldn't be found or opened. </summary>
+        FileNotFound,
+        /// <summary> There was an error reading from the source file (local or remote). </summary>
+        ReadError,
+        /// <summary> There was an error writing to the target file (local or remote), e.g. disk full. </summary>
+        WriteError,
+        /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
+        UserAbort,
+        /// <summary> The operation is not supported (e.g. resume). </summary>
+        NotSupported,
+        /// <summary> The target file (local or remote) already exists, and resume is supported. Not used for <see cref="FsPlugin.RenMovFile"/>. </summary>
+        ExistsResumeAllowed
     }
 
-    // Used as parameter type for LogProc callback method
+    /// <summary> Used as parameter type for <see cref="FsPlugin.LogProc"/> callback method </summary>
     public enum LogMsgType {
-        Connect = 1, // Connect to a file system requiring disconnect.
-        Disconnect, // Disconnected successfully.
-        Details, // Not so important messages like directory changing.
-        TransferComplete, // A file transfer was completed successfully.
-        ConnectComplete, // unused
-        ImportantError, // An important error has occured.
-        OperationComplete // An operation other than a file transfer has completed.
+        /// <summary> Connect to a file system requiring disconnect. </summary>
+        Connect = 1,
+        /// <summary> Disconnected successfully. </summary>
+        Disconnect,
+        /// <summary> Not so important messages like directory changing. </summary>
+        Details,
+        /// <summary> A file transfer was completed successfully. </summary>
+        TransferComplete,
+        /// <summary> unused </summary>
+        ConnectComplete,
+        /// <summary> An important error has occured. </summary>
+        ImportantError,
+        /// <summary> An operation other than a file transfer has completed. </summary>
+        OperationComplete
     }
 
 
-    // Used as result type for GetPreviewBitmap method
+    /// <summary> Used as result type for <see cref="FsPlugin.GetPreviewBitmap"/> method </summary>
     public struct PreviewBitmapResult {
-        /// <summary>
-        /// There is no preview bitmap.
-        /// </summary>
+        /// <summary> There is no preview bitmap. </summary>
         public static PreviewBitmapResult None => new PreviewBitmapResult {Value = PreviewBitmapEnum.None};
 
-        /// <summary>
-        /// The image was extracted and is returned
-        /// </summary>
+        /// <summary> The image was extracted and is returned </summary>
         /// <param name="bitmap"></param>
         /// <param name="bitmapName">Name of the bitmap. Total Commander can use this to cache the bitmap</param>
         /// <param name="cache">false to NOT cache the image</param>
@@ -208,9 +215,7 @@ namespace TcPluginBase.FileSystem {
             Cache = cache
         };
 
-        /// <summary>
-        /// Tells the caller to extract the image by itself from bitmapPath.
-        /// </summary>
+        /// <summary> Tells the caller to extract the image by itself from bitmapPath. </summary>
         /// <param name="bitmapPath">The local path to the bitmap</param>
         /// <param name="cache">false to NOT cache the image</param>
         public static PreviewBitmapResult ExtractYourself(string bitmapPath, bool cache = true)
@@ -245,12 +250,8 @@ namespace TcPluginBase.FileSystem {
         }
     }
 
-    // Used as parameter type for RequestProc callback method
-    public enum RequestType {
-        //DomainInfo = -1, // !!! Used for .NET interface only !!!
-        // Asks information about .NET application domains in current TC process
-        // and assemblies loaded to them. Can be used for debugging.
-
+    /// <summary> Used as parameter type for <see cref="FsPlugin.RequestProc"/> callback method </summary>
+    internal enum RequestType {
         Other = 0, // The requested string is none of the default types.
         UserName, // Asks for an User Name, e.g. for a connection.
         Password, // Asks for a Password, e.g. for a connection (shows ***).
@@ -266,34 +267,57 @@ namespace TcPluginBase.FileSystem {
         MsgOkCancel // Shows MessageBox with OK/Cancel buttons.
     }
 
-    // Used as parameter type for StatusInfo method
+    /// <summary> Used as parameter type for <see cref="FsPlugin.StatusInfo"/> method </summary>
     public enum InfoOperation {
-        None = 0, // !!! Used for .NET interface only !!!
-        List = 1, // Retrieve a directory listing.
-        GetSingle, // Get a single file from the plugin file system.
-        GetMulti, // Get multiple files, may include subdirs.
-        PutSingle, // Put a single file to the plugin file system.
-        PutMulti, // Put multiple files, may include subdirs.
-        RenMovSingle, // Rename/Move/Remote copy a single file.
-        RenMovMulti, // RenMov multiple files, may include subdirs.
-        Delete, // Delete multiple files, may include subdirs.
-        Attrib, // Change attributes/times, may include subdirs.
-        MkDir, // Create a single directory.
-        Exec, // Start a single remote item, or a command line.
-        CalcSize, // Calculating size of subdir (user pressed SPACE).
-        Search, // Searching for file names only (using FsFindFirst/NextFile/Close).
-        SearchText, // Searching for file contents (using also FsGetFile() calls).
-        SyncSearch, // Synchronize dirs searches subdirs for info.
-        SyncGet, // Synchronize: Downloading files from plugin.
-        SyncPut, // Synchronize: Uploading files to plugin.
-        SyncDelete, // Synchronize: Deleting files from plugin.
-        GetMultiThread, // Get multiple files, may include subdirs. Executes in background thread.
-        PutMultiThread // Put multiple files, may include subdirs. Executes in background thread.
+        // !!! Used for .NET interface only !!!
+        None = 0,
+        /// <summary> Retrieve a directory listing. </summary>
+        List = 1,
+        /// <summary> Get a single file from the plugin file system. </summary>
+        GetSingle,
+        /// <summary> Get multiple files, may include subdirs. </summary>
+        GetMulti,
+        /// <summary> Put a single file to the plugin file system. </summary>
+        PutSingle,
+        /// <summary> Put multiple files, may include subdirs. </summary>
+        PutMulti,
+        /// <summary> Rename/Move/Remote copy a single file. </summary>
+        RenMovSingle,
+        /// <summary> RenMov multiple files, may include subdirs. </summary>
+        RenMovMulti,
+        /// <summary> Delete multiple files, may include subdirs. </summary>
+        Delete,
+        /// <summary> Change attributes/times, may include subdirs. </summary>
+        Attributes,
+        /// <summary> Create a single directory. </summary>
+        MkDir,
+        /// <summary> Start a single remote item, or a command line. </summary>
+        Exec,
+        /// <summary> Calculating size of subdir (user pressed SPACE). </summary>
+        CalcSize,
+        /// <summary> Searching for file names only (using FsFindFirst/NextFile/Close). </summary>
+        Search,
+        /// <summary> Searching for file contents (using also FsGetFile() calls). </summary>
+        SearchText,
+        /// <summary> Synchronize dirs searches subdirs for info. </summary>
+        SyncSearch,
+        /// <summary> Synchronize: Downloading files from plugin. </summary>
+        SyncGet,
+        /// <summary> Synchronize: Uploading files to plugin. </summary>
+        SyncPut,
+        /// <summary> Synchronize: Deleting files from plugin. </summary>
+        SyncDelete,
+        /// <summary> Get multiple files, may include subdirs. Executes in background thread. </summary>
+        GetMultiThread,
+        /// <summary> Put multiple files, may include subdirs. Executes in background thread. </summary>
+        PutMultiThread
     }
 
-    // Used as parameter type for StatusInfo method
+    /// <summary> Used as parameter type for <see cref="FsPlugin.StatusInfo"/> method </summary>
     public enum InfoStartEnd {
-        Start, // Operation starts.
-        End // Operation has ended.
+        /// <summary> Operation starts. </summary>
+        Start,
+        /// <summary> Operation has ended. </summary>
+        End
     }
 }

@@ -5,7 +5,9 @@ namespace TcPluginBase.QuickSearch {
     // Enumerations below are managed wrappers for corresponding integer flags used in
     // QuickSearch "plugin" (tcmatch.dll)
 
-    // Used as parameter type for MatchGetSetOptions method
+    /// <summary>
+    /// Used as parameter type for MatchGetSetOptions method
+    /// </summary>
     [Flags]
     public enum ExactNameMatch {
         None = 0,
@@ -13,7 +15,9 @@ namespace TcPluginBase.QuickSearch {
         Ending = 2
     }
 
-    // Used as result type for MatchGetSetOptions method
+    /// <summary>
+    /// Used as result type for MatchGetSetOptions method
+    /// </summary>
     [Flags]
     public enum MatchOptions {
         None = 0,

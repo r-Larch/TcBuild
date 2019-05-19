@@ -66,7 +66,7 @@ namespace TcPluginBase.Tools {
         {
 #if TRACE
             var pluginTitle = plugin == null ? "NULL" : plugin.TraceTitle;
-            TcTrace.TraceError($"{callSignature}: {ex.Message}", pluginTitle);
+            new Logger(pluginTitle).Error($"{callSignature}: {ex.Message}", ex);
 #endif
             if (plugin == null || plugin.ShowErrorDialog) {
                 ErrorDialog.Show(callSignature, ex);

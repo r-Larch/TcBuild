@@ -9,11 +9,6 @@ namespace TcPluginBase {
 
         private static readonly TraceSwitch TcPluginTraceSwitch = new TraceSwitch("DotNetPlugins", "All .NET plugins", "Warning");
 
-        internal static void TraceError(string text, string pluginTitle)
-        {
-            TraceOut(TraceLevel.Error, text, pluginTitle);
-        }
-
         internal static void TraceOut(TraceLevel level, string text, string category)
         {
             TraceOut(level, text, category, 0);

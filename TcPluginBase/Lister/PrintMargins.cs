@@ -3,7 +3,9 @@ using System.Runtime.InteropServices;
 
 
 namespace TcPluginBase.Lister {
-    // Used as parameter type for Print method
+    /// <summary>
+    /// Used as parameter type for Print method
+    /// </summary>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public struct PrintMargins {

@@ -2,8 +2,8 @@
 
 
 namespace TcPluginBase.Packer {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in 
-    // TC "WCX Writer's Reference" (see "Packer extensions" -> "Interface description" on www.ghisler.com/plugins.htm) 
+    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // TC "WCX Writer's Reference" (see "Packer extensions" -> "Interface description" on www.ghisler.com/plugins.htm)
 
     // Used inside the OpenArchiveData class
     public enum ArcOpenMode {
@@ -45,7 +45,7 @@ namespace TcPluginBase.Packer {
     public enum PackFilesFlags {
         None = 0,
         MoveFiles = 1, // Delete original after packing
-        SavePaths = 2, // Save path names of files 
+        SavePaths = 2, // Save path names of files
         Encrypt = 4 // Ask user for password, then encrypt
     }
 
@@ -84,7 +84,7 @@ namespace TcPluginBase.Packer {
         EAborted, // Function aborted by user
         NoFiles, // No files found
         TooManyFiles, // Too many files to pack
-        NotSupported // Function not supported        
+        NotSupported // Function not supported
     }
 
 

@@ -2,8 +2,8 @@
 
 
 namespace TcPluginBase.Content {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in 
-    // TC "FS-Plugin writer's guide" and "Content-Plugin writer's guide" (www.ghisler.com/plugins.htm) 
+    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // TC "FS-Plugin writer's guide" and "Content-Plugin writer's guide" (www.ghisler.com/plugins.htm)
 
     // Used as result type for CompareFiles method
     public enum ContentCompareResult {
@@ -25,12 +25,12 @@ namespace TcPluginBase.Content {
         Date, // A date value (year, month, day).
         Time, // A time value (hour, minute, second). Date and time are in local time.
         Boolean, // A true/false value.
-        MultipleChoice, // A value allowing a limited number of choices. 
+        MultipleChoice, // A value allowing a limited number of choices.
         String, // A text string (ANSI).
         FullText, // A full text (multiple text strings), only used for searching, not supported in FS plugins.
-        DateTime, // A timestamp of type FILETIME, as returned e.g. by FindFirstFile(). 
+        DateTime, // A timestamp of type FILETIME, as returned e.g. by FindFirstFile().
         WideString, // A text string (Unicode).
-        CompareContent = 100 // Type is used in "Synchronize dirs" only. 
+        CompareContent = 100 // Type is used in "Synchronize dirs" only.
     }
 
     // Used as result type for GetDefaultSortOrder method
@@ -102,8 +102,8 @@ namespace TcPluginBase.Content {
         SubstTime = 8, // Substitute file time (fd_time)
         SubstAttributes = 10, // Substitute file attributes (numeric)
         SubstAttributeString = 12, // Substitute file attribute string in form -a--
-        PassThroughSizeFloat = 14, // Pass file size as ft_numeric_floating to ContentGetValue to format. 
-        SubstMask = 14, // A combination of all above substitution flags. 
+        PassThroughSizeFloat = 14, // Pass file size as ft_numeric_floating to ContentGetValue to format.
+        SubstMask = 14, // A combination of all above substitution flags.
         FieldEdit = 16 // TC will show a button >> to call the plugin own field editor (via ContentEditValue).
     }
 }

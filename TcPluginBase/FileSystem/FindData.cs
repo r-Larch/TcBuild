@@ -5,19 +5,30 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 
 namespace TcPluginBase.FileSystem {
-    // Used as parameter type for FindFirst and FindNext methods
+    /// <summary> Used as parameter type for <see cref="FsPlugin.FindFirst"/> and <see cref="FsPlugin.FindNext"/> methods </summary>
     [CLSCompliant(false)]
     [Serializable]
     public class FindData {
         #region Properties
 
+        /// <summary> Local file name relative to the directory (without the path) </summary>
         public string FileName { get; private set; }
-        //public string AltFileName { get; private set; }
+
+        /// <summary> File attributes. Use at least the <see cref="FileAttributes.Directory"/> flag to distinguish between files and directories. Links should be returned as files. </summary>
         public FileAttributes Attributes { get; private set; }
+
+        /// <summary> The file size </summary>
         public ulong FileSize { get; private set; }
+
+        /// <summary> Currently unused. If available, set to the time when the file was created. </summary>
         public DateTime? CreationTime { get; private set; }
+
+        /// <summary> Currently unused. If available, set to the time when the file was last accessed. </summary>
         public DateTime? LastAccessTime { get; private set; }
+
+        /// <summary> Time stamp shown in the Total Commander file list, and copied with files. <c>null</c> for files which don't have a time </summary>
         public DateTime? LastWriteTime { get; private set; }
+
         public uint Reserved0 { get; private set; }
         public uint Reserved1 { get; private set; }
 

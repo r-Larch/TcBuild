@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 namespace TcPluginBase {
     [Serializable]
     [ComVisible(true)]
-    public class MethodNotSupportedException : Exception {
+    internal class MethodNotSupportedException : Exception {
         private const string Msg = "Mandatory method '{0}' is not supported";
 
         public MethodNotSupportedException()

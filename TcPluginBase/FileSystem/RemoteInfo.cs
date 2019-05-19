@@ -5,14 +5,24 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 
 namespace TcPluginBase.FileSystem {
-    // Used as parameter type for GetFile and RenMovFile methods
+    /// <summary><see cref="RemoteInfo"/> is passed to FsGetFile and FsRenMovFile. It contains details about the remote file being copied.</summary>
+    /// <remarks>This struct is passed to <see cref="FsPlugin.GetFile"/> and <see cref="FsPlugin.RenMovFile"/> to make it easier for the plugin to copy the file. You can of course also ignore this parameter.</remarks>
     [CLSCompliant(false)]
     [Serializable]
     public class RemoteInfo {
         #region Properties
 
+        /// <summary>
+        /// The remote file size. Useful for a progress indicator.
+        /// </summary>
         public ulong Size { get; private set; }
+        /// <summary>
+        /// Time stamp of the remote file - should be copied with the file.
+        /// </summary>
         public DateTime? LastWriteTime { get; private set; }
+        /// <summary>
+        /// Attributes of the remote file - should be copied with the file.
+        /// </summary>
         public FileAttributes Attributes { get; private set; }
 
         #endregion Properties

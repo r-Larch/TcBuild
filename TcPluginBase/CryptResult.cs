@@ -1,9 +1,18 @@
 ﻿namespace TcPluginBase {
     public enum CryptResult {
-        OK = 0, // Success.
-        PasswordNotFound, // Password not found in password store.
-        NoMasterPassword, // No master password entered yet.
-        Failed, // Encrypt/Decrypt failed.
-        WriteError // Could not write password to password store.
+        /// <summary>Success.</summary>
+        OK = 0,
+
+        /// <summary>Password not found in password store.</summary>
+        PasswordNotFound,
+
+        /// <summary>No master password entered yet.</summary>
+        NoMasterPassword,
+
+        /// <summary>Encrypt/Decrypt failed.</summary>
+        Failed,
+
+        /// <summary>Could not write password to password store.</summary>
+        WriteError
     }
 }

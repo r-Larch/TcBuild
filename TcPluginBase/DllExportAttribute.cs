@@ -4,7 +4,7 @@
 namespace TcPluginBase {
     // Indicates that the attributed method will be exposed to unmanaged code as a static entry point.
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public sealed class DllExportAttribute : Attribute {
+    internal sealed class DllExportAttribute : Attribute {
         // Gets or sets the name of the DLL entry point. If not set, attributed method name will be used as entry point name.
         public string EntryPoint { get; set; }
     }
@@ -13,7 +13,7 @@ namespace TcPluginBase {
     /// <summary>
     /// A placeholder which will be replaced by the actual Plugin implementation
     /// </summary>
-    public class PluginClassPlaceholder {
+    internal class PluginClassPlaceholder {
     }
 
 
@@ -21,7 +21,7 @@ namespace TcPluginBase {
     /// Used to mark methods that can be omitted by the TcBuilder
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-    public class TcMethodAttribute : Attribute {
+    internal class TcMethodAttribute : Attribute {
         public string[] MethodNames { get; }
         public bool Mandatory { get; set; }
         public bool BaseImplemented { get; set; }

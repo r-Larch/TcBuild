@@ -45,6 +45,13 @@ namespace TcPluginBase.FileSystem {
             return new FindData[0];
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="findData"></param>
+        /// <exception cref="NoMoreFilesException"></exception>
+        /// <returns></returns>
         [CLSCompliant(false)]
         public virtual object FindFirst(RemotePath path, out FindData findData)
         {
@@ -99,7 +106,7 @@ namespace TcPluginBase.FileSystem {
                     void Progress(int percentDone)
                     {
                         exec.RunInMainThread(() => {
-                            if (ProgressProc(remoteName, localName, percentDone) == 1) {
+                            if (ProgressProc(remoteName, localName, percentDone)) {
                                 exec.Cancel();
                             }
                         });
@@ -134,7 +141,7 @@ namespace TcPluginBase.FileSystem {
                     void Progress(int percentDone)
                     {
                         exec.RunInMainThread(() => {
-                            if (ProgressProc(localName, remoteName, percentDone) == 1) {
+                            if (ProgressProc(localName, remoteName, percentDone)) {
                                 exec.Cancel();
                             }
                         });
@@ -323,9 +330,30 @@ namespace TcPluginBase.FileSystem {
 
         #region Callback Procedures
 
-        protected virtual int ProgressProc(string source, string destination, int percentDone)
+        /// <summary>
+        /// <see cref="ProgressProc"/> is a callback function, which the plugin can call to show copy progress.
+        /// The address of this callback function is received through the FsInit() function when the plugin is loaded.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// You should call this function at least twice in the copy functions FsGetFile(), FsPutFile() and FsRenMovFile(), at the beginning and at the end.
+        /// If you can't determine the progress, call it with 0% at the beginning and 100% at the end.
+        /// </para>
+        /// <para>
+        /// New in 1.3: During the FsFindFirst/FsFindNext/FsFindClose loop, the plugin may now call the ProgressProc to make a progress dialog appear.
+        /// This is useful for very slow connections. Don't call ProgressProc for fast connections!
+        /// The progress dialog will only be shown for normal dir changes, not for compound operations like get/put.
+        /// The calls to ProgressProc will also be ignored during the first 5 seconds,
+        /// so the user isn't bothered with a progress dialog on every dir change.
+        /// </para>
+        /// </remarks>
+        /// <param name="source">Name of the source file being copied. Depending on the direction of the operation (Get, Put), this may be a local file name of a name in the plugin file system.</param>
+        /// <param name="destination">Name to which the file is copied.</param>
+        /// <param name="percentDone">Percentage of THIS file being copied. Total Commander automatically shows a second percent bar if possible when multiple files are copied.</param>
+        /// <returns>Total Commander returns <c>true</c> if the user wants to abort copying, and <c>false</c> if the operation can continue.</returns>
+        protected virtual bool ProgressProc(string source, string destination, int percentDone)
         {
-            return OnTcPluginEvent(new ProgressEventArgs(PluginNumber, source, destination, percentDone));
+            return OnTcPluginEvent(new ProgressEventArgs(PluginNumber, source, destination, percentDone)) == 1;
         }
 
 

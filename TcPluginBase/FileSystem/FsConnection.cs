@@ -17,17 +17,30 @@ namespace TcPluginBase.FileSystem {
             _data = new ConcurrentDictionary<string, object>();
         }
 
+        /// <summary>
+        /// Calling <see cref="Connect"/> show the FTP connections toolbar in Total Commander,
+        /// and lets TC listen for log messages. Total Commander can show these messages in the log window (ftp toolbar) and write them to a log file.
+        /// <para> Call this if your file system requires explicit disconnection. </para>
+        /// </summary>
         public void Connect()
         {
             _plugin.LogProc(LogMsgType.Connect, $"CONNECT {ConnectionRoot.PathWithoutTrailingSlash}");
             IsConnected = true;
         }
 
+        /// <summary>
+        /// Can be used to log messages to Total Commander.
+        /// </summary>
+        /// <remarks>You must <see cref="Connect"/> to a <see cref="ConnectionRoot"/> for this to work!</remarks>
         public void WriteStatus(string msg)
         {
             _plugin.LogProc(LogMsgType.Details, msg);
         }
 
+        /// <summary>
+        /// Can be used to log errors to Total Commander.
+        /// </summary>
+        /// <remarks>You must <see cref="Connect"/> to a <see cref="ConnectionRoot"/> for this to work!</remarks>
         public void LogError(string error)
         {
             _plugin.Log.Error(error);
@@ -47,6 +60,7 @@ namespace TcPluginBase.FileSystem {
 
             return default;
         }
+
 
         public void Disconnect()
         {

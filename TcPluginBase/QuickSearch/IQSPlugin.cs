@@ -1,13 +1,9 @@
 namespace TcPluginBase.QuickSearch {
     public interface IQuickSearchPlugin {
-        #region Mandatory Methods
-
-        //[TcMethod("MatchFileW")]
+        [TcMethod("MatchFileW", Mandatory = true)]
         bool MatchFile(string filter, string fileName);
 
-        //[TcMethod("MatchGetSetOptions")]
+        [TcMethod("MatchGetSetOptions", Mandatory = true)]
         MatchOptions MatchGetSetOptions(ExactNameMatch status);
-
-        #endregion Mandatory Methods
     }
 }

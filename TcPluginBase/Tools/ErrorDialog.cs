@@ -11,7 +11,7 @@ namespace TcPluginBase.Tools {
             InitializeComponent();
         }
 
-        public static void Show(string callSignature, Exception ex)
+        internal static void Show(string callSignature, Exception ex)
         {
             using (var dialog = new ErrorDialog()) {
                 if (!string.IsNullOrEmpty(callSignature)) {

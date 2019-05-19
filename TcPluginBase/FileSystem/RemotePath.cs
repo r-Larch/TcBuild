@@ -1,7 +1,10 @@
 using System;
 
 
-namespace TcPluginBase {
+namespace TcPluginBase.FileSystem {
+    /// <summary>
+    /// A RemotePath always starts with a backslash, then the names returned by FsFindFirst/FsFindNext separated by backslashes.
+    /// </summary>
     public struct RemotePath {
         // Path = '\just\some\path\starting\with\backslash\file.txt'
         public string Path { get; set; }
@@ -14,13 +17,23 @@ namespace TcPluginBase {
         /// '\segment\segment'  level 2
         /// </summary>
         public int Level => Segments.Length;
+
+        /// <summary>true if this RemotePath has a trailing slash</summary>
         public bool TrailingSlash => (Path.Length > 1 ? Path[Path.Length - 1] : (char) 0) == '\\';
 
+        /// <summary>Returns the directory information for this RemotePath.</summary>
         public RemotePath Directory => System.IO.Path.GetDirectoryName(Path);
+
+        /// <summary>Returns the file name and extension of this RemotePath.</summary>
         public string FileName => System.IO.Path.GetFileName(Path);
+
+        /// <summary>Returns the file name of this RemotePath without the extension.</summary>
         public string FileNameWithoutExtension => System.IO.Path.GetFileNameWithoutExtension(Path);
+
+        /// <summary>Returns the extension of this RemotePath.</summary>
         public string Extension => System.IO.Path.GetExtension(Path);
 
+        /// <summary>Returns a new RemotePath consisting of the current Path without trailing slash.</summary>
         public RemotePath PathWithoutTrailingSlash => TrailingSlash
             ? Path.Substring(0, Path.Length - 1)
             : Path;
