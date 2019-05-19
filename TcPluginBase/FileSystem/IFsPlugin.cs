@@ -12,20 +12,20 @@ namespace TcPluginBase.FileSystem {
         #region Optional Async
 
         [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNext", "FsFindClose")]
-        IEnumerable<FindData> GetFiles(string path);
+        IEnumerable<FindData> GetFiles(RemotePath path);
 
         [TcMethod("FsGetFile", "FsGetFileW")]
-        Task<FileSystemExitCode> GetFileAsync(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token);
+        Task<FileSystemExitCode> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token);
 
         [TcMethod("FsPutFile", "FsPutFileW")]
-        Task<FileSystemExitCode> PutFileAsync(string localName, string remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token);
+        Task<FileSystemExitCode> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token);
 
         #endregion
 
         #region Mandatory Methods
 
         [TcMethod("FsFindFirst", "FsFindFirstW", Mandatory = true)]
-        object FindFirst(string path, out FindData findData);
+        object FindFirst(RemotePath path, out FindData findData);
 
         [TcMethod("FsFindNext", "FsFindNextW", Mandatory = true)]
         bool FindNext(ref object o, out FindData findData);
@@ -42,52 +42,52 @@ namespace TcPluginBase.FileSystem {
         bool IsTempFilePanel { get; }
 
         [TcMethod("FsGetFile", "FsGetFileW")]
-        FileSystemExitCode GetFile(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo);
+        FileSystemExitCode GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo);
 
         [TcMethod("FsPutFile", "FsPutFileW")]
-        FileSystemExitCode PutFile(string localName, string remoteName, CopyFlags copyFlags);
+        FileSystemExitCode PutFile(string localName, RemotePath remoteName, CopyFlags copyFlags);
 
         [TcMethod("FsRenMovFile", "FsRenMovFileW")]
-        FileSystemExitCode RenMovFile(string oldName, string newName, bool move, bool overwrite, RemoteInfo remoteInfo);
+        FileSystemExitCode RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo);
 
         [TcMethod("FsDeleteFile", "FsDeleteFileW")]
-        bool DeleteFile(string fileName);
+        bool DeleteFile(RemotePath fileName);
 
         [TcMethod("FsRemoveDir", "FsRemoveDirW")]
-        bool RemoveDir(string dirName);
+        bool RemoveDir(RemotePath dirName);
 
         [TcMethod("FsMkDir", "FsMkDirW")]
-        bool MkDir(string dir);
+        bool MkDir(RemotePath dir);
 
         [TcMethod("FsExecuteFile", "FsExecuteFileW")]
-        ExecResult ExecuteOpen(TcWindow mainWin, ref string remoteName);
+        ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName);
 
         [TcMethod("FsExecuteFile", "FsExecuteFileW")]
-        ExecResult ExecuteProperties(TcWindow mainWin, string remoteName);
+        ExecResult ExecuteProperties(TcWindow mainWin, RemotePath remoteName);
 
         [TcMethod("FsExecuteFile", "FsExecuteFileW")]
-        ExecResult ExecuteCommand(TcWindow mainWin, ref string remoteName, string command);
+        ExecResult ExecuteCommand(TcWindow mainWin, RemotePath remoteName, string command);
 
         [TcMethod("FsSetAttr", "FsSetAttrW")]
-        bool SetAttr(string remoteName, FileAttributes attr);
+        bool SetAttr(RemotePath remoteName, FileAttributes attr);
 
         [TcMethod("FsSetTime", "FsSetTimeW")]
-        bool SetTime(string remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime);
+        bool SetTime(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime);
 
-        [TcMethod("FsDisconnect", "FsDisconnectW")]
-        bool Disconnect(string disconnectRoot);
+        [TcMethod("FsDisconnect", "FsDisconnectW", BaseImplemented = true)]
+        bool Disconnect(RemotePath disconnectRoot);
 
         [TcMethod("FsStatusInfo", "FsStatusInfoW")]
         void StatusInfo(string remoteDir, InfoStartEnd startEnd, InfoOperation infoOperation);
 
         [TcMethod("FsExtractCustomIcon", "FsExtractCustomIconW")]
-        ExtractIconResult ExtractCustomIcon(ref string remoteName, ExtractIconFlags extractFlags, out Icon icon);
+        ExtractIconResult ExtractCustomIcon(RemotePath remoteName, ExtractIconFlags extractFlags);
 
         [TcMethod("FsGetPreviewBitmap", "FsGetPreviewBitmapW")]
-        PreviewBitmapResult GetPreviewBitmap(ref string remoteName, int width, int height, out Bitmap returnedBitmap);
+        PreviewBitmapResult GetPreviewBitmap(RemotePath remoteName, int width, int height);
 
         [TcMethod("FsGetLocalName", "FsGetLocalNameW")]
-        bool GetLocalName(ref string remoteName, int maxLen);
+        string GetLocalName(RemotePath remoteName, int maxLen);
 
         // FsContent... methods - are determined in IContentPlugin interface
 

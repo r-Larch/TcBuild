@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,48 +13,47 @@ namespace TcBuild.Test.PluginImplementation {
         {
         }
 
-        public override IEnumerable<FindData> GetFiles(string path)
+        public override IEnumerable<FindData> GetFiles(RemotePath path)
         {
             return base.GetFiles(path);
         }
 
-        public override Task<FileSystemExitCode> PutFileAsync(string localName, string remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
+        public override Task<FileSystemExitCode> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
         {
             return base.PutFileAsync(localName, remoteName, copyFlags, setProgress, token);
         }
 
-        public override Task<FileSystemExitCode> GetFileAsync(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
+        public override Task<FileSystemExitCode> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
             return base.GetFileAsync(remoteName, localName, copyFlags, remoteInfo, setProgress, token);
         }
 
 
-        public override bool MkDir(string dir)
+        public override bool MkDir(RemotePath dir)
         {
             return false;
         }
 
 
-        public override bool RemoveDir(string dirName)
+        public override bool RemoveDir(RemotePath dirName)
         {
             return false;
         }
 
-        public override bool DeleteFile(string fileName)
+        public override bool DeleteFile(RemotePath fileName)
         {
             return false;
         }
 
 
-        public override FileSystemExitCode RenMovFile(string oldName, string newName, bool move, bool overwrite, RemoteInfo remoteInfo)
+        public override FileSystemExitCode RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
             return FileSystemExitCode.NotSupported;
         }
 
 
-        public override ExtractIconResult ExtractCustomIcon(ref string remoteName, ExtractIconFlags extractFlags, out Icon icon)
+        public override ExtractIconResult ExtractCustomIcon(RemotePath remoteName, ExtractIconFlags extractFlags)
         {
-            icon = null;
             return ExtractIconResult.UseDefault;
         }
 
@@ -66,38 +64,37 @@ namespace TcBuild.Test.PluginImplementation {
         }
 
 
-        public override bool Disconnect(string disconnectRoot)
+        public override bool Disconnect(RemotePath disconnectRoot)
         {
             return false;
         }
 
-        public override ExecResult ExecuteCommand(TcWindow mainWin, ref string remoteName, string command)
+        public override ExecResult ExecuteCommand(TcWindow mainWin, RemotePath remoteName, string command)
         {
             return ExecResult.Yourself;
         }
 
-        public override ExecResult ExecuteProperties(TcWindow mainWin, string remoteName)
+        public override ExecResult ExecuteProperties(TcWindow mainWin, RemotePath remoteName)
         {
             return ExecResult.Yourself;
         }
 
-        public override ExecResult ExecuteOpen(TcWindow mainWin, ref string remoteName)
+        public override ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName)
         {
             return ExecResult.Yourself;
         }
 
-        public override PreviewBitmapResult GetPreviewBitmap(ref string remoteName, int width, int height, out Bitmap returnedBitmap)
+        public override PreviewBitmapResult GetPreviewBitmap(RemotePath remoteName, int width, int height)
         {
-            returnedBitmap = null;
             return PreviewBitmapResult.None;
         }
 
-        public override bool SetAttr(string remoteName, FileAttributes attr)
+        public override bool SetAttr(RemotePath remoteName, FileAttributes attr)
         {
             return false;
         }
 
-        public override bool SetTime(string remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime)
+        public override bool SetTime(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime)
         {
             return false;
         }

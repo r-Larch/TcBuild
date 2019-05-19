@@ -1,7 +1,9 @@
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TcPluginBase.Content;
@@ -38,13 +40,13 @@ namespace TcPluginBase.FileSystem {
         // TODO use IAsyncEnumerable when C# 8
         // TODO return new []{ new FindData("..", FileAttributes.Directory) } when path == empty directory
         [CLSCompliant(false)]
-        public virtual IEnumerable<FindData> GetFiles(string path)
+        public virtual IEnumerable<FindData> GetFiles(RemotePath path)
         {
             return new FindData[0];
         }
 
         [CLSCompliant(false)]
-        public virtual object FindFirst(string path, out FindData findData)
+        public virtual object FindFirst(RemotePath path, out FindData findData)
         {
             var enumerable = GetFiles(path);
             if (enumerable != null) {
@@ -89,7 +91,7 @@ namespace TcPluginBase.FileSystem {
         #region Optional Methods
 
         [CLSCompliant(false)]
-        public virtual FileSystemExitCode GetFile(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
+        public virtual FileSystemExitCode GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
         {
             try {
                 // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
@@ -124,7 +126,7 @@ namespace TcPluginBase.FileSystem {
         }
 
 
-        public virtual FileSystemExitCode PutFile(string localName, string remoteName, CopyFlags copyFlags)
+        public virtual FileSystemExitCode PutFile(string localName, RemotePath remoteName, CopyFlags copyFlags)
         {
             try {
                 // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
@@ -175,79 +177,90 @@ namespace TcPluginBase.FileSystem {
         }
 
         [CLSCompliant(false)]
-        public virtual Task<FileSystemExitCode> GetFileAsync(string remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
+        public virtual Task<FileSystemExitCode> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
             return Task.FromResult(FileSystemExitCode.NotSupported);
         }
 
-        public virtual Task<FileSystemExitCode> PutFileAsync(string localName, string remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
+        public virtual Task<FileSystemExitCode> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
         {
             return Task.FromResult(FileSystemExitCode.NotSupported);
         }
 
         [CLSCompliant(false)]
-        public virtual FileSystemExitCode RenMovFile(string oldName, string newName, bool move, bool overwrite, RemoteInfo remoteInfo)
+        public virtual FileSystemExitCode RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
             return FileSystemExitCode.NotSupported;
         }
 
-        public virtual bool DeleteFile(string fileName)
+        public virtual bool DeleteFile(RemotePath fileName)
         {
             return false;
         }
 
-        public virtual bool RemoveDir(string dirName)
+        public virtual bool RemoveDir(RemotePath dirName)
         {
             return false;
         }
 
-        public virtual bool MkDir(string dir)
+        public virtual bool MkDir(RemotePath dir)
         {
             return false;
         }
 
-        public ExecResult ExecuteFile(TcWindow mainWin, ref string remoteName, string verb)
+        public ExecResult ExecuteFile(TcWindow mainWin, RemotePath remoteName, string verb)
         {
-            if (string.IsNullOrEmpty(verb))
+            if (string.IsNullOrEmpty(verb)) {
                 return ExecResult.Error;
-            if (verb.Equals("open", StringComparison.CurrentCultureIgnoreCase))
-                return ExecuteOpen(mainWin, ref remoteName);
-            if (verb.Equals("properties", StringComparison.CurrentCultureIgnoreCase))
-                return ExecuteProperties(mainWin, remoteName);
-            if (verb.StartsWith("chmod ", StringComparison.CurrentCultureIgnoreCase))
-                return ExecuteCommand(mainWin, ref remoteName, verb.Trim());
-            if (verb.StartsWith("quote ", StringComparison.CurrentCultureIgnoreCase))
-                return ExecuteCommand(mainWin, ref remoteName, verb.Substring(6).Trim());
-            return ExecResult.Yourself;
+            }
+
+            var cmd = verb.Split(' ')[0].ToLower();
+            switch (cmd) {
+                case "open":
+                    return ExecuteOpen(mainWin, remoteName);
+                case "properties":
+                    return ExecuteProperties(mainWin, remoteName);
+                case "chmod":
+                    return ExecuteCommand(mainWin, remoteName, verb.Trim());
+                case "quote":
+                    return ExecuteCommand(mainWin, remoteName, verb.Substring(6).Trim());
+                default:
+                    return ExecResult.Yourself;
+            }
         }
 
-        public virtual ExecResult ExecuteOpen(TcWindow mainWin, ref string remoteName)
+        public virtual ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName)
         {
             return ExecResult.Yourself;
         }
 
-        public virtual ExecResult ExecuteProperties(TcWindow mainWin, string remoteName)
+        public virtual ExecResult ExecuteProperties(TcWindow mainWin, RemotePath remoteName)
         {
             return ExecResult.Yourself;
         }
 
-        public virtual ExecResult ExecuteCommand(TcWindow mainWin, ref string remoteName, string command)
+        public virtual ExecResult ExecuteCommand(TcWindow mainWin, RemotePath remoteName, string command)
         {
             return ExecResult.Yourself;
         }
 
-        public virtual bool SetAttr(string remoteName, FileAttributes attr)
+        public virtual bool SetAttr(RemotePath remoteName, FileAttributes attr)
         {
             return false;
         }
 
-        public virtual bool SetTime(string remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime)
+        public virtual bool SetTime(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime)
         {
             return false;
         }
 
-        public virtual bool Disconnect(string disconnectRoot)
+        public virtual bool Disconnect(RemotePath disconnectRoot)
         {
+            if (Connections.TryRemove(disconnectRoot, out var connection)) {
+                connection.Disconnect();
+                return true;
+            }
+
             return false;
         }
 
@@ -258,21 +271,51 @@ namespace TcPluginBase.FileSystem {
             CurrentTcOperation = startEnd == InfoStartEnd.Start ? infoOperation : InfoOperation.None;
         }
 
-        public virtual ExtractIconResult ExtractCustomIcon(ref string remoteName, ExtractIconFlags extractFlags, out Icon icon)
+        /// <summary>
+        /// ExtractCustomIcon is called when a file/directory is displayed in the file list.
+        /// It can be used to specify a custom icon for that file/directory.
+        /// This function is new in version 1.1. It requires Total Commander >=5.51, but is ignored by older versions.
+        /// </summary>
+        /// <param name="remoteName">This is the full path to the file or directory whose icon is to be retrieved</param>
+        /// <param name="extractFlags">Flags for the extract operation. A combination of <see cref="ExtractIconFlags"/></param>
+        /// <returns><see cref="ExtractIconResult"/> with the extracted Icon, caching infos or the path to a local file where TC can extract the Icon on its own.</returns>
+        public virtual ExtractIconResult ExtractCustomIcon(RemotePath remoteName, ExtractIconFlags extractFlags)
         {
-            icon = null;
             return ExtractIconResult.UseDefault;
         }
 
-        public virtual PreviewBitmapResult GetPreviewBitmap(ref string remoteName, int width, int height, out Bitmap returnedBitmap)
+        /// <summary>
+        /// GetPreviewBitmap is called when a file/directory is displayed in thumbnail view.
+        /// It can be used to return a custom bitmap for that file/directory.
+        /// This function is new in version 1.4. It requires Total Commander >=7.0, but is ignored by older versions.
+        /// </summary>
+        /// <param name="remoteName">This is the full path to the file or directory whose bitmap is to be retrieved.</param>
+        /// <param name="width">The maximum dimensions of the preview bitmap. If your image is smaller, or has a different side ratio, then you need to return an image which is smaller than these dimensions! See notes below!</param>
+        /// <param name="height">The maximum dimensions of the preview bitmap. If your image is smaller, or has a different side ratio, then you need to return an image which is smaller than these dimensions! See notes below!</param>
+        /// <returns><see cref="PreviewBitmapResult"/> with the extracted Bitmap, caching infos or the path to a local file where TC can extract the bitmap on its own.</returns>
+        public virtual PreviewBitmapResult GetPreviewBitmap(RemotePath remoteName, int width, int height)
         {
-            returnedBitmap = null;
             return PreviewBitmapResult.None;
         }
 
-        public virtual bool GetLocalName(ref string remoteName, int maxLen)
+        /// <summary>
+        /// GetLocalName must not be implemented unless your plugin is a temporary file panel plugin! Temporary file panels just hold links to files on the local file system.
+        /// </summary>
+        /// <remarks>
+        /// If your plugin is a temporary panel plugin, the following functions MUST be thread-safe (can be called from background transfer manager):
+        /// - GetLocalName
+        /// - FindFirst
+        /// - FindNext
+        /// - FindClose
+        ///     This means that when uploading subdirectories from your plugin to FTP in the background, Total Commander will call these functions in a background thread.If the user continues to work in the foreground, calls to FsFindFirst and FsFindNext may be occuring at the same time! Therefore it's very important to use the search handle to keep temporary information about the search.
+        ///     FsStatusInfo will NOT be called from the background thread!
+        /// </remarks>
+        /// <param name="remoteName">Full path to the file name in the plugin namespace, e.g. \somedir\file.ext</param>
+        /// <param name="maxLen">Maximum number of characters you can return in RemoteName, including the final 0.</param>
+        /// <returns>Return the path of the file on the local file system, e.g. c:\windows\file.ext or null if it does not point to a local file.</returns>
+        public virtual string GetLocalName(RemotePath remoteName, int maxLen)
         {
-            return false;
+            return null;
         }
 
         #endregion Optional Methods
@@ -285,12 +328,19 @@ namespace TcPluginBase.FileSystem {
             return OnTcPluginEvent(new ProgressEventArgs(PluginNumber, source, destination, percentDone));
         }
 
-        protected virtual void LogProc(LogMsgType msgType, string logText)
+
+        /// <param name="logText"> String which should be logged.
+        /// When MsgType==MSGTYPE_CONNECT, the string MUST have a specific format:
+        /// "CONNECT" followed by a single whitespace, then the root of the file system which was connected, without trailing backslash. Example: CONNECT \Filesystem
+        /// When MsgType==MSGTYPE_TRANSFERCOMPLETE, this parameter should contain both the source and target names, separated by an arrow " -> ", e.g.
+        /// Download complete: \Filesystem\dir1\file1.txt -> c:\localdir\file1.txt
+        /// </param>
+        internal virtual void LogProc(LogMsgType msgType, string logText)
         {
             OnTcPluginEvent(new LogEventArgs(PluginNumber, (int) msgType, logText));
         }
 
-        protected virtual bool RequestProc(RequestType requestType, string customTitle, string customText, ref string returnedText, int maxLen)
+        internal virtual bool RequestProc(RequestType requestType, string customTitle, string customText, ref string returnedText, int maxLen)
         {
             var e = new RequestEventArgs(PluginNumber, (int) requestType, customTitle, customText, returnedText, maxLen);
             if (OnTcPluginEvent(e) != 0) {
@@ -303,34 +353,14 @@ namespace TcPluginBase.FileSystem {
 
         #endregion Callback Procedures
 
-        public FsPassword Password { get; protected set; }
+        protected ConcurrentDictionary<RemotePath, FsConnection> Connections = new ConcurrentDictionary<RemotePath, FsConnection>();
 
-        public virtual void CreatePassword(int cryptoNumber, int flags)
+        protected FsConnection GetConnection(RemotePath connectionRoot)
         {
-            if (Password == null) {
-                Password = new FsPassword(this, cryptoNumber, flags);
-            }
-        }
-
-
-        private IntPtr _mainWindowHandle = IntPtr.Zero;
-        public IntPtr MainWindowHandle {
-            get => _mainWindowHandle;
-            set {
-                if (_mainWindowHandle == IntPtr.Zero) {
-                    _mainWindowHandle = value;
-                }
-            }
-        }
-
-        // TODO do something with it
-        protected void OpenTcPluginHome()
-        {
-            if (MainWindowHandle != IntPtr.Zero) {
-                const int cmOpenNetwork = 2125;
-                TcWindow.SendMessage(MainWindowHandle, cmOpenNetwork);
-                Thread.Sleep(500);
-            }
+            return Connections.GetOrAdd(connectionRoot, root => {
+                var connection = new FsConnection(connectionRoot, this);
+                return connection;
+            });
         }
     }
 }

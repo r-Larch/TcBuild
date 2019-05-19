@@ -492,54 +492,46 @@ namespace WfxWrapper {
         public static int ExecuteFile(IntPtr mainWin, IntPtr remoteName, [MarshalAs(UnmanagedType.LPStr)] string verb)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
-            var inRmtName = rmtName;
-            var result = ExecuteFileInternal(mainWin, ref rmtName, verb);
-            if (result == ExecResult.SymLink && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
-                TcUtils.WriteStringAnsi(rmtName, remoteName, 0);
+            var result = ExecuteFileInternal(mainWin, rmtName, verb);
+
+            if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
+                TcUtils.WriteStringAnsi(result.SymlinkTarget, remoteName, 0);
             }
 
-            return (int) result;
+            return (int) result.Type;
         }
 
         [DllExport(EntryPoint = "FsExecuteFileW")]
         public static int ExecuteFileW(IntPtr mainWin, IntPtr remoteName, [MarshalAs(UnmanagedType.LPWStr)] string verb)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
-            var inRmtName = rmtName;
-            var result = ExecuteFileInternal(mainWin, ref rmtName, verb);
-            if (result == ExecResult.SymLink && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
-                TcUtils.WriteStringUni(rmtName, remoteName, 0);
+            var result = ExecuteFileInternal(mainWin, rmtName, verb);
+
+            if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
+                TcUtils.WriteStringUni(result.SymlinkTarget, remoteName, 0);
             }
 
-            return (int) result;
+            return (int) result.Type;
         }
 
-        private static ExecResult ExecuteFileInternal(IntPtr mainWin, ref string remoteName, string verb)
+        private static ExecResult ExecuteFileInternal(IntPtr mainWin, RemotePath remoteName, string verb)
         {
-            var result = ExecResult.OK;
             _callSignature = $"ExecuteFile '{remoteName}' - {verb}";
             try {
-                Plugin.MainWindowHandle = mainWin;
-                var tcWindow = new TcWindow(mainWin);
-                result = Plugin.ExecuteFile(tcWindow, ref remoteName, verb);
+                var result = Plugin.ExecuteFile(new TcWindow(mainWin), remoteName, verb);
 
-                var resStr = result.ToString();
-                if (result == ExecResult.SymLink) {
-                    resStr += " (" + remoteName + ")";
+                var resStr = result.Type.ToString();
+                if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
+                    resStr += " (" + result.SymlinkTarget + ")";
                 }
 
                 TraceCall(TraceLevel.Warning, resStr);
-
-                if (result == ExecResult.OkReread) {
-                    tcWindow.Refresh();
-                    result = ExecResult.OK;
-                }
             }
             catch (Exception ex) {
                 ProcessException(ex);
             }
 
-            return result;
+            return ExecResult.Ok;
         }
 
         #endregion FsExecuteFile
@@ -682,7 +674,7 @@ namespace WfxWrapper {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
             var inRmtName = rmtName;
             var result = ExtractIconInternal(ref rmtName, extractFlags, theIcon);
-            if (result != ExtractIconResult.UseDefault && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
+            if (result != ExtractIconResult.ExtractIconEnum.UseDefault && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
                 TcUtils.WriteStringAnsi(rmtName, remoteName, 0);
             }
 
@@ -696,7 +688,7 @@ namespace WfxWrapper {
             var rmtName = Marshal.PtrToStringUni(remoteName);
             var inRmtName = rmtName;
             var result = ExtractIconInternal(ref rmtName, extractFlags, theIcon);
-            if (result != ExtractIconResult.UseDefault && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
+            if (result != ExtractIconResult.ExtractIconEnum.UseDefault && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
                 TcUtils.WriteStringUni(rmtName, remoteName, 0);
             }
 
@@ -704,49 +696,23 @@ namespace WfxWrapper {
         }
 
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        public static ExtractIconResult ExtractIconInternal(ref string remoteName, int extractFlags, IntPtr theIcon)
+        internal static ExtractIconResult.ExtractIconEnum ExtractIconInternal(ref string remoteName, int extractFlags, IntPtr theIcon)
         {
-            const uint imageTypeIcon = 1; //  IMAGE_ICON
-            const uint loadImageFlags = 0x10 + 0x8000; //  LR_LOADFROMFILE | LR_SHARED
-
-            var result = ExtractIconResult.UseDefault;
             var flags = (ExtractIconFlags) extractFlags;
             _callSignature = $"ExtractCustomIcon '{remoteName}' ({flags.ToString()})";
-            try {
-                result = Plugin.ExtractCustomIcon(ref remoteName, flags, out var icon);
-                var resultStr = result.ToString();
-                if (result == ExtractIconResult.LoadFromFile) {
-                    if (string.IsNullOrEmpty(remoteName)) {
-                        resultStr += " , empty RemoteName - UseDefault";
-                        result = ExtractIconResult.UseDefault;
-                    }
-                    else {
-                        // use LoadImage, it produces better results than LoadIcon
-                        var extrIcon = (flags & ExtractIconFlags.Small) == ExtractIconFlags.Small
-                            ? NativeMethods.LoadImage(IntPtr.Zero, remoteName, imageTypeIcon, 16, 16, loadImageFlags)
-                            : NativeMethods.LoadImage(IntPtr.Zero, remoteName, imageTypeIcon, 0, 0, loadImageFlags);
 
-                        if (extrIcon == IntPtr.Zero) {
-                            var errorCode = NativeMethods.GetLastError();
-                            resultStr += $" , extrIcon = 0 (errorCode = {errorCode}) - UseDefault";
-                            result = ExtractIconResult.UseDefault;
-                        }
-                        else {
-                            resultStr += $" , extrIcon ({extrIcon})";
-                            Marshal.WriteIntPtr(theIcon, extrIcon);
-                            result = ExtractIconResult.Extracted;
-                        }
-                    }
+            var ret = ExtractIconResult.ExtractIconEnum.UseDefault;
+            try {
+                var result = Plugin.ExtractCustomIcon(remoteName, flags);
+                var resultStr = result.ToString();
+
+                if (result.IconName != null) {
+                    remoteName = result.IconName;
                 }
-                else if (result != ExtractIconResult.UseDefault && result != ExtractIconResult.Delayed) {
-                    if (icon == null) {
-                        resultStr += " , icon = null - UseDefault";
-                        result = ExtractIconResult.UseDefault;
-                    }
-                    else {
-                        resultStr += $" , icon ({icon.Handle})";
-                        Marshal.WriteIntPtr(theIcon, icon.Handle);
-                    }
+
+                if (result.Icon != null) {
+                    Marshal.WriteIntPtr(theIcon, result.Icon.Handle);
+                    ret = result.Value;
                 }
 
                 // !!! may produce much trace info !!!
@@ -756,7 +722,7 @@ namespace WfxWrapper {
                 ProcessException(ex);
             }
 
-            return result;
+            return ret;
         }
 
         #endregion FsExtractCustomIcon
@@ -790,7 +756,7 @@ namespace WfxWrapper {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
             var inRmtName = rmtName;
             var result = GetPreviewBitmapInternal(ref rmtName, width, height, returnedBitmap);
-            if (result != PreviewBitmapResult.None && !string.IsNullOrEmpty(rmtName) && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
+            if (result != PreviewBitmapResult.PreviewBitmapEnum.None && !string.IsNullOrEmpty(rmtName) && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
                 TcUtils.WriteStringAnsi(rmtName, remoteName, 0);
             }
 
@@ -803,7 +769,7 @@ namespace WfxWrapper {
             var rmtName = Marshal.PtrToStringUni(remoteName);
             var inRmtName = rmtName;
             var result = GetPreviewBitmapInternal(ref rmtName, width, height, returnedBitmap);
-            if (result != PreviewBitmapResult.None && !string.IsNullOrEmpty(rmtName) && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
+            if (result != PreviewBitmapResult.PreviewBitmapEnum.None && !string.IsNullOrEmpty(rmtName) && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
                 TcUtils.WriteStringUni(rmtName, remoteName, 0);
             }
 
@@ -811,64 +777,36 @@ namespace WfxWrapper {
         }
 
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        public static PreviewBitmapResult GetPreviewBitmapInternal(ref string remoteName, int width, int height, IntPtr returnedBitmap)
+        internal static PreviewBitmapResult.PreviewBitmapEnum GetPreviewBitmapInternal(ref string remoteName, int width, int height, IntPtr returnedBitmap)
         {
-            var result = PreviewBitmapResult.None;
             _callSignature = $"GetPreviewBitmap '{remoteName}' ({width} x {height})";
+
+            var ret = PreviewBitmapResult.PreviewBitmapEnum.None;
             try {
-                result = Plugin.GetPreviewBitmap(ref remoteName, width, height, out var bitmap);
+                var result = Plugin.GetPreviewBitmap(remoteName, width, height);
 
-                var isCached = (int) result >= (int) PreviewBitmapResult.Cache;
-                var resNoCache = isCached ? (PreviewBitmapResult) ((int) result - (int) PreviewBitmapResult.Cache) : result;
-                switch (resNoCache) {
-                    case PreviewBitmapResult.None:
-                    case PreviewBitmapResult.Extracted when bitmap == null:
-                        result = PreviewBitmapResult.None;
-                        break;
-                    case PreviewBitmapResult.Extracted: {
-                        var extrBitmap = bitmap.GetHbitmap();
-                        Marshal.WriteIntPtr(returnedBitmap, extrBitmap);
-                        remoteName = string.Empty;
-                        break;
-                    }
+                if (result.Bitmap != null) {
+                    var extrBitmap = result.Bitmap.GetHbitmap();
+                    Marshal.WriteIntPtr(returnedBitmap, extrBitmap);
+                }
 
-                    case PreviewBitmapResult.ExtractYourself:
-                    case PreviewBitmapResult.ExtractYourselfAndDelete: {
-                        if (string.IsNullOrEmpty(remoteName) || !File.Exists(remoteName)) {
-                            result = PreviewBitmapResult.None;
-                        }
-                        else {
-                            var img = Image.FromFile(remoteName);
-                            bitmap = new Bitmap(img, width, height);
-                            Marshal.WriteIntPtr(returnedBitmap, bitmap.GetHbitmap());
-                            result = PreviewBitmapResult.Extracted;
-                            if (isCached) {
-                                result |= PreviewBitmapResult.Cache;
-                            }
+                if (result.BitmapName != null) {
+                    remoteName = result.BitmapName;
+                }
 
-                            if (resNoCache == PreviewBitmapResult.ExtractYourselfAndDelete) {
-                                try {
-                                    File.Delete(remoteName);
-                                }
-                                catch (IOException) {
-                                }
-                                catch (UnauthorizedAccessException) {
-                                }
-                            }
-                        }
-
-                        break;
-                    }
+                ret = result.Value;
+                if (result.Cache) {
+                    ret |= PreviewBitmapResult.PreviewBitmapEnum.Cache;
                 }
 
                 // !!! may produce much trace info !!!
-                TraceCall(TraceLevel.Verbose, $"{resNoCache.ToString()}{(isCached ? ", Cached" : null)} ({(resNoCache == PreviewBitmapResult.None ? null : remoteName)})");
+                TraceCall(TraceLevel.Verbose, $"{ret} ({result.BitmapName})");
             }
             catch (Exception ex) {
                 ProcessException(ex);
             }
 
-            return result;
+            return ret;
         }
 
         #endregion FsGetPreviewBitmap
@@ -933,7 +871,11 @@ namespace WfxWrapper {
             var result = false;
             _callSignature = $"GetLocalName '{remoteName}'";
             try {
-                result = Plugin.GetLocalName(ref remoteName, maxLen);
+                var localName = Plugin.GetLocalName(remoteName, maxLen);
+                if (localName != null) {
+                    remoteName = localName;
+                    result = true;
+                }
 
                 // !!! may produce much trace info !!!
                 TraceCall(TraceLevel.Verbose, result ? remoteName : "<N/A>");

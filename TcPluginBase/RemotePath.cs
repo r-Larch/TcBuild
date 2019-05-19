@@ -6,6 +6,8 @@ namespace TcPluginBase {
         // Path = '\just\some\path\starting\with\backslash\file.txt'
         public string Path { get; set; }
 
+        public bool HasValue => Path.Length > 0;
+
         /// <summary>
         /// '\'                 level 0
         /// '\segment'          level 1
@@ -19,7 +21,7 @@ namespace TcPluginBase {
         public string FileNameWithoutExtension => System.IO.Path.GetFileNameWithoutExtension(Path);
         public string Extension => System.IO.Path.GetExtension(Path);
 
-        public RemotePath WithoutTrailingSlash => TrailingSlash
+        public RemotePath PathWithoutTrailingSlash => TrailingSlash
             ? Path.Substring(0, Path.Length - 1)
             : Path;
 
@@ -67,7 +69,7 @@ namespace TcPluginBase {
 
         public static RemotePath operator +(RemotePath parentPath, RemotePath subPath)
         {
-            return new RemotePath(parentPath.WithoutTrailingSlash + subPath.Path);
+            return new RemotePath(parentPath.PathWithoutTrailingSlash + subPath.Path);
         }
 
         public static RemotePath operator +(RemotePath path, string segment)
