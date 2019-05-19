@@ -23,11 +23,13 @@ namespace TcPluginBase.FileSystem {
         /// You can use it to save and load passwords
         /// </summary>
         public FsPassword Password { get; set; }
+        public FsPrompt Prompt { get; set; }
 
 
         public FsPlugin(Settings pluginSettings) : base(pluginSettings)
         {
             WriteStatusInfo = Convert.ToBoolean(pluginSettings["writeStatusInfo"]);
+            Prompt = new FsPrompt(this);
         }
 
 
