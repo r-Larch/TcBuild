@@ -126,11 +126,12 @@ namespace TcBuild {
                 desc = $"{Path.GetFileNameWithoutExtension(outFile.Name)} is a File System Plugin for Total Commander";
             }
 
+            // https://www.ghisler.ch/wiki/index.php/Plugins_Automated_Installation
             var plugininstall = new List<string> {
                 $"[plugininstall]",
                 $"type={TcUtils.PluginExtensions[pluginType]}",
                 $"file={outFile.Name}",
-                $"description={desc}",
+                $"description={desc}", // TODO desc max length 255
                 $"defaultdir={Path.GetFileNameWithoutExtension(outFile.Name)}",
                 $"version={version.FileVersion}"
             };

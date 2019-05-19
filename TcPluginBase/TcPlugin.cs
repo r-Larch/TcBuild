@@ -10,7 +10,7 @@ namespace TcPluginBase {
     [Serializable]
     public class TcPlugin : MarshalByRefObject {
         public int PluginNumber { get; internal set; }
-        public PluginDefaultParams DefaultParams { get; internal set; }
+        public PluginDefaultParams DefaultParams { get; set; } // for unit tests
 
         public string Title { get; set; }
         public virtual string TraceTitle => Title;

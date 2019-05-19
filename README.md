@@ -68,3 +68,5 @@ So I (René Larch) used his code (it is Licesed as MIT) and wrote this Nuget wit
 | AppDomain Isolation   | ❌Not now, maybe I reimplement it later | ✔️Yes it load your Plugin in its own AppDomain	|
 
 
+# Some docu
+http://java.totalcmd.net/V1.7/javadoc/plugins/wfx/WFXPluginInterface.html
