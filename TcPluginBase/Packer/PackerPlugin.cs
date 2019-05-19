@@ -4,15 +4,10 @@ using System.Collections.Generic;
 
 namespace TcPluginBase.Packer {
     public class PackerPlugin : TcPlugin, IPackerPlugin {
-        #region Properties
-
         public PackerCapabilities Capabilities { get; set; }
-
         public PackBackgroundFlags BackgroundFlags { get; set; }
+        public PackerPassword PasswordManager { get; internal set; }
 
-        #endregion Properties
-
-        #region Constructors
 
         public PackerPlugin(Settings pluginSettings) : base(pluginSettings)
         {
@@ -20,11 +15,8 @@ namespace TcPluginBase.Packer {
             Capabilities = PackerCapabilities.None;
         }
 
-        #endregion Constructors
 
         #region IPackerPlugin Members
-
-        #region Mandatory Methods
 
         public virtual object OpenArchive(ref OpenArchiveData archiveData)
         {
@@ -47,7 +39,6 @@ namespace TcPluginBase.Packer {
             throw new MethodNotSupportedException(nameof(CloseArchive));
         }
 
-        #endregion Mandatory Methods
 
         #region Optional Methods
 
@@ -80,7 +71,7 @@ namespace TcPluginBase.Packer {
             return PackerResult.NotSupported;
         }
 
-        public virtual bool CanYouHandleThisFile(string fileName)
+        public virtual bool CanHandleThisFile(string fileName)
         {
             return false;
         }
@@ -89,7 +80,6 @@ namespace TcPluginBase.Packer {
 
         #endregion IPackerPlugin Members
 
-        #region Callback Procedures
 
         protected int ProcessDataProc(string fileName, int size)
         {
@@ -99,17 +89,6 @@ namespace TcPluginBase.Packer {
         protected int ChangeVolProc(string arcName, ChangeValueProcMode mode)
         {
             return OnTcPluginEvent(new PackerChangeVolEventArgs(arcName, (int) mode));
-        }
-
-        #endregion Callback Procedures
-
-        public PackerPassword Password { get; protected set; }
-
-        public virtual void CreatePassword(int cryptoNumber, int flags)
-        {
-            if (Password == null) {
-                Password = new PackerPassword(this, cryptoNumber, flags);
-            }
         }
     }
 }

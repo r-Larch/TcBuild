@@ -475,7 +475,7 @@ namespace WcxWrapper {
             var result = false;
             _callSignature = $"CanYouHandleThisFile ({fileName})";
             try {
-                result = Plugin.CanYouHandleThisFile(fileName);
+                result = Plugin.CanHandleThisFile(fileName);
 
                 TraceCall(TraceLevel.Warning, result ? "Yes" : "No");
             }
@@ -516,7 +516,9 @@ namespace WcxWrapper {
             _callSignature = $"PkSetCryptCallback ({cryptNumber}, {flags})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, null, null, null, cryptProc, null);
-                Plugin.CreatePassword(cryptNumber, flags);
+                if (Plugin.PasswordManager == null) {
+                    Plugin.PasswordManager = new PackerPassword(Plugin, cryptNumber, flags);
+                }
 
                 TraceCall(TraceLevel.Info, cryptProc.Method.MethodHandle.GetFunctionPointer().ToString());
             }
@@ -531,7 +533,9 @@ namespace WcxWrapper {
             _callSignature = $"PkSetCryptCallbackW ({cryptNumber}, {flags})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, null, null, null, null, cryptProcW);
-                Plugin.CreatePassword(cryptNumber, flags);
+                if (Plugin.PasswordManager == null) {
+                    Plugin.PasswordManager = new PackerPassword(Plugin, cryptNumber, flags);
+                }
 
                 TraceCall(TraceLevel.Info, cryptProcW.Method.MethodHandle.GetFunctionPointer().ToString());
             }

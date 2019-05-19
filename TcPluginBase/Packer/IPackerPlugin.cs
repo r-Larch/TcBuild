@@ -42,7 +42,7 @@ namespace TcPluginBase.Packer {
         PackerResult DoneMemPack(object memData);
 
         [TcMethod("CanYouHandleThisFile", "CanYouHandleThisFileW")]
-        bool CanYouHandleThisFile(string fileName);
+        bool CanHandleThisFile(string fileName);
 
         #endregion Optional Methods
     }
