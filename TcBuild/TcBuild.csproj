@@ -46,6 +46,7 @@
       <!-- references for target project -->
       <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="lib\$(TargetFramework)" />
       <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.pdb" PackagePath="lib\$(TargetFramework)" />
+      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.xml" PackagePath="lib\$(TargetFramework)" />
     </ItemGroup>
   </Target>
 

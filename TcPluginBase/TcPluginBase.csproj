@@ -6,6 +6,7 @@
 
     <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
     <Description>Base interfaces and classes for managed plugins for Total Commander.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

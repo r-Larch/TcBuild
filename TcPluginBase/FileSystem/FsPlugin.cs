@@ -329,12 +329,13 @@ namespace TcPluginBase.FileSystem {
         }
 
 
-        /// <param name="logText"> String which should be logged.
+        /// <summary>
+        /// param logText: String which should be logged.
         /// When MsgType==MSGTYPE_CONNECT, the string MUST have a specific format:
         /// "CONNECT" followed by a single whitespace, then the root of the file system which was connected, without trailing backslash. Example: CONNECT \Filesystem
         /// When MsgType==MSGTYPE_TRANSFERCOMPLETE, this parameter should contain both the source and target names, separated by an arrow " -> ", e.g.
         /// Download complete: \Filesystem\dir1\file1.txt -> c:\localdir\file1.txt
-        /// </param>
+        /// </summary>
         internal virtual void LogProc(LogMsgType msgType, string logText)
         {
             OnTcPluginEvent(new LogEventArgs(PluginNumber, (int) msgType, logText));
