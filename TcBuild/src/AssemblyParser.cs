@@ -64,6 +64,7 @@ namespace TcBuild {
                     PluginMethod = _.Name,
                     IsMandatory = attr?.Mandatory ?? false,
                     Exports = attr?.MethodNames ?? new string[0],
+                    BaseImplemented = attr?.BaseImplemented == true,
                 };
             }).ToList();
 
@@ -76,7 +77,7 @@ namespace TcBuild {
 
             // exports to keep
             var mandatory = methods.Where(_ => _.IsMandatory).SelectMany(_ => _.Exports);
-            var implemented = methods.Where(_ => typeMethods.Contains(_.PluginMethod)).SelectMany(_ => _.Exports);
+            var implemented = methods.Where(_ => typeMethods.Contains(_.PluginMethod) || _.BaseImplemented).SelectMany(_ => _.Exports);
 
             // all exports that have no corresponding implementation
             var exportsToRemove = methods

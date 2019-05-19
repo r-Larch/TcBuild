@@ -24,6 +24,7 @@ namespace TcPluginBase {
     public class TcMethodAttribute : Attribute {
         public string[] MethodNames { get; }
         public bool Mandatory { get; set; }
+        public bool BaseImplemented { get; set; }
 
         public TcMethodAttribute(string method)
         {
