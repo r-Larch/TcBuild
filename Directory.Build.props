@@ -2,7 +2,9 @@
 <Project>
   <PropertyGroup>
     <Version>0.1.23</Version>
-    <Copyright>Copyright © 2020 Martin Ficnar &amp; 2019 René Larch &amp; 2015-16 Oleg Yuvashev</Copyright>
+    <Authors>Oleg Yuvashev, René Larch, Martin Ficnar</Authors>
+    <Company>TcBuild</Company>
+    <Copyright>Copyright © 2020-21 Martin Ficnar &amp; 2019 René Larch &amp; 2015-16 Oleg Yuvashev</Copyright>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <LangVersion>latest</LangVersion>
     <NoWarn>CS1591;CS0618</NoWarn>
