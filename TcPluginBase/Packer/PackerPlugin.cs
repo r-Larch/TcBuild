@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 
 namespace TcPluginBase.Packer {
-    public class PackerPlugin : TcPlugin, IPackerPlugin {
+    public abstract class PackerPlugin : TcPlugin, IPackerPlugin {
         public PackerCapabilities Capabilities { get; set; }
         public PackBackgroundFlags BackgroundFlags { get; set; }
-        public PackerPassword PasswordManager { get; internal set; }
+        public PackerPassword PasswordManager { get; set; }
 
 
-        public PackerPlugin(Settings pluginSettings) : base(pluginSettings)
+        protected PackerPlugin(IConfiguration pluginSettings) : base(pluginSettings)
         {
             BackgroundFlags = PackBackgroundFlags.None;
             Capabilities = PackerCapabilities.None;
@@ -23,7 +24,6 @@ namespace TcPluginBase.Packer {
             throw new MethodNotSupportedException(nameof(OpenArchive));
         }
 
-        [CLSCompliant(false)]
         public virtual PackerResult ReadHeader(ref object arcData, out HeaderData headerData)
         {
             throw new MethodNotSupportedException(nameof(ReadHeader));

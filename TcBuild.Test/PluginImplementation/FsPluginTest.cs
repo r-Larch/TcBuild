@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using TcPluginBase;
 using TcPluginBase.FileSystem;
 
 
 namespace TcBuild.Test.PluginImplementation {
     public class FsPluginTest : FsPlugin {
-        protected FsPluginTest(Settings pluginSettings) : base(pluginSettings)
+        protected FsPluginTest(IConfiguration pluginSettings) : base(pluginSettings)
         {
         }
 
@@ -18,12 +19,12 @@ namespace TcBuild.Test.PluginImplementation {
             return base.GetFiles(path);
         }
 
-        public override Task<FileSystemExitCode> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
+        public override Task<PutFileResult> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
         {
             return base.PutFileAsync(localName, remoteName, copyFlags, setProgress, token);
         }
 
-        public override Task<FileSystemExitCode> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
+        public override Task<GetFileResult> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
             return base.GetFileAsync(remoteName, localName, copyFlags, remoteInfo, setProgress, token);
         }
@@ -46,9 +47,9 @@ namespace TcBuild.Test.PluginImplementation {
         }
 
 
-        public override FileSystemExitCode RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
+        public override RenMovFileResult RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
-            return FileSystemExitCode.NotSupported;
+            return RenMovFileResult.NotSupported;
         }
 
 

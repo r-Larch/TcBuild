@@ -46,8 +46,12 @@ namespace WfxWrapper {
 
         // FsInit, FsInitW functionality is implemented here, not included to FS Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "FsInit")]
-        public static int Init(int pluginNumber, ProgressCallback progressProc, LogCallback logProc, RequestCallback requestProc)
+        public static int Init(int pluginNumber, IntPtr progressProcPtr, IntPtr logProcPtr, IntPtr requestProcPtr)
         {
+            var progressProc = Marshal.GetDelegateForFunctionPointer<ProgressCallback>(progressProcPtr);
+            var logProc = Marshal.GetDelegateForFunctionPointer<LogCallback>(logProcPtr);
+            var requestProc = Marshal.GetDelegateForFunctionPointer<RequestCallback>(requestProcPtr);
+
             try {
                 _callSignature = "FsInit";
                 Plugin.PluginNumber = pluginNumber;
@@ -63,8 +67,12 @@ namespace WfxWrapper {
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsInitW")]
-        public static int InitW(int pluginNumber, ProgressCallbackW progressProcW, LogCallbackW logProcW, RequestCallbackW requestProcW)
+        public static int InitW(int pluginNumber, IntPtr progressProcWPtr, IntPtr logProcWPtr, IntPtr requestProcWPtr)
         {
+            var progressProcW = Marshal.GetDelegateForFunctionPointer<ProgressCallbackW>(progressProcWPtr);
+            var logProcW = Marshal.GetDelegateForFunctionPointer<LogCallbackW>(logProcWPtr);
+            var requestProcW = Marshal.GetDelegateForFunctionPointer<RequestCallbackW>(requestProcWPtr);
+
             try {
                 _callSignature = "FsInitW";
                 Plugin.PluginNumber = pluginNumber;
@@ -85,18 +93,20 @@ namespace WfxWrapper {
         #region FsFindFirst
 
         [UnmanagedCallersOnly(EntryPoint = "FsFindFirst")]
-        public static IntPtr FindFirst([MarshalAs(UnmanagedType.LPStr)] string path, IntPtr findFileData)
+        public static IntPtr FindFirst(IntPtr pathPtr, IntPtr findFileData)
         {
+            var path = Marshal.PtrToStringAnsi(pathPtr);
             return FindFirstInternal(path, findFileData, false);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsFindFirstW")]
-        public static IntPtr FindFirstW([MarshalAs(UnmanagedType.LPWStr)] string path, IntPtr findFileData)
+        public static IntPtr FindFirstW(IntPtr pathPtr, IntPtr findFileData)
         {
+            var path = Marshal.PtrToStringUni(pathPtr);
             return FindFirstInternal(path, findFileData, true);
         }
 
-        public static IntPtr FindFirstInternal(string path, IntPtr findFileData, bool isUnicode)
+        private static IntPtr FindFirstInternal(string path, IntPtr findFileData, bool isUnicode)
         {
             var result = NativeMethods.INVALID_HANDLE;
             _callSignature = $"FindFirst ({path})";
@@ -127,20 +137,18 @@ namespace WfxWrapper {
         #region FsFindNext
 
         [UnmanagedCallersOnly(EntryPoint = "FsFindNext")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool FindNext(IntPtr hdl, IntPtr findFileData)
+        public static int FindNext(IntPtr hdl, IntPtr findFileData)
         {
-            return FindNextInternal(hdl, findFileData, false);
+            return FindNextInternal(hdl, findFileData, false) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsFindNextW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool FindNextW(IntPtr hdl, IntPtr findFileData)
+        public static int FindNextW(IntPtr hdl, IntPtr findFileData)
         {
-            return FindNextInternal(hdl, findFileData, true);
+            return FindNextInternal(hdl, findFileData, true) ? 1 : 0;
         }
 
-        public static bool FindNextInternal(IntPtr hdl, IntPtr findFileData, bool isUnicode)
+        private static bool FindNextInternal(IntPtr hdl, IntPtr findFileData, bool isUnicode)
         {
             var result = false;
             _callSignature = "FindNext";
@@ -204,9 +212,10 @@ namespace WfxWrapper {
 
         // FsSetCryptCallback & FsSetCryptCallbackW functionality is implemented here, not included to FS Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "FsSetCryptCallback")]
-        public static void SetCryptCallback(FsCryptCallback cryptProc, int cryptNumber, int flags)
+        public static void SetCryptCallback(IntPtr cryptProcPtr, int cryptNumber, int flags)
         {
             _callSignature = "SetCryptCallback";
+            var cryptProc = Marshal.GetDelegateForFunctionPointer<FsCryptCallback>(cryptProcPtr);
             try {
                 TcCallback.SetFsPluginCallbacks(null, null, null, null, null, null, cryptProc, null);
                 Plugin.Password ??= new FsPassword(Plugin, cryptNumber, flags);
@@ -219,9 +228,10 @@ namespace WfxWrapper {
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsSetCryptCallbackW")]
-        public static void SetCryptCallbackW(FsCryptCallbackW cryptProcW, int cryptNumber, int flags)
+        public static void SetCryptCallbackW(IntPtr cryptProcWPtr, int cryptNumber, int flags)
         {
             _callSignature = "SetCryptCallbackW";
+            var cryptProcW = Marshal.GetDelegateForFunctionPointer<FsCryptCallbackW>(cryptProcWPtr);
             try {
                 TcCallback.SetFsPluginCallbacks(null, null, null, null, null, null, null, cryptProcW);
                 Plugin.Password ??= new FsPassword(Plugin, cryptNumber, flags);
@@ -264,26 +274,28 @@ namespace WfxWrapper {
         #region FsGetFile
 
         [UnmanagedCallersOnly(EntryPoint = "FsGetFile")]
-        public static int GetFile([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
+        public static int GetFile(IntPtr remoteNamePtr, IntPtr localNamePtr, int copyFlags, IntPtr remoteInfo)
         {
-            var locName = Marshal.PtrToStringAnsi(localName);
-            var result = GetFileInternal(remoteName, locName, (CopyFlags) copyFlags, remoteInfo);
+            var remoteName = Marshal.PtrToStringAnsi(remoteNamePtr);
+            var localName = Marshal.PtrToStringAnsi(localNamePtr);
+            var result = GetFileInternal(remoteName, localName, (CopyFlags) copyFlags, remoteInfo);
             if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
-                var newPath = new RemotePath(locName).SetFileName(result.FileName);
-                TcUtils.WriteStringAnsi(newPath, localName, 0);
+                var newPath = new RemotePath(localName).SetFileName(result.FileName);
+                TcUtils.WriteStringAnsi(newPath, localNamePtr, 0);
             }
 
             return (int) result.Code;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsGetFileW")]
-        public static int GetFileW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
+        public static int GetFileW(IntPtr remoteNamePtr, IntPtr localNamePtr, int copyFlags, IntPtr remoteInfo)
         {
-            var locName = Marshal.PtrToStringUni(localName);
-            var result = GetFileInternal(remoteName, locName, (CopyFlags) copyFlags, remoteInfo);
+            var remoteName = Marshal.PtrToStringUni(remoteNamePtr);
+            var localName = Marshal.PtrToStringUni(localNamePtr);
+            var result = GetFileInternal(remoteName, localName, (CopyFlags) copyFlags, remoteInfo);
             if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
-                var newPath = new RemotePath(locName).SetFileName(result.FileName);
-                TcUtils.WriteStringUni(newPath, localName, 0);
+                var newPath = new RemotePath(localName).SetFileName(result.FileName);
+                TcUtils.WriteStringUni(newPath, localNamePtr, 0);
             }
 
             return (int) result.Code;
@@ -313,26 +325,28 @@ namespace WfxWrapper {
         #region FsPutFile
 
         [UnmanagedCallersOnly(EntryPoint = "FsPutFile")]
-        public static int PutFile([MarshalAs(UnmanagedType.LPStr)] string localName, IntPtr remoteName, int copyFlags)
+        public static int PutFile(IntPtr localNamePtr, IntPtr remoteNamePtr, int copyFlags)
         {
-            var rmtName = Marshal.PtrToStringAnsi(remoteName);
-            var result = PutFileInternal(localName, rmtName, (CopyFlags) copyFlags);
+            var localName = Marshal.PtrToStringAnsi(localNamePtr);
+            var remoteName = Marshal.PtrToStringAnsi(remoteNamePtr);
+            var result = PutFileInternal(localName, remoteName, (CopyFlags) copyFlags);
             if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
-                var newPath = new RemotePath(rmtName).SetFileName(result.FileName);
-                TcUtils.WriteStringAnsi(newPath, remoteName, 0);
+                var newPath = new RemotePath(remoteName).SetFileName(result.FileName);
+                TcUtils.WriteStringAnsi(newPath, remoteNamePtr, 0);
             }
 
             return (int) result.Code;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsPutFileW")]
-        public static int PutFileW([MarshalAs(UnmanagedType.LPWStr)] string localName, IntPtr remoteName, int copyFlags)
+        public static int PutFileW(IntPtr localNamePtr, IntPtr remoteNamePtr, int copyFlags)
         {
-            var rmtName = Marshal.PtrToStringUni(remoteName);
-            var result = PutFileInternal(localName, rmtName, (CopyFlags) copyFlags);
+            var localName = Marshal.PtrToStringUni(localNamePtr);
+            var remoteName = Marshal.PtrToStringUni(remoteNamePtr);
+            var result = PutFileInternal(localName, remoteName, (CopyFlags) copyFlags);
             if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
-                var newPath = new RemotePath(rmtName).SetFileName(result.FileName);
-                TcUtils.WriteStringUni(newPath, remoteName, 0);
+                var newPath = new RemotePath(remoteName).SetFileName(result.FileName);
+                TcUtils.WriteStringUni(newPath, remoteNamePtr, 0);
             }
 
             return (int) result.Code;
@@ -361,13 +375,22 @@ namespace WfxWrapper {
         #region FsRenMovFile
 
         [UnmanagedCallersOnly(EntryPoint = "FsRenMovFile")]
-        public static int RenMovFile([MarshalAs(UnmanagedType.LPStr)] string oldName, [MarshalAs(UnmanagedType.LPStr)] string newName, [MarshalAs(UnmanagedType.Bool)] bool move, [MarshalAs(UnmanagedType.Bool)] bool overwrite, IntPtr remoteInfo)
+        public static int RenMovFile(IntPtr oldNamePtr, IntPtr newNamePtr, int move, int overwrite, IntPtr remoteInfo)
         {
-            return RenMovFileW(oldName, newName, move, overwrite, remoteInfo);
+            var oldName = Marshal.PtrToStringAnsi(oldNamePtr);
+            var newName = Marshal.PtrToStringAnsi(newNamePtr);
+            return RenMovFileInternal(oldName, newName, move != 0, overwrite != 0, remoteInfo);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsRenMovFileW")]
-        public static int RenMovFileW([MarshalAs(UnmanagedType.LPWStr)] string oldName, [MarshalAs(UnmanagedType.LPWStr)] string newName, [MarshalAs(UnmanagedType.Bool)] bool move, [MarshalAs(UnmanagedType.Bool)] bool overwrite, IntPtr rmtInfo)
+        public static int RenMovFileW(IntPtr oldNamePtr, IntPtr newNamePtr, int move, int overwrite, IntPtr remoteInfo)
+        {
+            var oldName = Marshal.PtrToStringUni(oldNamePtr);
+            var newName = Marshal.PtrToStringUni(newNamePtr);
+            return RenMovFileInternal(oldName, newName, move != 0, overwrite != 0, remoteInfo);
+        }
+
+        private static int RenMovFileInternal(string oldName, string newName, bool move, bool overwrite, IntPtr rmtInfo)
         {
             var result = RenMovFileResult.NotSupported;
             if (oldName == null || newName == null) {
@@ -395,15 +418,20 @@ namespace WfxWrapper {
         #region FsDeleteFile
 
         [UnmanagedCallersOnly(EntryPoint = "FsDeleteFile")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool DeleteFile([MarshalAs(UnmanagedType.LPStr)] string fileName)
+        public static int DeleteFile(IntPtr fileNamePtr)
         {
-            return DeleteFileW(fileName);
+            var fileName = Marshal.PtrToStringAnsi(fileNamePtr);
+            return DeleteFileInternal(fileName) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsDeleteFileW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool DeleteFileW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
+        public static int DeleteFileW(IntPtr fileNamePtr)
+        {
+            var fileName = Marshal.PtrToStringUni(fileNamePtr);
+            return DeleteFileInternal(fileName) ? 1 : 0;
+        }
+
+        private static bool DeleteFileInternal(string fileName)
         {
             var result = false;
             _callSignature = $"DeleteFile '{fileName}'";
@@ -425,15 +453,20 @@ namespace WfxWrapper {
         #region FsRemoveDir
 
         [UnmanagedCallersOnly(EntryPoint = "FsRemoveDir")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool RemoveDir([MarshalAs(UnmanagedType.LPStr)] string dirName)
+        public static int RemoveDir(IntPtr dirNamePtr)
         {
-            return RemoveDirW(dirName);
+            var dirName = Marshal.PtrToStringAnsi(dirNamePtr);
+            return RemoveDirInternal(dirName) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsRemoveDirW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool RemoveDirW([MarshalAs(UnmanagedType.LPWStr)] string dirName)
+        public static int RemoveDirW(IntPtr dirNamePtr)
+        {
+            var dirName = Marshal.PtrToStringUni(dirNamePtr);
+            return RemoveDirInternal(dirName) ? 1 : 0;
+        }
+
+        private static bool RemoveDirInternal(string dirName)
         {
             var result = false;
             _callSignature = $"RemoveDir '{dirName}'";
@@ -455,15 +488,20 @@ namespace WfxWrapper {
         #region FsMkDir
 
         [UnmanagedCallersOnly(EntryPoint = "FsMkDir")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool MkDir([MarshalAs(UnmanagedType.LPStr)] string dirName)
+        public static int MkDir(IntPtr dirNamePtr)
         {
-            return MkDirW(dirName);
+            var dirName = Marshal.PtrToStringAnsi(dirNamePtr);
+            return MkDirInternal(dirName) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsMkDirW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool MkDirW([MarshalAs(UnmanagedType.LPWStr)] string dirName)
+        public static int MkDirW(IntPtr dirNamePtr)
+        {
+            var dirName = Marshal.PtrToStringUni(dirNamePtr);
+            return MkDirInternal(dirName) ? 1 : 0;
+        }
+
+        private static bool MkDirInternal(string dirName)
         {
             var result = false;
             _callSignature = $"MkDir '{dirName}'";
@@ -484,9 +522,10 @@ namespace WfxWrapper {
         #region FsExecuteFile
 
         [UnmanagedCallersOnly(EntryPoint = "FsExecuteFile")]
-        public static int ExecuteFile(IntPtr mainWin, IntPtr remoteName, [MarshalAs(UnmanagedType.LPStr)] string verb)
+        public static int ExecuteFile(IntPtr mainWin, IntPtr remoteName, IntPtr verbPtr)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
+            var verb = Marshal.PtrToStringAnsi(verbPtr);
             var result = ExecuteFileInternal(mainWin, rmtName, verb);
 
             if (result.Type == ExecResult.ExecEnum.SymLink && !string.IsNullOrEmpty(result.SymlinkTarget)) {
@@ -497,9 +536,10 @@ namespace WfxWrapper {
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsExecuteFileW")]
-        public static int ExecuteFileW(IntPtr mainWin, IntPtr remoteName, [MarshalAs(UnmanagedType.LPWStr)] string verb)
+        public static int ExecuteFileW(IntPtr mainWin, IntPtr remoteName, IntPtr verbPtr)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
+            var verb = Marshal.PtrToStringUni(verbPtr);
             var result = ExecuteFileInternal(mainWin, rmtName, verb);
 
             if (result.Type == ExecResult.ExecEnum.SymLink && !string.IsNullOrEmpty(result.SymlinkTarget)) {
@@ -536,19 +576,24 @@ namespace WfxWrapper {
         #region FsSetAttr
 
         [UnmanagedCallersOnly(EntryPoint = "FsSetAttr")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool SetAttr([MarshalAs(UnmanagedType.LPStr)] string remoteName, int newAttr)
+        public static int SetAttr(IntPtr remoteNamePtr, int newAttr)
         {
-            return SetAttrW(remoteName, newAttr);
+            var remoteName = Marshal.PtrToStringAnsi(remoteNamePtr);
+            return SetAttrInternal(remoteName, newAttr) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsSetAttrW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool SetAttrW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, int newAttr)
+        public static int SetAttrW(IntPtr remoteNamePtr, int newAttr)
+        {
+            var remoteName = Marshal.PtrToStringUni(remoteNamePtr);
+            return SetAttrInternal(remoteName, newAttr) ? 1 : 0;
+        }
+
+        private static bool SetAttrInternal(string remoteName, int newAttr)
         {
             var result = false;
             var attr = (FileAttributes) newAttr;
-            _callSignature = $"SetAttr '{remoteName}' ({attr.ToString()})";
+            _callSignature = $"SetAttr '{remoteName}' ({attr})";
             try {
                 result = Plugin.SetAttr(remoteName, attr);
 
@@ -567,15 +612,20 @@ namespace WfxWrapper {
         #region FsSetTime
 
         [UnmanagedCallersOnly(EntryPoint = "FsSetTime")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool SetTime([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
+        public static int SetTime(IntPtr remoteNamePtr, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
         {
-            return SetTimeW(remoteName, creationTime, lastAccessTime, lastWriteTime);
+            var remoteName = Marshal.PtrToStringAnsi(remoteNamePtr);
+            return SetTimeInternal(remoteName, creationTime, lastAccessTime, lastWriteTime) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsSetTimeW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool SetTimeW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
+        public static int SetTimeW(IntPtr remoteNamePtr, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
+        {
+            var remoteName = Marshal.PtrToStringUni(remoteNamePtr);
+            return SetTimeInternal(remoteName, creationTime, lastAccessTime, lastWriteTime) ? 1 : 0;
+        }
+
+        private static bool SetTimeInternal(string remoteName, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
         {
             var crTime = TcUtils.ReadDateTime(creationTime);
             var laTime = TcUtils.ReadDateTime(lastAccessTime);
@@ -606,15 +656,20 @@ namespace WfxWrapper {
         #region FsDisconnect
 
         [UnmanagedCallersOnly(EntryPoint = "FsDisconnect")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool Disconnect([MarshalAs(UnmanagedType.LPStr)] string disconnectRoot)
+        public static int Disconnect(IntPtr disconnectRootPtr)
         {
-            return DisconnectW(disconnectRoot);
+            var disconnectRoot = Marshal.PtrToStringAnsi(disconnectRootPtr);
+            return DisconnectInternal(disconnectRoot) ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsDisconnectW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool DisconnectW([MarshalAs(UnmanagedType.LPWStr)] string disconnectRoot)
+        public static int DisconnectW(IntPtr disconnectRootPtr)
+        {
+            var disconnectRoot = Marshal.PtrToStringUni(disconnectRootPtr);
+            return DisconnectInternal(disconnectRoot) ? 1 : 0;
+        }
+
+        private static bool DisconnectInternal(string disconnectRoot)
         {
             var result = false;
             _callSignature = $"Disconnect '{disconnectRoot}'";
@@ -636,13 +691,20 @@ namespace WfxWrapper {
         #region FsStatusInfo
 
         [UnmanagedCallersOnly(EntryPoint = "FsStatusInfo")]
-        public static void StatusInfo([MarshalAs(UnmanagedType.LPStr)] string remoteDir, int startEnd, int operation)
+        public static void StatusInfo(IntPtr remoteDirPtr, int startEnd, int operation)
         {
-            StatusInfoW(remoteDir, startEnd, operation);
+            var remoteDir = Marshal.PtrToStringAnsi(remoteDirPtr);
+            StatusInfoInternal(remoteDir, startEnd, operation);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsStatusInfoW")]
-        public static void StatusInfoW([MarshalAs(UnmanagedType.LPWStr)] string remoteDir, int startEnd, int operation)
+        public static void StatusInfoW(IntPtr remoteDirPtr, int startEnd, int operation)
+        {
+            var remoteDir = Marshal.PtrToStringUni(remoteDirPtr);
+            StatusInfoInternal(remoteDir, startEnd, operation);
+        }
+
+        private static void StatusInfoInternal(string remoteDir, int startEnd, int operation)
         {
             try {
 #if TRACE
@@ -688,7 +750,7 @@ namespace WfxWrapper {
             return (int) result;
         }
 
-        internal static ExtractIconResult.ExtractIconEnum ExtractIconInternal(ref string remoteName, int extractFlags, IntPtr theIcon)
+        private static ExtractIconResult.ExtractIconEnum ExtractIconInternal(ref string remoteName, int extractFlags, IntPtr theIcon)
         {
             var flags = (ExtractIconFlags) extractFlags;
             _callSignature = $"ExtractCustomIcon '{remoteName}' ({flags.ToString()})";
@@ -724,9 +786,10 @@ namespace WfxWrapper {
 
         // FsSetDefaultParams functionality is implemented here, not included to FS Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "FsSetDefaultParams")]
-        public static void SetDefaultParams(ref PluginDefaultParams defParams)
+        public static void SetDefaultParams(IntPtr defParamsPtr)
         {
             _callSignature = "SetDefaultParams";
+            var defParams = Marshal.PtrToStructure<PluginDefaultParams>(defParamsPtr);
             try {
                 Plugin.DefaultParams = defParams;
 
@@ -768,7 +831,7 @@ namespace WfxWrapper {
             return (int) result;
         }
 
-        internal static PreviewBitmapResult.PreviewBitmapEnum GetPreviewBitmapInternal(ref string remoteName, int width, int height, IntPtr returnedBitmap)
+        private static PreviewBitmapResult.PreviewBitmapEnum GetPreviewBitmapInternal(ref string remoteName, int width, int height, IntPtr returnedBitmap)
         {
             _callSignature = $"GetPreviewBitmap '{remoteName}' ({width} x {height})";
 
@@ -807,8 +870,7 @@ namespace WfxWrapper {
 
         // FsLinksToLocalFiles functionality is implemented here, not included to FS Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "FsLinksToLocalFiles")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool LinksToLocalFiles()
+        public static int LinksToLocalFiles()
         {
             var result = false;
             _callSignature = "LinksToLocalFiles";
@@ -821,7 +883,7 @@ namespace WfxWrapper {
                 ProcessException(ex);
             }
 
-            return result;
+            return result ? 1 : 0;
         }
 
         #endregion FsLinksToLocalFiles
@@ -830,8 +892,7 @@ namespace WfxWrapper {
         #region FsGetLocalName
 
         [UnmanagedCallersOnly(EntryPoint = "FsGetLocalName")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool GetLocalName(IntPtr remoteName, int maxLen)
+        public static int GetLocalName(IntPtr remoteName, int maxLen)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
             var result = GetLocalNameInternal(ref rmtName, maxLen);
@@ -839,12 +900,11 @@ namespace WfxWrapper {
                 TcUtils.WriteStringAnsi(rmtName, remoteName, 0);
             }
 
-            return result;
+            return result ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsGetLocalNameW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool GetLocalNameW(IntPtr remoteName, int maxLen)
+        public static int GetLocalNameW(IntPtr remoteName, int maxLen)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
             var result = GetLocalNameInternal(ref rmtName, maxLen);
@@ -852,10 +912,10 @@ namespace WfxWrapper {
                 TcUtils.WriteStringUni(rmtName, remoteName, 0);
             }
 
-            return result;
+            return result ? 1 : 0;
         }
 
-        public static bool GetLocalNameInternal(ref string remoteName, int maxLen)
+        private static bool GetLocalNameInternal(ref string remoteName, int maxLen)
         {
             var result = false;
             _callSignature = $"GetLocalName '{remoteName}'";
@@ -942,13 +1002,20 @@ namespace WfxWrapper {
         #region FsContentGetValue
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentGetValue")]
-        public static int GetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
+        public static int GetValue(IntPtr fileNamePtr, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
-            return GetValueW(fileName, fieldIndex, unitIndex, fieldValue, maxLen, flags);
+            var fileName = Marshal.PtrToStringAnsi(fileNamePtr);
+            return GetValueInternal(fileName, fieldIndex, unitIndex, fieldValue, maxLen, flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentGetValueW")]
-        public static int GetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
+        public static int GetValueW(IntPtr fileNamePtr, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
+        {
+            var fileName = Marshal.PtrToStringUni(fileNamePtr);
+            return GetValueInternal(fileName, fieldIndex, unitIndex, fieldValue, maxLen, flags);
+        }
+
+        private static int GetValueInternal(string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
             GetValueResult result;
             var fieldType = ContentFieldType.NoMoreFields;
@@ -982,13 +1049,20 @@ namespace WfxWrapper {
         #region FsContentStopGetValue
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentStopGetValue")]
-        public static void StopGetValue([MarshalAs(UnmanagedType.LPStr)] string fileName)
+        public static void StopGetValue(IntPtr fileNamePtr)
         {
-            StopGetValueW(fileName);
+            var fileName = Marshal.PtrToStringAnsi(fileNamePtr);
+            StopGetValueInternal(fileName);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentStopGetValueW")]
-        public static void StopGetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
+        public static void StopGetValueW(IntPtr fileNamePtr)
+        {
+            var fileName = Marshal.PtrToStringUni(fileNamePtr);
+            StopGetValueInternal(fileName);
+        }
+
+        private static void StopGetValueInternal(string fileName)
         {
             _callSignature = "ContentStopGetValue";
             try {
@@ -1069,13 +1143,20 @@ namespace WfxWrapper {
         #region FsContentSetValue
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentSetValue")]
-        public static int SetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
+        public static int SetValue(IntPtr fileNamePtr, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
-            return SetValueW(fileName, fieldIndex, unitIndex, fieldType, fieldValue, flags);
+            var fileName = Marshal.PtrToStringAnsi(fileNamePtr);
+            return SetValueInternal(fileName, fieldIndex, unitIndex, fieldType, fieldValue, flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentSetValueW")]
-        public static int SetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
+        public static int SetValueW(IntPtr fileNamePtr, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
+        {
+            var fileName = Marshal.PtrToStringUni(fileNamePtr);
+            return SetValueInternal(fileName, fieldIndex, unitIndex, fieldType, fieldValue, flags);
+        }
+
+        private static int SetValueInternal(string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
             SetValueResult result;
             var fldType = (ContentFieldType) fieldType;
@@ -1101,8 +1182,7 @@ namespace WfxWrapper {
         #region FsContentGetDefaultView
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentGetDefaultView")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool GetDefaultView(IntPtr viewContents, IntPtr viewHeaders, IntPtr viewWidths, IntPtr viewOptions, int maxLen)
+        public static int GetDefaultView(IntPtr viewContents, IntPtr viewHeaders, IntPtr viewWidths, IntPtr viewOptions, int maxLen)
         {
             var result = GetDefaultViewFs(out var contents, out var headers, out var widths, out var options, maxLen);
             if (result) {
@@ -1111,15 +1191,14 @@ namespace WfxWrapper {
                 TcUtils.WriteStringAnsi(widths, viewWidths, maxLen);
                 TcUtils.WriteStringAnsi(options, viewOptions, maxLen);
 
-                return true;
+                return true ? 1 : 0;
             }
 
-            return false;
+            return false ? 1 : 0;
         }
 
         [UnmanagedCallersOnly(EntryPoint = "FsContentGetDefaultViewW")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool GetDefaultViewW(IntPtr viewContents, IntPtr viewHeaders, IntPtr viewWidths, IntPtr viewOptions, int maxLen)
+        public static int GetDefaultViewW(IntPtr viewContents, IntPtr viewHeaders, IntPtr viewWidths, IntPtr viewOptions, int maxLen)
         {
             var result = GetDefaultViewFs(out var contents, out var headers, out var widths, out var options, maxLen);
             if (result) {
@@ -1128,10 +1207,10 @@ namespace WfxWrapper {
                 TcUtils.WriteStringUni(widths, viewWidths, maxLen);
                 TcUtils.WriteStringUni(options, viewOptions, maxLen);
 
-                return true;
+                return true ? 1 : 0;
             }
 
-            return false;
+            return false ? 1 : 0;
         }
 
         public static bool GetDefaultViewFs(out string viewContents, out string viewHeaders, out string viewWidths, out string viewOptions, int maxLen)

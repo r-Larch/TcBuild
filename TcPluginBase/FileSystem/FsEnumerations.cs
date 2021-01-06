@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 
@@ -59,9 +60,10 @@ namespace TcPluginBase.FileSystem {
         /// <param name="symlinkTarget">The file or directory where the symlink points to.</param>
         public static ExecResult SymLink(string symlinkTarget) => new ExecResult(ExecEnum.SymLink, symlinkTarget);
 
-
-        internal ExecEnum Type;
-        internal string SymlinkTarget;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ExecEnum Type;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string SymlinkTarget;
 
         private ExecResult(ExecEnum type, string symlinkTarget = default)
         {
@@ -69,7 +71,8 @@ namespace TcPluginBase.FileSystem {
             SymlinkTarget = symlinkTarget;
         }
 
-        internal enum ExecEnum {
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public enum ExecEnum {
             OK = 0,
             Error = 1,
             Yourself = -1,
@@ -148,11 +151,15 @@ namespace TcPluginBase.FileSystem {
             return ExtractIconResult.Extracted(System.Drawing.Icon.FromHandle(extrIcon), filePath);
         }
 
-        internal ExtractIconEnum Value { get; set; }
-        internal Icon Icon { get; set; }
-        internal string IconName { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public ExtractIconEnum Value { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Icon Icon { get; set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string IconName { get; set; }
 
-        internal enum ExtractIconEnum {
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public enum ExtractIconEnum {
             UseDefault = 0, // No icon is returned. The calling app should show the default icon for this file type.
             Extracted, // An icon was returned in TheIcon. The icon must NOT be freed by the calling app.
             ExtractedDestroy, // An icon was returned in TheIcon. The icon MUST be destroyed by the calling app.
@@ -166,8 +173,10 @@ namespace TcPluginBase.FileSystem {
     }
 
     public readonly struct GetFileResult {
-        internal FileSystemExitCode Code { get; }
-        internal string FileName { get; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public FileSystemExitCode Code { get; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string FileName { get; }
 
         private GetFileResult(FileSystemExitCode code, string fileName = null)
         {
@@ -197,8 +206,10 @@ namespace TcPluginBase.FileSystem {
     }
 
     public readonly struct PutFileResult {
-        internal FileSystemExitCode Code { get; }
-        internal string FileName { get; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public FileSystemExitCode Code { get; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string FileName { get; }
 
         private PutFileResult(FileSystemExitCode code, string fileName = null)
         {
@@ -228,8 +239,10 @@ namespace TcPluginBase.FileSystem {
     }
 
     public readonly struct RenMovFileResult {
-        internal FileSystemExitCode Code { get; }
-        private RenMovFileResult(FileSystemExitCode code) => Code = code;
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public FileSystemExitCode Code { get; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public RenMovFileResult(FileSystemExitCode code) => Code = code;
 
         /// <summary> The file was copied/moved OK. </summary>
         public static RenMovFileResult Ok => new RenMovFileResult(FileSystemExitCode.OK);
@@ -321,14 +334,18 @@ namespace TcPluginBase.FileSystem {
         public static PreviewBitmapResult ExtractYourselfAndDelete(string temporaryImageFile, bool cache = true) => new PreviewBitmapResult {Value = PreviewBitmapEnum.ExtractYourselfAndDelete, BitmapName = temporaryImageFile, Cache = cache};
 
 
-        internal string BitmapName { get; private set; }
-        internal PreviewBitmapEnum Value { get; private set; }
-        internal Bitmap Bitmap { get; private set; }
-        internal bool Cache { get; private set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string BitmapName { get; private set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public PreviewBitmapEnum Value { get; private set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public Bitmap Bitmap { get; private set; }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool Cache { get; private set; }
 
 
-        [Flags]
-        internal enum PreviewBitmapEnum {
+        [Flags, EditorBrowsable(EditorBrowsableState.Never)]
+        public enum PreviewBitmapEnum {
             None = 0, // There is no preview bitmap.
             Extracted, // The image was extracted and is returned in ReturnedBitmap.
             ExtractYourself, // Tells the caller to extract the image by itself.

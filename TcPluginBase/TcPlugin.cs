@@ -2,11 +2,12 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 
 namespace TcPluginBase {
     public class TcPlugin {
-        public int PluginNumber { get; internal set; }
+        public int PluginNumber { get; set; }
         public PluginDefaultParams DefaultParams { get; set; } // for unit tests
 
         public string Title { get; set; }
@@ -21,7 +22,7 @@ namespace TcPluginBase {
         protected string PluginFolder { get; }
 
 
-        public TcPlugin(Settings pluginSettings = null)
+        public TcPlugin(IConfiguration pluginSettings = null)
         {
             PluginNumber = -1;
             _mainThreadId = Thread.CurrentThread.ManagedThreadId;

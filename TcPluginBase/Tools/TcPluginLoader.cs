@@ -1,13 +1,18 @@
 ﻿using System;
-using System.Configuration;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.FileProviders;
 
 
 namespace TcPluginBase.Tools {
-    internal static class TcPluginLoader {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static class TcPluginLoader {
         /// <summary>
         /// This is the TcPluginBase EntryPoint!
         /// </summary>
@@ -31,37 +36,26 @@ namespace TcPluginBase.Tools {
 
             var settings = GetSettings(pluginClass.Assembly);
 
-            var ctor = pluginClass.GetConstructor(new[] {typeof(Settings)});
+            var ctor = pluginClass.GetConstructor(new[] {typeof(IConfiguration)});
             var tcPlugin = (TPlugin) ctor.Invoke(new object[] {settings});
             return tcPlugin;
         }
 
 
-        private static Settings GetSettings(Assembly assembly)
+        private static IConfiguration GetSettings(Assembly assembly)
         {
-            var settings = new Settings();
+            var root = new ConfigurationBuilder()
+                .Add(new JsonConfigurationSource {
+                    FileProvider = new PhysicalFileProvider(Path.GetDirectoryName(assembly.Location)),
+                    Path = $"settings.json",
+                })
+                .Build();
 
-            // load global settings
-            foreach (var key in ConfigurationManager.AppSettings.AllKeys) {
-                settings.Add(key, ConfigurationManager.AppSettings[key]);
-            }
-
-            // and add plugin settings
-            var appSettings = ConfigurationManager.OpenExeConfiguration(assembly.Location).AppSettings.Settings;
-            foreach (var key in appSettings.AllKeys) {
-                if (settings.ContainsKey(key)) {
-                    settings[key] = appSettings[key].Value;
-                }
-                else {
-                    settings.Add(key, appSettings[key].Value);
-                }
-            }
-
-            return settings;
+            return root;
         }
 
 
-        internal static void ProcessException(TcPlugin plugin, string callSignature, Exception ex)
+        public static void ProcessException(TcPlugin plugin, string callSignature, Exception ex)
         {
 #if TRACE
             var pluginTitle = plugin == null ? "NULL" : plugin.TraceTitle;

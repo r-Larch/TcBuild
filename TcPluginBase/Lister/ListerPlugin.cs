@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using Microsoft.Extensions.Configuration;
 
 
 namespace TcPluginBase.Lister {
@@ -9,7 +10,7 @@ namespace TcPluginBase.Lister {
         WPF
     }
 
-    public class ListerPlugin : TcPlugin, IListerPlugin {
+    public abstract class ListerPlugin : TcPlugin, IListerPlugin {
         #region Constants
 
         // Lister handler builder load
@@ -37,7 +38,7 @@ namespace TcPluginBase.Lister {
 
         #region Constructors
 
-        public ListerPlugin(Settings pluginSettings) : base(pluginSettings)
+        protected ListerPlugin(IConfiguration pluginSettings) : base(pluginSettings)
         {
             BitmapBackgroundColor = Color.White;
             ListerHandle = IntPtr.Zero;

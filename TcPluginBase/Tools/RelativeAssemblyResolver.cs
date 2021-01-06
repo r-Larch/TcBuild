@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 
 namespace TcPluginBase.Tools {
-    internal class RelativeAssemblyResolver {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class RelativeAssemblyResolver {
         private readonly IEnumerable<FileInfo> _dlls;
 
 

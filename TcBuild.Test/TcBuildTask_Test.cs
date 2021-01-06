@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -41,7 +40,7 @@ namespace TcBuild.Test {
                     Configuration = "Debug",
                     AssemblyFile = assemblyFile.FullName,
                     //TargetFile = assemblyFile.FullName,
-                    TcPluginBase = typeof(UnmanagedCallersOnlyAttribute).Assembly.Location,
+                    TcPluginBase = typeof(TcPluginBase.TcPlugin).Assembly.Location,
                     IntermediateDirectory = outDir.FullName,
                     ProjectDirectory = "/ignored",
                     ReferenceCopyLocalFiles = AppDomain.CurrentDomain.GetAssemblies().Select(_ => new TaskItem(_.Location)).Cast<ITaskItem>().ToArray(),

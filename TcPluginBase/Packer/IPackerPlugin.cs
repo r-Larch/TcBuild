@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 
 namespace TcPluginBase.Packer {
-    [CLSCompliant(false)]
     public interface IPackerPlugin {
         #region Mandatory Methods
 

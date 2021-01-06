@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace TcPluginBase.Packer {
     // Used as parameter type for ReadHeader method
-    [CLSCompliant(false)]
     [Serializable]
     public class HeaderData {
         private const int AllowedPackerAttributes = 0x3F;
@@ -81,7 +80,6 @@ namespace TcPluginBase.Packer {
         #region TC Structures
 
         // Used in TC ReadHeaderEx function (Unicode version)
-        [CLSCompliant(false)]
         [Serializable]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct TcHeaderDataExW {
@@ -109,7 +107,6 @@ namespace TcPluginBase.Packer {
         }
 
         // Used in TC ReadHeaderEx function (non-Unicode version)
-        [CLSCompliant(false)]
         [Serializable]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct TcHeaderDataEx {

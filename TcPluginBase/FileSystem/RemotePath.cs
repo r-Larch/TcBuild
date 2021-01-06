@@ -19,7 +19,7 @@ namespace TcPluginBase.FileSystem {
         public int Level => Segments.Length;
 
         /// <summary>true if this RemotePath has a trailing slash</summary>
-        public bool TrailingSlash => (Path.Length > 1 ? Path[Path.Length - 1] : (char) 0) == '\\';
+        public bool TrailingSlash => (Path.Length > 1 ? Path[^1] : (char) 0) == '\\';
 
         /// <summary>Returns the directory information for this RemotePath.</summary>
         public RemotePath Directory => System.IO.Path.GetDirectoryName(Path);
@@ -83,7 +83,7 @@ namespace TcPluginBase.FileSystem {
                     : path.Substring(1);
 
                 return string.IsNullOrEmpty(path)
-                    ? new string[0]
+                    ? Array.Empty<string>()
                     : path.Split('\\');
             }
         }

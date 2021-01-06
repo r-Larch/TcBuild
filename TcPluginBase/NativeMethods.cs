@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 
 namespace TcPluginBase {
     // see help for CA1060
-    internal static class NativeMethods {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static class NativeMethods {
         // ReSharper disable InconsistentNaming
         public const int MAX_PATH_UNI = 1024;
         public const int MAX_PATH_ANSI = 260;

@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using TcPluginBase.Content;
 
 
 namespace TcPluginBase.FileSystem {
-    public class FsPlugin : TcPlugin, IFsPlugin {
+    public abstract class FsPlugin : TcPlugin, IFsPlugin {
         public ContentPlugin ContentPlugin { get; set; }
 
         public virtual string RootName { get; set; }
@@ -27,7 +28,7 @@ namespace TcPluginBase.FileSystem {
         public FsPrompt Prompt { get; set; }
 
 
-        public FsPlugin(Settings pluginSettings) : base(pluginSettings)
+        protected FsPlugin(IConfiguration pluginSettings) : base(pluginSettings)
         {
             WriteStatusInfo = Convert.ToBoolean(pluginSettings["writeStatusInfo"]);
             Prompt = new FsPrompt(this);
@@ -38,7 +39,6 @@ namespace TcPluginBase.FileSystem {
 
         // TODO use IAsyncEnumerable when C# 8
         // TODO return new []{ new FindData("..", FileAttributes.Directory) } when path == empty directory
-        [CLSCompliant(false)]
         public virtual IEnumerable<FindData> GetFiles(RemotePath path)
         {
             return new FindData[0];
@@ -51,7 +51,6 @@ namespace TcPluginBase.FileSystem {
         /// <param name="findData"></param>
         /// <exception cref="NoMoreFilesException"></exception>
         /// <returns></returns>
-        [CLSCompliant(false)]
         public virtual object FindFirst(RemotePath path, out FindData findData)
         {
             var enumerable = GetFiles(path);
@@ -68,7 +67,6 @@ namespace TcPluginBase.FileSystem {
             return null;
         }
 
-        [CLSCompliant(false)]
         public virtual bool FindNext(ref object o, out FindData findData)
         {
             if (o is IEnumerator<FindData> fsEnum) {
@@ -96,7 +94,6 @@ namespace TcPluginBase.FileSystem {
 
         #region Optional Methods
 
-        [CLSCompliant(false)]
         public virtual GetFileResult GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
         {
             try {
@@ -182,7 +179,6 @@ namespace TcPluginBase.FileSystem {
             return false;
         }
 
-        [CLSCompliant(false)]
         public virtual Task<GetFileResult> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
             return Task.FromResult(GetFileResult.NotSupported);
@@ -193,7 +189,6 @@ namespace TcPluginBase.FileSystem {
             return Task.FromResult(PutFileResult.NotSupported);
         }
 
-        [CLSCompliant(false)]
         public virtual RenMovFileResult RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
             return RenMovFileResult.NotSupported;

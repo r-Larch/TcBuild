@@ -6,7 +6,6 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace TcPluginBase.FileSystem {
     /// <summary> Used as parameter type for <see cref="FsPlugin.FindFirst"/> and <see cref="FsPlugin.FindNext"/> methods </summary>
-    [CLSCompliant(false)]
     [Serializable]
     public class FindData {
         #region Properties

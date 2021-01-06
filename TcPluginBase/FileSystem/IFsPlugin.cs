@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 
 namespace TcPluginBase.FileSystem {
-    [CLSCompliant(false)]
     public interface IFsPlugin {
         #region Optional Async
 

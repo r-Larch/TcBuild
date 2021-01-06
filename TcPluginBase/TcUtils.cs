@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using TcPluginBase.Content;
 using TcPluginBase.FileSystem;
@@ -20,7 +21,8 @@ namespace TcPluginBase {
         Unknown
     }
 
-    internal static class TcUtils {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static class TcUtils {
         private const uint EmptyDateTimeHi = 0xFFFFFFFF;
         private const uint EmptyDateTimeLo = 0xFFFFFFFE;
 
@@ -143,7 +145,7 @@ namespace TcPluginBase {
         //        ? DateTime.FromFileTime(longTime) : (DateTime?)null;
         //}
 
-        internal static DateTime? ReadDateTime(IntPtr addr)
+        public static DateTime? ReadDateTime(IntPtr addr)
         {
             return addr == IntPtr.Zero
                 ? (DateTime?) null
@@ -213,7 +215,8 @@ namespace TcPluginBase {
             return result;
         }
 
-        internal static void WriteStringAnsi(string str, IntPtr addr, int length)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void WriteStringAnsi(string str, IntPtr addr, int length)
         {
             if (String.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);
@@ -232,7 +235,8 @@ namespace TcPluginBase {
             }
         }
 
-        internal static void WriteStringUni(string str, IntPtr addr, int length)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void WriteStringUni(string str, IntPtr addr, int length)
         {
             if (String.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);
@@ -240,7 +244,7 @@ namespace TcPluginBase {
                 int strLen = str.Length;
                 if (length > 0 && strLen >= length)
                     strLen = length - 1;
-                Marshal.Copy((str + (Char) 0).ToCharArray(0, strLen + 1), 0, addr, strLen + 1);
+                Marshal.Copy((str + (char) 0).ToCharArray(0, strLen + 1), 0, addr, strLen + 1);
             }
         }
 

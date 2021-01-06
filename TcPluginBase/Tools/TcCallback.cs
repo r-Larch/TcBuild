@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using TcPluginBase.Content;
@@ -7,7 +8,8 @@ using TcPluginBase.Packer;
 
 
 namespace TcPluginBase.Tools {
-    internal static class TcCallback {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static class TcCallback {
         #region Constants
 
         //public const string PluginCallbackDataName = "PluginCallbackData";

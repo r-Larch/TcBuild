@@ -7,7 +7,6 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 namespace TcPluginBase.FileSystem {
     /// <summary><see cref="RemoteInfo"/> is passed to FsGetFile and FsRenMovFile. It contains details about the remote file being copied.</summary>
     /// <remarks>This struct is passed to <see cref="FsPlugin.GetFile"/> and <see cref="FsPlugin.RenMovFile"/> to make it easier for the plugin to copy the file. You can of course also ignore this parameter.</remarks>
-    [CLSCompliant(false)]
     [Serializable]
     public class RemoteInfo {
         #region Properties

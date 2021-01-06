@@ -1,14 +1,12 @@
-﻿namespace TcPluginBase.QuickSearch {
-    public class QuickSearchPlugin : TcPlugin, IQuickSearchPlugin {
-        #region Constructors
+﻿using Microsoft.Extensions.Configuration;
 
-        public QuickSearchPlugin(Settings pluginSettings) : base(pluginSettings)
+
+namespace TcPluginBase.QuickSearch {
+    public abstract class QuickSearchPlugin : TcPlugin, IQuickSearchPlugin {
+        protected QuickSearchPlugin(IConfiguration pluginSettings) : base(pluginSettings)
         {
         }
 
-        #endregion Constructors
-
-        #region IQSPlugin Members
 
         public virtual bool MatchFile(string filter, string fileName)
         {
@@ -19,7 +17,5 @@
         {
             return MatchOptions.None;
         }
-
-        #endregion IQSPlugin Members
     }
 }

@@ -1,10 +1,13 @@
-﻿namespace TcPluginBase.Content {
-    public class ContentPlugin : TcPlugin, IContentPlugin {
+﻿using Microsoft.Extensions.Configuration;
+
+
+namespace TcPluginBase.Content {
+    public abstract class ContentPlugin : TcPlugin, IContentPlugin {
         public virtual string DetectString { get; set; }
         public override string TraceTitle => Title;
 
 
-        public ContentPlugin(Settings pluginSettings) : base(pluginSettings)
+        protected ContentPlugin(IConfiguration pluginSettings) : base(pluginSettings)
         {
         }
 

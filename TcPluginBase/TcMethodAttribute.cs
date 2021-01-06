@@ -1,11 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 
 
 namespace TcPluginBase {
     /// <summary>
     /// A placeholder which will be replaced by the actual Plugin implementation
     /// </summary>
-    internal class PluginClassPlaceholder {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class PluginClassPlaceholder {
     }
 
 

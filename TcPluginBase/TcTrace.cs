@@ -1,20 +1,22 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
 
 
 namespace TcPluginBase {
-    internal static class TcTrace {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static class TcTrace {
 #if TRACE
 
         private static readonly TraceSwitch TcPluginTraceSwitch = new TraceSwitch("DotNetPlugins", "All .NET plugins", "Warning");
 
-        internal static void TraceOut(TraceLevel level, string text, string category)
+        public static void TraceOut(TraceLevel level, string text, string category)
         {
             TraceOut(level, text, category, 0);
         }
 
-        internal static void TraceOut(TraceLevel level, string text, string category, int indent)
+        public static void TraceOut(TraceLevel level, string text, string category, int indent)
         {
             if (
                 level.Equals(TraceLevel.Error) && TcPluginTraceSwitch.TraceError ||
@@ -55,7 +57,7 @@ namespace TcPluginBase {
 
 #endif
 
-        internal static void TraceCall(TcPlugin plugin, TraceLevel level, string callSignature, string result)
+        public static void TraceCall(TcPlugin plugin, TraceLevel level, string callSignature, string result)
         {
 #if TRACE
             var text = callSignature + (string.IsNullOrEmpty(result) ? null : ": " + result);
