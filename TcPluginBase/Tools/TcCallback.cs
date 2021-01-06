@@ -65,48 +65,40 @@ namespace TcPluginBase.Tools {
 
         #region FS Callbacks
 
-        private static ProgressCallback progressCallback;
-        private static ProgressCallbackW progressCallbackW;
-        private static LogCallback logCallback;
-        private static LogCallbackW logCallbackW;
-        private static RequestCallback requestCallback;
-        private static RequestCallbackW requestCallbackW;
-        private static FsCryptCallback fsCryptCallback;
-        private static FsCryptCallbackW fsCryptCallbackW;
+        private static ProgressCallback _progressCallback;
+        private static ProgressCallbackW _progressCallbackW;
+        private static LogCallback _logCallback;
+        private static LogCallbackW _logCallbackW;
+        private static RequestCallback _requestCallback;
+        private static RequestCallbackW _requestCallbackW;
+        private static FsCryptCallback _fsCryptCallback;
+        private static FsCryptCallbackW _fsCryptCallbackW;
 
         public static void SetFsPluginCallbacks(ProgressCallback progress, ProgressCallbackW progressW, LogCallback log, LogCallbackW logW, RequestCallback request, RequestCallbackW requestW, FsCryptCallback crypt, FsCryptCallbackW cryptW)
         {
-            if (progressCallback == null)
-                progressCallback = progress;
-            if (progressCallbackW == null)
-                progressCallbackW = progressW;
-            if (logCallback == null)
-                logCallback = log;
-            if (logCallbackW == null)
-                logCallbackW = logW;
-            if (requestCallback == null)
-                requestCallback = request;
-            if (requestCallbackW == null)
-                requestCallbackW = requestW;
-            if (fsCryptCallback == null)
-                fsCryptCallback = crypt;
-            if (fsCryptCallbackW == null)
-                fsCryptCallbackW = cryptW;
+            _progressCallback ??= progress;
+            _progressCallbackW ??= progressW;
+            _logCallback ??= log;
+            _logCallbackW ??= logW;
+            _requestCallback ??= request;
+            _requestCallbackW ??= requestW;
+            _fsCryptCallback ??= crypt;
+            _fsCryptCallbackW ??= cryptW;
         }
 
         public static void FsProgressCallback(ProgressEventArgs e)
         {
-            if (progressCallbackW != null || progressCallback != null) {
+            if (_progressCallbackW != null || _progressCallback != null) {
                 var pluginNumber = e.PluginNumber;
                 var sourceName = e.SourceName;
                 var targetName = e.TargetName;
                 var percentDone = e.PercentDone;
 
-                if (progressCallbackW != null) {
-                    e.Result = progressCallbackW(pluginNumber, sourceName, targetName, percentDone);
+                if (_progressCallbackW != null) {
+                    e.Result = _progressCallbackW(pluginNumber, sourceName, targetName, percentDone);
                 }
-                else if (progressCallback != null) {
-                    e.Result = progressCallback(pluginNumber, sourceName, targetName, percentDone);
+                else if (_progressCallback != null) {
+                    e.Result = _progressCallback(pluginNumber, sourceName, targetName, percentDone);
                 }
 
 #if TRACE
@@ -125,11 +117,11 @@ namespace TcPluginBase.Tools {
 
         public static void FsLogCallback(LogEventArgs e)
         {
-            if (logCallbackW != null || logCallback != null) {
-                if (logCallbackW != null)
-                    logCallbackW(e.PluginNumber, e.MessageType, e.LogText);
+            if (_logCallbackW != null || _logCallback != null) {
+                if (_logCallbackW != null)
+                    _logCallbackW(e.PluginNumber, e.MessageType, e.LogText);
                 else
-                    logCallback(e.PluginNumber, e.MessageType, e.LogText);
+                    _logCallback(e.PluginNumber, e.MessageType, e.LogText);
 #if TRACE
                 TraceOut(TraceLevel.Info, $"OnLog ({e.PluginNumber}, {((LogMsgType) e.MessageType).ToString()}): {e.LogText}.", Callback);
 #endif
@@ -138,10 +130,10 @@ namespace TcPluginBase.Tools {
 
         public static void FsRequestCallback(RequestEventArgs e)
         {
-            if (requestCallbackW != null || requestCallback != null) {
+            if (_requestCallbackW != null || _requestCallback != null) {
                 var retText = IntPtr.Zero;
                 if (e.RequestType < (int) RequestType.MsgOk) {
-                    if (requestCallbackW != null) {
+                    if (_requestCallbackW != null) {
                         retText = Marshal.AllocHGlobal(e.MaxLen * 2);
                         Marshal.Copy(new char[e.MaxLen], 0, retText, e.MaxLen);
                     }
@@ -153,23 +145,23 @@ namespace TcPluginBase.Tools {
 
                 try {
                     if (retText != IntPtr.Zero && !string.IsNullOrEmpty(e.ReturnedText)) {
-                        if (requestCallbackW != null)
+                        if (_requestCallbackW != null)
                             Marshal.Copy(e.ReturnedText.ToCharArray(), 0, retText, e.ReturnedText.Length);
                         else
                             TcUtils.WriteStringAnsi(e.ReturnedText, retText, 0);
                     }
 
-                    if (requestCallbackW != null) {
-                        e.Result = requestCallbackW(e.PluginNumber, e.RequestType, e.CustomTitle, e.CustomText, retText, e.MaxLen) ? 1 : 0;
+                    if (_requestCallbackW != null) {
+                        e.Result = _requestCallbackW(e.PluginNumber, e.RequestType, e.CustomTitle, e.CustomText, retText, e.MaxLen) ? 1 : 0;
                     }
                     else {
-                        e.Result = requestCallback(e.PluginNumber, e.RequestType, e.CustomTitle, e.CustomText, retText, e.MaxLen) ? 1 : 0;
+                        e.Result = _requestCallback(e.PluginNumber, e.RequestType, e.CustomTitle, e.CustomText, retText, e.MaxLen) ? 1 : 0;
                     }
 #if TRACE
                     var traceStr = $"OnRequest ({e.PluginNumber}, {(RequestType) e.RequestType}): {e.ReturnedText}";
 #endif
                     if (e.Result != 0 && retText != IntPtr.Zero) {
-                        e.ReturnedText = (requestCallbackW != null) ? Marshal.PtrToStringUni(retText) : Marshal.PtrToStringAnsi(retText);
+                        e.ReturnedText = (_requestCallbackW != null) ? Marshal.PtrToStringUni(retText) : Marshal.PtrToStringAnsi(retText);
 #if TRACE
                         traceStr += " => " + e.ReturnedText;
 #endif
@@ -191,17 +183,17 @@ namespace TcPluginBase.Tools {
 
         #region Content Callbacks
 
-        private static ContentProgressCallback contentProgressCallback;
+        private static ContentProgressCallback _contentProgressCallback;
 
         public static void SetContentPluginCallback(ContentProgressCallback contentProgress)
         {
-            contentProgressCallback = contentProgress;
+            _contentProgressCallback = contentProgress;
         }
 
         public static void ContentProgressCallback(ContentProgressEventArgs e)
         {
-            if (contentProgressCallback != null) {
-                e.Result = contentProgressCallback(e.NextBlockData);
+            if (_contentProgressCallback != null) {
+                e.Result = _contentProgressCallback(e.NextBlockData);
 #if TRACE
                 TraceOut(TraceLevel.Verbose, $"OnCompareProgress ({e.NextBlockData}) - {e.Result}.", Callback);
 #endif
@@ -213,39 +205,33 @@ namespace TcPluginBase.Tools {
 
         #region Packer Callbacks
 
-        private static ChangeVolCallback changeVolCallback;
-        private static ChangeVolCallbackW changeVolCallbackW;
-        private static ProcessDataCallback processDataCallback;
-        private static ProcessDataCallbackW processDataCallbackW;
-        private static PkCryptCallback pkCryptCallback;
-        private static PkCryptCallbackW pkCryptCallbackW;
+        private static ChangeVolCallback _changeVolCallback;
+        private static ChangeVolCallbackW _changeVolCallbackW;
+        private static ProcessDataCallback _processDataCallback;
+        private static ProcessDataCallbackW _processDataCallbackW;
+        private static PkCryptCallback _pkCryptCallback;
+        private static PkCryptCallbackW _pkCryptCallbackW;
 
         public static void SetPackerPluginCallbacks(ChangeVolCallback changeVol, ChangeVolCallbackW changeVolW, ProcessDataCallback processData, ProcessDataCallbackW processDataW, PkCryptCallback crypt, PkCryptCallbackW cryptW)
         {
-            if (changeVolCallback == null)
-                changeVolCallback = changeVol;
-            if (changeVolCallbackW == null)
-                changeVolCallbackW = changeVolW;
-            if (processDataCallback == null)
-                processDataCallback = processData;
-            if (processDataCallbackW == null)
-                processDataCallbackW = processDataW;
-            if (pkCryptCallback == null)
-                pkCryptCallback = crypt;
-            if (pkCryptCallbackW == null)
-                pkCryptCallbackW = cryptW;
+            _changeVolCallback ??= changeVol;
+            _changeVolCallbackW ??= changeVolW;
+            _processDataCallback ??= processData;
+            _processDataCallbackW ??= processDataW;
+            _pkCryptCallback ??= crypt;
+            _pkCryptCallbackW ??= cryptW;
         }
 
         public static void PackerProcessCallback(PackerProcessEventArgs e)
         {
-            if (processDataCallbackW != null || processDataCallback != null) {
+            if (_processDataCallbackW != null || _processDataCallback != null) {
                 string fileName = e.FileName;
                 int size = e.Size;
 
-                if (processDataCallbackW != null)
-                    e.Result = processDataCallbackW(fileName, size);
-                else if (processDataCallback != null)
-                    e.Result = processDataCallback(fileName, size);
+                if (_processDataCallbackW != null)
+                    e.Result = _processDataCallbackW(fileName, size);
+                else if (_processDataCallback != null)
+                    e.Result = _processDataCallback(fileName, size);
 #if TRACE
                 TraceOut(TraceLevel.Verbose, $"OnProcessData ({fileName}, {size}) - {e.Result}.", Callback);
 #endif
@@ -254,14 +240,14 @@ namespace TcPluginBase.Tools {
 
         public static void PackerChangeVolCallback(PackerChangeVolEventArgs e)
         {
-            if (changeVolCallbackW != null || changeVolCallback != null) {
+            if (_changeVolCallbackW != null || _changeVolCallback != null) {
                 string arcName = e.ArcName;
                 int mode = e.Mode;
 
-                if (changeVolCallbackW != null)
-                    e.Result = changeVolCallbackW(arcName, mode);
-                else if (changeVolCallback != null)
-                    e.Result = changeVolCallback(arcName, mode);
+                if (_changeVolCallbackW != null)
+                    e.Result = _changeVolCallbackW(arcName, mode);
+                else if (_changeVolCallback != null)
+                    e.Result = _changeVolCallback(arcName, mode);
 #if TRACE
                 TraceOut(TraceLevel.Verbose, $"OnChangeVol ({arcName}, {mode}) - {e.Result}.", Callback);
 #endif
@@ -274,15 +260,15 @@ namespace TcPluginBase.Tools {
             var loadPassword = e.Mode == 2 || e.Mode == 3; // LoadPassword or LoadPasswordNoUI
             if (e.PluginNumber < 0) {
                 // Packer plugin call
-                if (pkCryptCallbackW == null && pkCryptCallback == null)
+                if (_pkCryptCallbackW == null && _pkCryptCallback == null)
                     return;
-                isUnicode = (pkCryptCallbackW != null);
+                isUnicode = (_pkCryptCallbackW != null);
             }
             else {
                 // File System plugin call
-                if (fsCryptCallbackW == null && fsCryptCallback == null)
+                if (_fsCryptCallbackW == null && _fsCryptCallback == null)
                     return;
-                isUnicode = (fsCryptCallbackW != null);
+                isUnicode = (_fsCryptCallbackW != null);
             }
 
             var pswText = IntPtr.Zero;
@@ -296,8 +282,8 @@ namespace TcPluginBase.Tools {
                     }
 
                     e.Result = (e.PluginNumber < 0)
-                        ? pkCryptCallbackW(e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen)
-                        : fsCryptCallbackW(e.PluginNumber, e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen);
+                        ? _pkCryptCallbackW(e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen)
+                        : _fsCryptCallbackW(e.PluginNumber, e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen);
                 }
                 else {
                     if (loadPassword) {
@@ -308,8 +294,8 @@ namespace TcPluginBase.Tools {
                     }
 
                     e.Result = (e.PluginNumber < 0)
-                        ? pkCryptCallback(e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen)
-                        : fsCryptCallback(e.PluginNumber, e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen);
+                        ? _pkCryptCallback(e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen)
+                        : _fsCryptCallback(e.PluginNumber, e.CryptoNumber, e.Mode, e.StoreName, pswText, CryptPasswordMaxLen);
                 }
 
                 // tracing

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TcPluginBase.Content;
@@ -16,7 +14,8 @@ namespace TcPluginBase.FileSystem {
         public virtual string RootName { get; set; }
         public override string TraceTitle => Title;
         public FsBackgroundFlags BackgroundFlags { get; set; } = FsBackgroundFlags.Download | FsBackgroundFlags.Upload;
-        public bool IsTempFilePanel { get; set; }
+
+
         public bool WriteStatusInfo { get; set; }
 
 
@@ -98,7 +97,7 @@ namespace TcPluginBase.FileSystem {
         #region Optional Methods
 
         [CLSCompliant(false)]
-        public virtual FileSystemExitCode GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
+        public virtual GetFileResult GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
         {
             try {
                 // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
@@ -118,14 +117,14 @@ namespace TcPluginBase.FileSystem {
                 }
             }
             catch (TaskCanceledException) {
-                return FileSystemExitCode.UserAbort;
+                return GetFileResult.UserAbort;
             }
             catch (OperationCanceledException) {
-                return FileSystemExitCode.UserAbort;
+                return GetFileResult.UserAbort;
             }
             catch (AggregateException e) {
                 if (HasCanceledException(e)) {
-                    return FileSystemExitCode.UserAbort;
+                    return GetFileResult.UserAbort;
                 }
 
                 throw;
@@ -133,7 +132,7 @@ namespace TcPluginBase.FileSystem {
         }
 
 
-        public virtual FileSystemExitCode PutFile(string localName, RemotePath remoteName, CopyFlags copyFlags)
+        public virtual PutFileResult PutFile(string localName, RemotePath remoteName, CopyFlags copyFlags)
         {
             try {
                 // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
@@ -153,14 +152,14 @@ namespace TcPluginBase.FileSystem {
                 }
             }
             catch (TaskCanceledException) {
-                return FileSystemExitCode.UserAbort;
+                return PutFileResult.UserAbort;
             }
             catch (OperationCanceledException) {
-                return FileSystemExitCode.UserAbort;
+                return PutFileResult.UserAbort;
             }
             catch (AggregateException e) {
                 if (HasCanceledException(e)) {
-                    return FileSystemExitCode.UserAbort;
+                    return PutFileResult.UserAbort;
                 }
 
                 throw;
@@ -184,20 +183,20 @@ namespace TcPluginBase.FileSystem {
         }
 
         [CLSCompliant(false)]
-        public virtual Task<FileSystemExitCode> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
+        public virtual Task<GetFileResult> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
-            return Task.FromResult(FileSystemExitCode.NotSupported);
+            return Task.FromResult(GetFileResult.NotSupported);
         }
 
-        public virtual Task<FileSystemExitCode> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
+        public virtual Task<PutFileResult> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token)
         {
-            return Task.FromResult(FileSystemExitCode.NotSupported);
+            return Task.FromResult(PutFileResult.NotSupported);
         }
 
         [CLSCompliant(false)]
-        public virtual FileSystemExitCode RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
+        public virtual RenMovFileResult RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
-            return FileSystemExitCode.NotSupported;
+            return RenMovFileResult.NotSupported;
         }
 
         public virtual bool DeleteFile(RemotePath fileName)
@@ -305,24 +304,14 @@ namespace TcPluginBase.FileSystem {
             return PreviewBitmapResult.None;
         }
 
-        /// <summary>
-        /// GetLocalName must not be implemented unless your plugin is a temporary file panel plugin! Temporary file panels just hold links to files on the local file system.
-        /// </summary>
-        /// <remarks>
-        /// If your plugin is a temporary panel plugin, the following functions MUST be thread-safe (can be called from background transfer manager):
-        /// - GetLocalName
-        /// - FindFirst
-        /// - FindNext
-        /// - FindClose
-        ///     This means that when uploading subdirectories from your plugin to FTP in the background, Total Commander will call these functions in a background thread.If the user continues to work in the foreground, calls to FsFindFirst and FsFindNext may be occuring at the same time! Therefore it's very important to use the search handle to keep temporary information about the search.
-        ///     FsStatusInfo will NOT be called from the background thread!
-        /// </remarks>
-        /// <param name="remoteName">Full path to the file name in the plugin namespace, e.g. \somedir\file.ext</param>
-        /// <param name="maxLen">Maximum number of characters you can return in RemoteName, including the final 0.</param>
-        /// <returns>Return the path of the file on the local file system, e.g. c:\windows\file.ext or null if it does not point to a local file.</returns>
         public virtual string GetLocalName(RemotePath remoteName, int maxLen)
         {
             return null;
+        }
+
+        public virtual bool IsTempFilePanel()
+        {
+            return false;
         }
 
         #endregion Optional Methods

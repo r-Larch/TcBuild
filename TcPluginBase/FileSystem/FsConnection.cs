@@ -24,7 +24,7 @@ namespace TcPluginBase.FileSystem {
         /// </summary>
         public void Connect()
         {
-            _plugin.LogProc(LogMsgType.Connect, $"CONNECT {ConnectionRoot.PathWithoutTrailingSlash}");
+            _plugin.LogProc(LogMsgType.Connect, $"CONNECT {ConnectionRoot}");
             IsConnected = true;
         }
 

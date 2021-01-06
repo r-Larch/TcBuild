@@ -165,6 +165,88 @@ namespace TcPluginBase.FileSystem {
         }
     }
 
+    public readonly struct GetFileResult {
+        internal FileSystemExitCode Code { get; }
+        internal string FileName { get; }
+
+        private GetFileResult(FileSystemExitCode code, string fileName = null)
+        {
+            Code = code;
+            FileName = fileName;
+        }
+
+        /// <summary> The file was copied OK, but name or extension has changed. </summary>
+        public static GetFileResult OkNameChanged(string newFileName) => new GetFileResult(FileSystemExitCode.OK, newFileName);
+
+        /// <summary> The file was copied OK. </summary>
+        public static GetFileResult Ok => new GetFileResult(FileSystemExitCode.OK);
+        /// <summary> The target file already exists, and resume is not supported. </summary>
+        public static GetFileResult FileExists => new GetFileResult(FileSystemExitCode.FileExists);
+        /// <summary> The source file couldn't be found or opened. </summary>
+        public static GetFileResult FileNotFound => new GetFileResult(FileSystemExitCode.FileNotFound);
+        /// <summary> There was an error reading from the source file. </summary>
+        public static GetFileResult ReadError => new GetFileResult(FileSystemExitCode.ReadError);
+        /// <summary> There was an error writing to the target file, e.g. disk full. </summary>
+        public static GetFileResult WriteError => new GetFileResult(FileSystemExitCode.WriteError);
+        /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
+        public static GetFileResult UserAbort => new GetFileResult(FileSystemExitCode.UserAbort);
+        /// <summary> The operation is not supported (e.g. resume). </summary>
+        public static GetFileResult NotSupported => new GetFileResult(FileSystemExitCode.NotSupported);
+        /// <summary> The target file already exists, and resume is supported. </summary>
+        public static GetFileResult ExistsResumeAllowed => new GetFileResult(FileSystemExitCode.ExistsResumeAllowed);
+    }
+
+    public readonly struct PutFileResult {
+        internal FileSystemExitCode Code { get; }
+        internal string FileName { get; }
+
+        private PutFileResult(FileSystemExitCode code, string fileName = null)
+        {
+            Code = code;
+            FileName = fileName;
+        }
+
+        /// <summary> The file was copied OK, but name or extension has changed. </summary>
+        public static PutFileResult OkNameChanged(string newFileName) => new PutFileResult(FileSystemExitCode.OK, newFileName);
+
+        /// <summary> The file was copied OK. </summary>
+        public static PutFileResult Ok => new PutFileResult(FileSystemExitCode.OK);
+        /// <summary> The target file already exists, and resume is not supported. </summary>
+        public static PutFileResult FileExists => new PutFileResult(FileSystemExitCode.FileExists);
+        /// <summary> The source file couldn't be found or opened. </summary>
+        public static PutFileResult FileNotFound => new PutFileResult(FileSystemExitCode.FileNotFound);
+        /// <summary> There was an error reading from the source file. </summary>
+        public static PutFileResult ReadError => new PutFileResult(FileSystemExitCode.ReadError);
+        /// <summary> There was an error writing to the target file, e.g. disk full. </summary>
+        public static PutFileResult WriteError => new PutFileResult(FileSystemExitCode.WriteError);
+        /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
+        public static PutFileResult UserAbort => new PutFileResult(FileSystemExitCode.UserAbort);
+        /// <summary> The operation is not supported (e.g. resume). </summary>
+        public static PutFileResult NotSupported => new PutFileResult(FileSystemExitCode.NotSupported);
+        /// <summary> The target file already exists, and resume is supported. </summary>
+        public static PutFileResult ExistsResumeAllowed => new PutFileResult(FileSystemExitCode.ExistsResumeAllowed);
+    }
+
+    public readonly struct RenMovFileResult {
+        internal FileSystemExitCode Code { get; }
+        private RenMovFileResult(FileSystemExitCode code) => Code = code;
+
+        /// <summary> The file was copied/moved OK. </summary>
+        public static RenMovFileResult Ok => new RenMovFileResult(FileSystemExitCode.OK);
+        /// <summary> The target file already exists, and resume is not supported. </summary>
+        public static RenMovFileResult FileExists => new RenMovFileResult(FileSystemExitCode.FileExists);
+        /// <summary> The source file couldn't be found or opened. </summary>
+        public static RenMovFileResult FileNotFound => new RenMovFileResult(FileSystemExitCode.FileNotFound);
+        /// <summary> There was an error reading from the source file. </summary>
+        public static RenMovFileResult ReadError => new RenMovFileResult(FileSystemExitCode.ReadError);
+        /// <summary> There was an error writing to the target file, e.g. disk full. </summary>
+        public static RenMovFileResult WriteError => new RenMovFileResult(FileSystemExitCode.WriteError);
+        /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
+        public static RenMovFileResult UserAbort => new RenMovFileResult(FileSystemExitCode.UserAbort);
+        /// <summary> The operation is not supported (e.g. resume). </summary>
+        public static RenMovFileResult NotSupported => new RenMovFileResult(FileSystemExitCode.NotSupported);
+    }
+
     /// <summary> Used as result type for <see cref="FsPlugin.GetFile"/>, <see cref="FsPlugin.PutFile"/> and <see cref="FsPlugin.RenMovFile"/> methods </summary>
     public enum FileSystemExitCode {
         /// <summary> The file was copied OK. </summary>

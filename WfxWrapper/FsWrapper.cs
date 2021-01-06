@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
@@ -20,7 +19,7 @@ namespace WfxWrapper {
 
         private static string _callSignature;
         private static FsPlugin _plugin;
-        private static FsPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<FsPlugin>(typeof(PluginClassPlaceholder)));
+        private static FsPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<FsPlugin>(typeof(PluginClassPlaceholder));
         private static ContentPlugin ContentPlugin => Plugin.ContentPlugin;
 
 
@@ -211,9 +210,7 @@ namespace WfxWrapper {
             _callSignature = "SetCryptCallback";
             try {
                 TcCallback.SetFsPluginCallbacks(null, null, null, null, null, null, cryptProc, null);
-                if (Plugin.Password == null) {
-                    Plugin.Password = new FsPassword(Plugin, cryptNumber, flags);
-                }
+                Plugin.Password ??= new FsPassword(Plugin, cryptNumber, flags);
 
                 TraceCall(TraceLevel.Warning, $"CryptoNumber={cryptNumber}, Flags={flags}, {cryptProc.Method.MethodHandle.GetFunctionPointer().ToString("X")}");
             }
@@ -228,9 +225,7 @@ namespace WfxWrapper {
             _callSignature = "SetCryptCallbackW";
             try {
                 TcCallback.SetFsPluginCallbacks(null, null, null, null, null, null, null, cryptProcW);
-                if (Plugin.Password == null) {
-                    Plugin.Password = new FsPassword(Plugin, cryptNumber, flags);
-                }
+                Plugin.Password ??= new FsPassword(Plugin, cryptNumber, flags);
 
                 TraceCall(TraceLevel.Warning, $"CryptoNumber={cryptNumber}, Flags={flags}, {cryptProcW.Method.MethodHandle.GetFunctionPointer().ToString("X")}");
             }
@@ -250,9 +245,13 @@ namespace WfxWrapper {
         {
             _callSignature = "GetDefRootName";
             try {
-                TcUtils.WriteStringAnsi(Plugin.Title, rootName, maxLen);
+                var name = string.IsNullOrEmpty(Plugin.RootName)
+                    ? Plugin.Title
+                    : Plugin.RootName;
 
-                TraceCall(TraceLevel.Warning, Plugin.Title);
+                TcUtils.WriteStringAnsi(name, rootName, maxLen);
+
+                TraceCall(TraceLevel.Warning, name);
             }
             catch (Exception ex) {
                 TcUtils.WriteStringAnsi(ex.Message, rootName, maxLen);
@@ -269,31 +268,31 @@ namespace WfxWrapper {
         public static int GetFile([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
         {
             var locName = Marshal.PtrToStringAnsi(localName);
-            var inLocName = locName;
-            var result = GetFileInternal(remoteName, ref locName, (CopyFlags) copyFlags, remoteInfo);
-            if (result == FileSystemExitCode.OK && !locName.Equals(inLocName, StringComparison.CurrentCultureIgnoreCase)) {
-                TcUtils.WriteStringAnsi(locName, localName, 0);
+            var result = GetFileInternal(remoteName, locName, (CopyFlags) copyFlags, remoteInfo);
+            if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
+                var newPath = new RemotePath(locName).SetFileName(result.FileName);
+                TcUtils.WriteStringAnsi(newPath, localName, 0);
             }
 
-            return (int) result;
+            return (int) result.Code;
         }
 
         [DllExport(EntryPoint = "FsGetFileW"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static int GetFileW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
         {
             var locName = Marshal.PtrToStringUni(localName);
-            var inLocName = locName;
-            var result = GetFileInternal(remoteName, ref locName, (CopyFlags) copyFlags, remoteInfo);
-            if (result == FileSystemExitCode.OK && !locName.Equals(inLocName, StringComparison.CurrentCultureIgnoreCase)) {
-                TcUtils.WriteStringUni(locName, localName, 0);
+            var result = GetFileInternal(remoteName, locName, (CopyFlags) copyFlags, remoteInfo);
+            if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
+                var newPath = new RemotePath(locName).SetFileName(result.FileName);
+                TcUtils.WriteStringUni(newPath, localName, 0);
             }
 
-            return (int) result;
+            return (int) result.Code;
         }
 
-        private static FileSystemExitCode GetFileInternal(string remoteName, ref string localName, CopyFlags copyFlags, IntPtr rmtInfo)
+        private static GetFileResult GetFileInternal(string remoteName, in string localName, CopyFlags copyFlags, IntPtr rmtInfo)
         {
-            FileSystemExitCode result;
+            GetFileResult result;
             _callSignature = $"GetFile '{remoteName}' => '{localName}' ({copyFlags.ToString()})";
             var remoteInfo = new RemoteInfo(rmtInfo);
             try {
@@ -303,7 +302,7 @@ namespace WfxWrapper {
             }
             catch (Exception ex) {
                 ProcessException(ex);
-                result = FileSystemExitCode.ReadError;
+                result = GetFileResult.ReadError;
             }
 
             return result;
@@ -318,31 +317,31 @@ namespace WfxWrapper {
         public static int PutFile([MarshalAs(UnmanagedType.LPStr)] string localName, IntPtr remoteName, int copyFlags)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
-            var inRmtName = rmtName;
-            var result = PutFileInternal(localName, ref rmtName, (CopyFlags) copyFlags);
-            if (result == FileSystemExitCode.OK && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
-                TcUtils.WriteStringAnsi(rmtName, remoteName, 0);
+            var result = PutFileInternal(localName, rmtName, (CopyFlags) copyFlags);
+            if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
+                var newPath = new RemotePath(rmtName).SetFileName(result.FileName);
+                TcUtils.WriteStringAnsi(newPath, remoteName, 0);
             }
 
-            return (int) result;
+            return (int) result.Code;
         }
 
         [DllExport(EntryPoint = "FsPutFileW"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static int PutFileW([MarshalAs(UnmanagedType.LPWStr)] string localName, IntPtr remoteName, int copyFlags)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
-            var inRmtName = rmtName;
-            var result = PutFileInternal(localName, ref rmtName, (CopyFlags) copyFlags);
-            if (result == FileSystemExitCode.OK && !rmtName.Equals(inRmtName, StringComparison.CurrentCultureIgnoreCase)) {
-                TcUtils.WriteStringUni(rmtName, remoteName, 0);
+            var result = PutFileInternal(localName, rmtName, (CopyFlags) copyFlags);
+            if (result.Code == FileSystemExitCode.OK && !string.IsNullOrEmpty(result.FileName)) {
+                var newPath = new RemotePath(rmtName).SetFileName(result.FileName);
+                TcUtils.WriteStringUni(newPath, remoteName, 0);
             }
 
-            return (int) result;
+            return (int) result.Code;
         }
 
-        private static FileSystemExitCode PutFileInternal(string localName, ref string remoteName, CopyFlags copyFlags)
+        private static PutFileResult PutFileInternal(string localName, string remoteName, CopyFlags copyFlags)
         {
-            FileSystemExitCode result;
+            PutFileResult result;
             _callSignature = $"PutFile '{localName}' => '{remoteName}' ({copyFlags.ToString()})";
             try {
                 result = Plugin.PutFile(localName, remoteName, copyFlags);
@@ -351,7 +350,7 @@ namespace WfxWrapper {
             }
             catch (Exception ex) {
                 ProcessException(ex);
-                result = FileSystemExitCode.ReadError;
+                result = PutFileResult.ReadError;
             }
 
             return result;
@@ -371,27 +370,24 @@ namespace WfxWrapper {
         [DllExport(EntryPoint = "FsRenMovFileW")]
         public static int RenMovFileW([MarshalAs(UnmanagedType.LPWStr)] string oldName, [MarshalAs(UnmanagedType.LPWStr)] string newName, [MarshalAs(UnmanagedType.Bool)] bool move, [MarshalAs(UnmanagedType.Bool)] bool overwrite, IntPtr rmtInfo)
         {
-            var result = FileSystemExitCode.NotSupported;
+            var result = RenMovFileResult.NotSupported;
             if (oldName == null || newName == null) {
-                return (int) result;
+                return (int) result.Code;
             }
 
             _callSignature = $"RenMovFile '{oldName}' => '{newName}' ({(move ? "M" : " ") + (overwrite ? "O" : " ")})";
             var remoteInfo = new RemoteInfo(rmtInfo);
             try {
-                // TODO IgnoreCase ?? noo!
-                result = newName.Equals(oldName, StringComparison.CurrentCultureIgnoreCase)
-                    ? FileSystemExitCode.OK
-                    : Plugin.RenMovFile(oldName, newName, move, overwrite, remoteInfo);
+                result = Plugin.RenMovFile(oldName, newName, move, overwrite, remoteInfo);
 
                 TraceCall(TraceLevel.Warning, result.ToString());
             }
             catch (Exception ex) {
                 ProcessException(ex);
-                result = FileSystemExitCode.ReadError;
+                result = RenMovFileResult.ReadError;
             }
 
-            return (int) result;
+            return (int) result.Code;
         }
 
         #endregion FsRenMovFile
@@ -625,7 +621,6 @@ namespace WfxWrapper {
             _callSignature = $"Disconnect '{disconnectRoot}'";
             try {
                 result = Plugin.Disconnect(disconnectRoot);
-                // TODO: add - unload plugin AppDomain after successful disconnect (configurable)
 
                 TraceCall(TraceLevel.Warning, result ? "OK" : "No");
             }
@@ -823,7 +818,7 @@ namespace WfxWrapper {
             var result = false;
             _callSignature = "LinksToLocalFiles";
             try {
-                result = Plugin.IsTempFilePanel;
+                result = Plugin.IsTempFilePanel();
 
                 TraceCall(TraceLevel.Info, result ? "Yes" : "No");
             }

@@ -27,6 +27,15 @@ namespace TcPluginBase.FileSystem {
         /// <summary>Returns the file name and extension of this RemotePath.</summary>
         public string FileName => System.IO.Path.GetFileName(Path);
 
+        /// <summary>
+        /// Create a new Path with a different fileName
+        /// </summary>
+        public RemotePath SetFileName(string fileName)
+        {
+            var newPath = Path.Substring(0, Path.IndexOf(FileName, StringComparison.Ordinal)) + fileName;
+            return newPath;
+        }
+
         /// <summary>Returns the file name of this RemotePath without the extension.</summary>
         public string FileNameWithoutExtension => System.IO.Path.GetFileNameWithoutExtension(Path);
 
