@@ -7,7 +7,6 @@ using System.Threading;
 
 
 namespace TcPluginBase.Tools {
-    [Serializable]
     internal static class TcPluginLoader {
         /// <summary>
         /// This is the TcPluginBase EntryPoint!

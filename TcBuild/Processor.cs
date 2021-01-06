@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -261,7 +262,7 @@ namespace TcBuild {
                 .Replace("[TcPluginBase]", "")
             );
 
-            var dllExportAttribute = $".custom instance void {typeof(DllExportAttribute).FullName}";
+            var dllExportAttribute = $".custom instance void {typeof(UnmanagedCallersOnlyAttribute).FullName}";
 
             var count = 1;
             foreach (var method in wrapper.Classes.SelectMany(_ => _.Methods).Where(_ => _.Public && _.Static)) {

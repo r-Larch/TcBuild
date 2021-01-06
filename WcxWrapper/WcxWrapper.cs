@@ -18,7 +18,7 @@ namespace WcxWrapper {
 
         private static string _callSignature;
         private static PackerPlugin _plugin;
-        private static PackerPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<PackerPlugin>(typeof(PluginClassPlaceholder)));
+        private static PackerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<PackerPlugin>(typeof(PluginClassPlaceholder));
 
 
         private PackerWrapper()
@@ -31,14 +31,14 @@ namespace WcxWrapper {
 
         #region OpenArchive
 
-        [DllExport(EntryPoint = "OpenArchive")]
+        [UnmanagedCallersOnly(EntryPoint = "OpenArchive")]
         public static IntPtr OpenArchive(IntPtr archiveData)
         {
             var data = new OpenArchiveData(archiveData, false);
             return OpenArchiveInternal(data);
         }
 
-        [DllExport(EntryPoint = "OpenArchiveW")]
+        [UnmanagedCallersOnly(EntryPoint = "OpenArchiveW")]
         public static IntPtr OpenArchiveW(IntPtr archiveData)
         {
             var data = new OpenArchiveData(archiveData, true);
@@ -70,7 +70,7 @@ namespace WcxWrapper {
 
         #region ReadHeader
 
-        [DllExport(EntryPoint = "ReadHeader")]
+        [UnmanagedCallersOnly(EntryPoint = "ReadHeader")]
         public static int ReadHeader(IntPtr arcData, IntPtr headerData)
         {
             return ReadHeaderInternal(arcData, headerData, HeaderDataMode.Ansi);
@@ -80,13 +80,13 @@ namespace WcxWrapper {
 
         #region ReadHeaderEx
 
-        [DllExport(EntryPoint = "ReadHeaderEx")]
+        [UnmanagedCallersOnly(EntryPoint = "ReadHeaderEx")]
         public static int ReadHeaderEx(IntPtr arcData, IntPtr headerData)
         {
             return ReadHeaderInternal(arcData, headerData, HeaderDataMode.ExAnsi);
         }
 
-        [DllExport(EntryPoint = "ReadHeaderExW")]
+        [UnmanagedCallersOnly(EntryPoint = "ReadHeaderExW")]
         public static int ReadHeaderExW(IntPtr arcData, IntPtr headerData)
         {
             return ReadHeaderInternal(arcData, headerData, HeaderDataMode.ExUnicode);
@@ -122,13 +122,13 @@ namespace WcxWrapper {
 
         #region ProcessFile
 
-        [DllExport(EntryPoint = "ProcessFile")]
+        [UnmanagedCallersOnly(EntryPoint = "ProcessFile")]
         public static int ProcessFile(IntPtr arcData, int operation, [MarshalAs(UnmanagedType.LPStr)] string destPath, [MarshalAs(UnmanagedType.LPStr)] string destName)
         {
             return ProcessFileW(arcData, operation, destPath, destName);
         }
 
-        [DllExport(EntryPoint = "ProcessFileW")]
+        [UnmanagedCallersOnly(EntryPoint = "ProcessFileW")]
         public static int ProcessFileW(IntPtr arcData, int operation, [MarshalAs(UnmanagedType.LPWStr)] string destPath, [MarshalAs(UnmanagedType.LPWStr)] string destName)
         {
             var result = PackerResult.NotSupported;
@@ -158,7 +158,7 @@ namespace WcxWrapper {
 
         #region CloseArchive
 
-        [DllExport(EntryPoint = "CloseArchive")]
+        [UnmanagedCallersOnly(EntryPoint = "CloseArchive")]
         public static int CloseArchive(IntPtr arcData)
         {
             var result = PackerResult.ErrorClose;
@@ -188,7 +188,7 @@ namespace WcxWrapper {
         #region SetChangeVolProc
 
         // SetChangeVolProc & SetChangeVolProcW functionality is implemented here, not included to Packer Plugin interface.
-        [DllExport(EntryPoint = "SetChangeVolProc")]
+        [UnmanagedCallersOnly(EntryPoint = "SetChangeVolProc")]
         public static void SetChangeVolProc(IntPtr arcData, ChangeVolCallback changeVolProc)
         {
             _callSignature = $"SetChangeVolProc ({arcData.ToString()})";
@@ -202,7 +202,7 @@ namespace WcxWrapper {
             }
         }
 
-        [DllExport(EntryPoint = "SetChangeVolProcW")]
+        [UnmanagedCallersOnly(EntryPoint = "SetChangeVolProcW")]
         public static void SetChangeVolProcW(IntPtr arcData, ChangeVolCallbackW changeVolProcW)
         {
             _callSignature = $"SetChangeVolProcW ({arcData.ToString()})";
@@ -221,7 +221,7 @@ namespace WcxWrapper {
         #region SetProcessDataProc
 
         // SetProcessDataProc & SetProcessDataProcW functionality is implemented here, not included to Packer Plugin interface.
-        [DllExport(EntryPoint = "SetProcessDataProc")]
+        [UnmanagedCallersOnly(EntryPoint = "SetProcessDataProc")]
         public static void SetProcessDataProc(IntPtr arcData, ProcessDataCallback processDataProc)
         {
             _callSignature = $"SetProcessDataProc ({arcData.ToString()})";
@@ -235,7 +235,7 @@ namespace WcxWrapper {
             }
         }
 
-        [DllExport(EntryPoint = "SetProcessDataProcW")]
+        [UnmanagedCallersOnly(EntryPoint = "SetProcessDataProcW")]
         public static void SetProcessDataProcW(IntPtr arcData, ProcessDataCallbackW processDataProcW)
         {
             _callSignature = $"SetProcessDataProcW ({arcData.ToString()})";
@@ -257,7 +257,7 @@ namespace WcxWrapper {
 
         #region PackFiles
 
-        [DllExport(EntryPoint = "PackFiles")]
+        [UnmanagedCallersOnly(EntryPoint = "PackFiles")]
         public static int PackFiles(
             [MarshalAs(UnmanagedType.LPStr)] string packedFile,
             [MarshalAs(UnmanagedType.LPStr)] string subPath,
@@ -268,7 +268,7 @@ namespace WcxWrapper {
             return PackFilesInternal(packedFile, subPath, srcPath, addList, (PackFilesFlags) flags);
         }
 
-        [DllExport(EntryPoint = "PackFilesW")]
+        [UnmanagedCallersOnly(EntryPoint = "PackFilesW")]
         public static int PackFilesW(
             [MarshalAs(UnmanagedType.LPWStr)] string packedFile,
             [MarshalAs(UnmanagedType.LPWStr)] string subPath,
@@ -299,14 +299,14 @@ namespace WcxWrapper {
 
         #region DeleteFiles
 
-        [DllExport(EntryPoint = "DeleteFiles")]
+        [UnmanagedCallersOnly(EntryPoint = "DeleteFiles")]
         public static int DeleteFiles([MarshalAs(UnmanagedType.LPStr)] string packedFile, IntPtr deleteListPtr)
         {
             var deleteList = TcUtils.ReadStringListAnsi(deleteListPtr);
             return DeleteFilesInternal(packedFile, deleteList);
         }
 
-        [DllExport(EntryPoint = "DeleteFilesW")]
+        [UnmanagedCallersOnly(EntryPoint = "DeleteFilesW")]
         public static int DeleteFilesW([MarshalAs(UnmanagedType.LPWStr)] string packedFile, IntPtr deleteListPtr)
         {
             var deleteList = TcUtils.ReadStringListUni(deleteListPtr);
@@ -334,7 +334,7 @@ namespace WcxWrapper {
         #region GetPackerCaps
 
         // GetPackerCaps functionality is implemented here, not included to Packer Plugin interface.
-        [DllExport(EntryPoint = "GetPackerCaps")]
+        [UnmanagedCallersOnly(EntryPoint = "GetPackerCaps")]
         public static int GetPackerCaps()
         {
             _callSignature = "GetPackerCaps";
@@ -347,7 +347,7 @@ namespace WcxWrapper {
 
         #region ConfigurePacker
 
-        [DllExport(EntryPoint = "ConfigurePacker")]
+        [UnmanagedCallersOnly(EntryPoint = "ConfigurePacker")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static void ConfigurePacker(IntPtr parentWin, IntPtr dllInstance)
         {
@@ -366,13 +366,13 @@ namespace WcxWrapper {
 
         #region StartMemPack
 
-        [DllExport(EntryPoint = "StartMemPack")]
+        [UnmanagedCallersOnly(EntryPoint = "StartMemPack")]
         public static IntPtr StartMemPack(int options, [MarshalAs(UnmanagedType.LPStr)] string fileName)
         {
             return StartMemPackW(options, fileName);
         }
 
-        [DllExport(EntryPoint = "StartMemPackW")]
+        [UnmanagedCallersOnly(EntryPoint = "StartMemPackW")]
         public static IntPtr StartMemPackW(int options, [MarshalAs(UnmanagedType.LPWStr)] string fileName)
         {
             var result = IntPtr.Zero;
@@ -397,7 +397,7 @@ namespace WcxWrapper {
 
         #region PackToMem
 
-        [DllExport(EntryPoint = "PackToMem")]
+        [UnmanagedCallersOnly(EntryPoint = "PackToMem")]
         public static int PackToMem(IntPtr hMemPack,
             [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]
             byte[] bufIn,
@@ -433,7 +433,7 @@ namespace WcxWrapper {
 
         #region DoneMemPack
 
-        [DllExport(EntryPoint = "DoneMemPack")]
+        [UnmanagedCallersOnly(EntryPoint = "DoneMemPack")]
         public static int DoneMemPack(IntPtr hMemPack)
         {
             var result = PackerResult.ErrorClose;
@@ -461,14 +461,14 @@ namespace WcxWrapper {
 
         #region CanYouHandleThisFile
 
-        [DllExport(EntryPoint = "CanYouHandleThisFile")]
+        [UnmanagedCallersOnly(EntryPoint = "CanYouHandleThisFile")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool CanYouHandleThisFile([MarshalAs(UnmanagedType.LPStr)] string fileName)
         {
             return CanYouHandleThisFileW(fileName);
         }
 
-        [DllExport(EntryPoint = "CanYouHandleThisFileW")]
+        [UnmanagedCallersOnly(EntryPoint = "CanYouHandleThisFileW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool CanYouHandleThisFileW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
         {
@@ -491,7 +491,7 @@ namespace WcxWrapper {
         #region PackSetDefaultParams
 
         // PackSetDefaultParams functionality is implemented here, not included to Packer Plugin interface.
-        [DllExport(EntryPoint = "PackSetDefaultParams")]
+        [UnmanagedCallersOnly(EntryPoint = "PackSetDefaultParams")]
         public static void SetDefaultParams(ref PluginDefaultParams defParams)
         {
             _callSignature = "SetDefaultParams";
@@ -510,7 +510,7 @@ namespace WcxWrapper {
         #region PkSetCryptCallback
 
         // PkSetCryptCallback & PkSetCryptCallbackW functionality is implemented here, not included to Packer Plugin interface.
-        [DllExport(EntryPoint = "PkSetCryptCallback")]
+        [UnmanagedCallersOnly(EntryPoint = "PkSetCryptCallback")]
         public static void SetCryptCallback(PkCryptCallback cryptProc, int cryptNumber, int flags)
         {
             _callSignature = $"PkSetCryptCallback ({cryptNumber}, {flags})";
@@ -527,7 +527,7 @@ namespace WcxWrapper {
             }
         }
 
-        [DllExport(EntryPoint = "PkSetCryptCallbackW")]
+        [UnmanagedCallersOnly(EntryPoint = "PkSetCryptCallbackW")]
         public static void SetCryptCallbackW(PkCryptCallbackW cryptProcW, int cryptNumber, int flags)
         {
             _callSignature = $"PkSetCryptCallbackW ({cryptNumber}, {flags})";
@@ -549,7 +549,7 @@ namespace WcxWrapper {
         #region GetBackgroundFlags
 
         // GetBackgroundFlags functionality is implemented here, not included to Packer Plugin interface.
-        [DllExport(EntryPoint = "GetBackgroundFlags")]
+        [UnmanagedCallersOnly(EntryPoint = "GetBackgroundFlags")]
         public static int GetBackgroundFlags()
         {
             var result = PackBackgroundFlags.None;

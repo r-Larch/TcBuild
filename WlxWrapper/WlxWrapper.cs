@@ -17,7 +17,7 @@ namespace WlxWrapper {
 
         private static string _callSignature;
         private static ListerPlugin _plugin;
-        private static ListerPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<ListerPlugin>(typeof(PluginClassPlaceholder)));
+        private static ListerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ListerPlugin>(typeof(PluginClassPlaceholder));
 
 
         private static IListerHandlerBuilder ListerHandlerBuilder => GetListerHandlerBuilder(Plugin);
@@ -52,13 +52,13 @@ namespace WlxWrapper {
 
         #region ListLoad
 
-        [DllExport(EntryPoint = "ListLoad")]
+        [UnmanagedCallersOnly(EntryPoint = "ListLoad")]
         public static IntPtr Load(IntPtr parentWin, [MarshalAs(UnmanagedType.LPStr)] string fileToLoad, int flags)
         {
             return LoadW(parentWin, fileToLoad, flags);
         }
 
-        [DllExport(EntryPoint = "ListLoadW")]
+        [UnmanagedCallersOnly(EntryPoint = "ListLoadW")]
         public static IntPtr LoadW(IntPtr parentWin, [MarshalAs(UnmanagedType.LPWStr)] string fileToLoad, int flags)
         {
             var listerHandle = IntPtr.Zero;
@@ -93,13 +93,13 @@ namespace WlxWrapper {
 
         #region ListLoadNext
 
-        [DllExport(EntryPoint = "ListLoadNext")]
+        [UnmanagedCallersOnly(EntryPoint = "ListLoadNext")]
         public static int LoadNext(IntPtr parentWin, IntPtr listWin, [MarshalAs(UnmanagedType.LPStr)] string fileToLoad, int flags)
         {
             return LoadNextW(parentWin, listWin, fileToLoad, flags);
         }
 
-        [DllExport(EntryPoint = "ListLoadNextW")]
+        [UnmanagedCallersOnly(EntryPoint = "ListLoadNextW")]
         public static int LoadNextW(IntPtr parentWin, IntPtr listWin, [MarshalAs(UnmanagedType.LPWStr)] string fileToLoad, int flags)
         {
             var result = ListerResult.Error;
@@ -122,7 +122,7 @@ namespace WlxWrapper {
 
         #region ListCloseWindow
 
-        [DllExport(EntryPoint = "ListCloseWindow")]
+        [UnmanagedCallersOnly(EntryPoint = "ListCloseWindow")]
         public static void CloseWindow(IntPtr listWin)
         {
             _callSignature = $"CloseWindow ({listWin.ToString()})";
@@ -143,7 +143,7 @@ namespace WlxWrapper {
         #region ListGetDetectString
 
         // ListGetDetectString functionality is implemented here, not included to Lister Plugin interface.
-        [DllExport(EntryPoint = "ListGetDetectString")]
+        [UnmanagedCallersOnly(EntryPoint = "ListGetDetectString")]
         public static void GetDetectString(IntPtr detectString, int maxLen)
         {
             _callSignature = "GetDetectString";
@@ -160,13 +160,13 @@ namespace WlxWrapper {
 
         #region ListSearchText
 
-        [DllExport(EntryPoint = "ListSearchText")]
+        [UnmanagedCallersOnly(EntryPoint = "ListSearchText")]
         public static int SearchText(IntPtr listWin, [MarshalAs(UnmanagedType.LPStr)] string searchString, int searchParameter)
         {
             return SearchTextW(listWin, searchString, searchParameter);
         }
 
-        [DllExport(EntryPoint = "ListSearchTextW")]
+        [UnmanagedCallersOnly(EntryPoint = "ListSearchTextW")]
         public static int SearchTextW(IntPtr listWin, [MarshalAs(UnmanagedType.LPWStr)] string searchString, int searchParameter)
         {
             var result = ListerResult.Error;
@@ -189,7 +189,7 @@ namespace WlxWrapper {
 
         #region ListSendCommand
 
-        [DllExport(EntryPoint = "ListSendCommand")]
+        [UnmanagedCallersOnly(EntryPoint = "ListSendCommand")]
         public static int SendCommand(IntPtr listWin, int command, int parameter)
         {
             var result = ListerResult.Error;
@@ -213,13 +213,13 @@ namespace WlxWrapper {
 
         #region ListPrint
 
-        [DllExport(EntryPoint = "ListPrint")]
+        [UnmanagedCallersOnly(EntryPoint = "ListPrint")]
         public static int Print(IntPtr listWin, [MarshalAs(UnmanagedType.LPStr)] string fileToPrint, [MarshalAs(UnmanagedType.LPStr)] string defPrinter, int flags, PrintMargins margins)
         {
             return PrintW(listWin, fileToPrint, defPrinter, flags, margins);
         }
 
-        [DllExport(EntryPoint = "ListPrintW")]
+        [UnmanagedCallersOnly(EntryPoint = "ListPrintW")]
         public static int PrintW(IntPtr listWin, [MarshalAs(UnmanagedType.LPWStr)] string fileToPrint, [MarshalAs(UnmanagedType.LPWStr)] string defPrinter, int flags, PrintMargins margins)
         {
             var result = ListerResult.Error;
@@ -242,7 +242,7 @@ namespace WlxWrapper {
 
         #region ListNotificationReceived
 
-        [DllExport(EntryPoint = "ListNotificationReceived")]
+        [UnmanagedCallersOnly(EntryPoint = "ListNotificationReceived")]
         public static int NotificationReceived(IntPtr listWin, int message, int wParam, int lParam) // 32, 64 ???
         {
             var result = 0;
@@ -265,7 +265,7 @@ namespace WlxWrapper {
         #region ListSetDefaultParams
 
         // ListSetDefaultParams functionality is implemented here, not included to Lister Plugin interface.
-        [DllExport(EntryPoint = "ListSetDefaultParams")]
+        [UnmanagedCallersOnly(EntryPoint = "ListSetDefaultParams")]
         public static void SetDefaultParams(ref PluginDefaultParams defParams)
         {
             _callSignature = "SetDefaultParams";
@@ -282,14 +282,14 @@ namespace WlxWrapper {
 
         #region ListGetPreviewBitmap
 
-        [DllExport(EntryPoint = "ListGetPreviewBitmap")]
+        [UnmanagedCallersOnly(EntryPoint = "ListGetPreviewBitmap")]
         public static IntPtr GetPreviewBitmap([MarshalAs(UnmanagedType.LPStr)] string fileToLoad, int width, int height, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
             byte[] contentBuf, int contentBufLen)
         {
             return GetPreviewBitmapInternal(fileToLoad, width, height, contentBuf);
         }
 
-        [DllExport(EntryPoint = "ListGetPreviewBitmapW")]
+        [UnmanagedCallersOnly(EntryPoint = "ListGetPreviewBitmapW")]
         public static IntPtr GetPreviewBitmapW([MarshalAs(UnmanagedType.LPWStr)] string fileToLoad, int width, int height, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
             byte[] contentBuf, int contentBufLen)
         {
@@ -319,7 +319,7 @@ namespace WlxWrapper {
 
         #region ListSearchDialog
 
-        [DllExport(EntryPoint = "ListSearchDialog")]
+        [UnmanagedCallersOnly(EntryPoint = "ListSearchDialog")]
         public static int SearchDialog(IntPtr listWin, int findNext)
         {
             var result = ListerResult.Error;

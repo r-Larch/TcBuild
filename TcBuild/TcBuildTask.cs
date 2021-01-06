@@ -7,7 +7,7 @@ using Microsoft.Build.Utilities;
 
 
 namespace TcBuild {
-    public class TcBuildTask : AppDomainIsolatedTask, ICancelableTask, ITask {
+    public class TcBuildTask : Task, ICancelableTask, ITask {
         private readonly CancellationTokenSource _token;
         private ILogger _log;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using TcPluginBase;
 
 
@@ -38,7 +39,7 @@ namespace TcBuild {
 
             var methods = Classes().SelectMany(clazz => clazz.GetMethods(BindingFlags.Static | BindingFlags.Public));
             foreach (var method in methods) {
-                var attr = method.GetCustomAttribute<DllExportAttribute>();
+                var attr = method.GetCustomAttribute<UnmanagedCallersOnlyAttribute>();
                 if (attr != null) {
                     var exportName = method.Name;
 

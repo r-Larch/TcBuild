@@ -15,7 +15,7 @@ namespace QSWrapper {
 
         private static string _callSignature;
         private static QuickSearchPlugin _plugin;
-        private static QuickSearchPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<QuickSearchPlugin>(typeof(PluginClassPlaceholder)));
+        private static QuickSearchPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<QuickSearchPlugin>(typeof(PluginClassPlaceholder));
 
 
         private QuickSearchWrapper()
@@ -26,7 +26,7 @@ namespace QSWrapper {
 
         #region Mandatory Methods
 
-        [DllExport(EntryPoint = "MatchFileW")]
+        [UnmanagedCallersOnly(EntryPoint = "MatchFileW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool MatchFile(IntPtr wcFilter, IntPtr wcFileName)
         {
@@ -48,7 +48,7 @@ namespace QSWrapper {
             return result;
         }
 
-        [DllExport]
+        [UnmanagedCallersOnly]
         public static int MatchGetSetOptions(int status)
         {
             MatchOptions result;

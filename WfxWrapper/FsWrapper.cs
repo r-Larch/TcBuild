@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
 using TcPluginBase;
 using TcPluginBase.Content;
 using TcPluginBase.FileSystem;
@@ -46,7 +45,7 @@ namespace WfxWrapper {
         #region FsInit
 
         // FsInit, FsInitW functionality is implemented here, not included to FS Plugin interface.
-        [DllExport(EntryPoint = "FsInit")]
+        [UnmanagedCallersOnly(EntryPoint = "FsInit")]
         public static int Init(int pluginNumber, ProgressCallback progressProc, LogCallback logProc, RequestCallback requestProc)
         {
             try {
@@ -63,7 +62,7 @@ namespace WfxWrapper {
             return 0;
         }
 
-        [DllExport(EntryPoint = "FsInitW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsInitW")]
         public static int InitW(int pluginNumber, ProgressCallbackW progressProcW, LogCallbackW logProcW, RequestCallbackW requestProcW)
         {
             try {
@@ -85,13 +84,13 @@ namespace WfxWrapper {
 
         #region FsFindFirst
 
-        [DllExport(EntryPoint = "FsFindFirst")]
+        [UnmanagedCallersOnly(EntryPoint = "FsFindFirst")]
         public static IntPtr FindFirst([MarshalAs(UnmanagedType.LPStr)] string path, IntPtr findFileData)
         {
             return FindFirstInternal(path, findFileData, false);
         }
 
-        [DllExport(EntryPoint = "FsFindFirstW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsFindFirstW")]
         public static IntPtr FindFirstW([MarshalAs(UnmanagedType.LPWStr)] string path, IntPtr findFileData)
         {
             return FindFirstInternal(path, findFileData, true);
@@ -127,14 +126,14 @@ namespace WfxWrapper {
 
         #region FsFindNext
 
-        [DllExport(EntryPoint = "FsFindNext")]
+        [UnmanagedCallersOnly(EntryPoint = "FsFindNext")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool FindNext(IntPtr hdl, IntPtr findFileData)
         {
             return FindNextInternal(hdl, findFileData, false);
         }
 
-        [DllExport(EntryPoint = "FsFindNextW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsFindNextW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool FindNextW(IntPtr hdl, IntPtr findFileData)
         {
@@ -171,7 +170,7 @@ namespace WfxWrapper {
 
         #region FsFindClose
 
-        [DllExport(EntryPoint = "FsFindClose")]
+        [UnmanagedCallersOnly(EntryPoint = "FsFindClose")]
         public static int FindClose(IntPtr hdl)
         {
             _callSignature = "FindClose";
@@ -204,7 +203,7 @@ namespace WfxWrapper {
         #region FsSetCryptCallback
 
         // FsSetCryptCallback & FsSetCryptCallbackW functionality is implemented here, not included to FS Plugin interface.
-        [DllExport(EntryPoint = "FsSetCryptCallback")]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetCryptCallback")]
         public static void SetCryptCallback(FsCryptCallback cryptProc, int cryptNumber, int flags)
         {
             _callSignature = "SetCryptCallback";
@@ -219,7 +218,7 @@ namespace WfxWrapper {
             }
         }
 
-        [DllExport(EntryPoint = "FsSetCryptCallbackW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetCryptCallbackW")]
         public static void SetCryptCallbackW(FsCryptCallbackW cryptProcW, int cryptNumber, int flags)
         {
             _callSignature = "SetCryptCallbackW";
@@ -240,7 +239,7 @@ namespace WfxWrapper {
         #region FsGetDefRootName
 
         // FsGetDefRootName functionality is implemented here, not included to FS Plugin interface.
-        [DllExport(EntryPoint = "FsGetDefRootName")]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetDefRootName")]
         public static void GetDefRootName(IntPtr rootName, int maxLen)
         {
             _callSignature = "GetDefRootName";
@@ -264,7 +263,7 @@ namespace WfxWrapper {
 
         #region FsGetFile
 
-        [DllExport(EntryPoint = "FsGetFile"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetFile")]
         public static int GetFile([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
         {
             var locName = Marshal.PtrToStringAnsi(localName);
@@ -277,7 +276,7 @@ namespace WfxWrapper {
             return (int) result.Code;
         }
 
-        [DllExport(EntryPoint = "FsGetFileW"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetFileW")]
         public static int GetFileW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, IntPtr localName, int copyFlags, IntPtr remoteInfo)
         {
             var locName = Marshal.PtrToStringUni(localName);
@@ -313,7 +312,7 @@ namespace WfxWrapper {
 
         #region FsPutFile
 
-        [DllExport(EntryPoint = "FsPutFile"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsPutFile")]
         public static int PutFile([MarshalAs(UnmanagedType.LPStr)] string localName, IntPtr remoteName, int copyFlags)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
@@ -326,7 +325,7 @@ namespace WfxWrapper {
             return (int) result.Code;
         }
 
-        [DllExport(EntryPoint = "FsPutFileW"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsPutFileW")]
         public static int PutFileW([MarshalAs(UnmanagedType.LPWStr)] string localName, IntPtr remoteName, int copyFlags)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
@@ -361,13 +360,13 @@ namespace WfxWrapper {
 
         #region FsRenMovFile
 
-        [DllExport(EntryPoint = "FsRenMovFile")]
+        [UnmanagedCallersOnly(EntryPoint = "FsRenMovFile")]
         public static int RenMovFile([MarshalAs(UnmanagedType.LPStr)] string oldName, [MarshalAs(UnmanagedType.LPStr)] string newName, [MarshalAs(UnmanagedType.Bool)] bool move, [MarshalAs(UnmanagedType.Bool)] bool overwrite, IntPtr remoteInfo)
         {
             return RenMovFileW(oldName, newName, move, overwrite, remoteInfo);
         }
 
-        [DllExport(EntryPoint = "FsRenMovFileW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsRenMovFileW")]
         public static int RenMovFileW([MarshalAs(UnmanagedType.LPWStr)] string oldName, [MarshalAs(UnmanagedType.LPWStr)] string newName, [MarshalAs(UnmanagedType.Bool)] bool move, [MarshalAs(UnmanagedType.Bool)] bool overwrite, IntPtr rmtInfo)
         {
             var result = RenMovFileResult.NotSupported;
@@ -395,14 +394,14 @@ namespace WfxWrapper {
 
         #region FsDeleteFile
 
-        [DllExport(EntryPoint = "FsDeleteFile")]
+        [UnmanagedCallersOnly(EntryPoint = "FsDeleteFile")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool DeleteFile([MarshalAs(UnmanagedType.LPStr)] string fileName)
         {
             return DeleteFileW(fileName);
         }
 
-        [DllExport(EntryPoint = "FsDeleteFileW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsDeleteFileW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool DeleteFileW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
         {
@@ -425,14 +424,14 @@ namespace WfxWrapper {
 
         #region FsRemoveDir
 
-        [DllExport(EntryPoint = "FsRemoveDir")]
+        [UnmanagedCallersOnly(EntryPoint = "FsRemoveDir")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool RemoveDir([MarshalAs(UnmanagedType.LPStr)] string dirName)
         {
             return RemoveDirW(dirName);
         }
 
-        [DllExport(EntryPoint = "FsRemoveDirW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsRemoveDirW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool RemoveDirW([MarshalAs(UnmanagedType.LPWStr)] string dirName)
         {
@@ -455,14 +454,14 @@ namespace WfxWrapper {
 
         #region FsMkDir
 
-        [DllExport(EntryPoint = "FsMkDir")]
+        [UnmanagedCallersOnly(EntryPoint = "FsMkDir")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool MkDir([MarshalAs(UnmanagedType.LPStr)] string dirName)
         {
             return MkDirW(dirName);
         }
 
-        [DllExport(EntryPoint = "FsMkDirW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsMkDirW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool MkDirW([MarshalAs(UnmanagedType.LPWStr)] string dirName)
         {
@@ -484,7 +483,7 @@ namespace WfxWrapper {
 
         #region FsExecuteFile
 
-        [DllExport(EntryPoint = "FsExecuteFile")]
+        [UnmanagedCallersOnly(EntryPoint = "FsExecuteFile")]
         public static int ExecuteFile(IntPtr mainWin, IntPtr remoteName, [MarshalAs(UnmanagedType.LPStr)] string verb)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
@@ -497,7 +496,7 @@ namespace WfxWrapper {
             return (int) result.Type;
         }
 
-        [DllExport(EntryPoint = "FsExecuteFileW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsExecuteFileW")]
         public static int ExecuteFileW(IntPtr mainWin, IntPtr remoteName, [MarshalAs(UnmanagedType.LPWStr)] string verb)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
@@ -536,14 +535,14 @@ namespace WfxWrapper {
 
         #region FsSetAttr
 
-        [DllExport(EntryPoint = "FsSetAttr")]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetAttr")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool SetAttr([MarshalAs(UnmanagedType.LPStr)] string remoteName, int newAttr)
         {
             return SetAttrW(remoteName, newAttr);
         }
 
-        [DllExport(EntryPoint = "FsSetAttrW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetAttrW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool SetAttrW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, int newAttr)
         {
@@ -567,14 +566,14 @@ namespace WfxWrapper {
 
         #region FsSetTime
 
-        [DllExport(EntryPoint = "FsSetTime"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetTime")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool SetTime([MarshalAs(UnmanagedType.LPStr)] string remoteName, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
         {
             return SetTimeW(remoteName, creationTime, lastAccessTime, lastWriteTime);
         }
 
-        [DllExport(EntryPoint = "FsSetTimeW"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetTimeW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool SetTimeW([MarshalAs(UnmanagedType.LPWStr)] string remoteName, IntPtr creationTime, IntPtr lastAccessTime, IntPtr lastWriteTime)
         {
@@ -606,14 +605,14 @@ namespace WfxWrapper {
 
         #region FsDisconnect
 
-        [DllExport(EntryPoint = "FsDisconnect")]
+        [UnmanagedCallersOnly(EntryPoint = "FsDisconnect")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool Disconnect([MarshalAs(UnmanagedType.LPStr)] string disconnectRoot)
         {
             return DisconnectW(disconnectRoot);
         }
 
-        [DllExport(EntryPoint = "FsDisconnectW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsDisconnectW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool DisconnectW([MarshalAs(UnmanagedType.LPWStr)] string disconnectRoot)
         {
@@ -636,13 +635,13 @@ namespace WfxWrapper {
 
         #region FsStatusInfo
 
-        [DllExport(EntryPoint = "FsStatusInfo")]
+        [UnmanagedCallersOnly(EntryPoint = "FsStatusInfo")]
         public static void StatusInfo([MarshalAs(UnmanagedType.LPStr)] string remoteDir, int startEnd, int operation)
         {
             StatusInfoW(remoteDir, startEnd, operation);
         }
 
-        [DllExport(EntryPoint = "FsStatusInfoW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsStatusInfoW")]
         public static void StatusInfoW([MarshalAs(UnmanagedType.LPWStr)] string remoteDir, int startEnd, int operation)
         {
             try {
@@ -663,8 +662,7 @@ namespace WfxWrapper {
 
         #region FsExtractCustomIcon
 
-        [DllExport(EntryPoint = "FsExtractCustomIcon")]
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsExtractCustomIcon")]
         public static int ExtractCustomIcon(IntPtr remoteName, int extractFlags, IntPtr theIcon)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
@@ -677,8 +675,7 @@ namespace WfxWrapper {
             return (int) result;
         }
 
-        [DllExport(EntryPoint = "FsExtractCustomIconW")]
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsExtractCustomIconW")]
         public static int ExtractCustomIconW(IntPtr remoteName, int extractFlags, IntPtr theIcon)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
@@ -691,7 +688,6 @@ namespace WfxWrapper {
             return (int) result;
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         internal static ExtractIconResult.ExtractIconEnum ExtractIconInternal(ref string remoteName, int extractFlags, IntPtr theIcon)
         {
             var flags = (ExtractIconFlags) extractFlags;
@@ -727,7 +723,7 @@ namespace WfxWrapper {
         #region FsSetDefaultParams
 
         // FsSetDefaultParams functionality is implemented here, not included to FS Plugin interface.
-        [DllExport(EntryPoint = "FsSetDefaultParams")]
+        [UnmanagedCallersOnly(EntryPoint = "FsSetDefaultParams")]
         public static void SetDefaultParams(ref PluginDefaultParams defParams)
         {
             _callSignature = "SetDefaultParams";
@@ -746,7 +742,7 @@ namespace WfxWrapper {
 
         #region FsGetPreviewBitmap
 
-        [DllExport(EntryPoint = "FsGetPreviewBitmap"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetPreviewBitmap")]
         public static int GetPreviewBitmap(IntPtr remoteName, int width, int height, IntPtr returnedBitmap)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
@@ -759,7 +755,7 @@ namespace WfxWrapper {
             return (int) result;
         }
 
-        [DllExport(EntryPoint = "FsGetPreviewBitmapW"), SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetPreviewBitmapW")]
         public static int GetPreviewBitmapW(IntPtr remoteName, int width, int height, IntPtr returnedBitmap)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
@@ -772,7 +768,6 @@ namespace WfxWrapper {
             return (int) result;
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         internal static PreviewBitmapResult.PreviewBitmapEnum GetPreviewBitmapInternal(ref string remoteName, int width, int height, IntPtr returnedBitmap)
         {
             _callSignature = $"GetPreviewBitmap '{remoteName}' ({width} x {height})";
@@ -811,7 +806,7 @@ namespace WfxWrapper {
         #region FsLinksToLocalFiles
 
         // FsLinksToLocalFiles functionality is implemented here, not included to FS Plugin interface.
-        [DllExport(EntryPoint = "FsLinksToLocalFiles")]
+        [UnmanagedCallersOnly(EntryPoint = "FsLinksToLocalFiles")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool LinksToLocalFiles()
         {
@@ -834,9 +829,8 @@ namespace WfxWrapper {
 
         #region FsGetLocalName
 
-        [DllExport(EntryPoint = "FsGetLocalName")]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetLocalName")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static bool GetLocalName(IntPtr remoteName, int maxLen)
         {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
@@ -848,9 +842,8 @@ namespace WfxWrapper {
             return result;
         }
 
-        [DllExport(EntryPoint = "FsGetLocalNameW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetLocalNameW")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static bool GetLocalNameW(IntPtr remoteName, int maxLen)
         {
             var rmtName = Marshal.PtrToStringUni(remoteName);
@@ -887,7 +880,7 @@ namespace WfxWrapper {
 
 
         // FsGetBackgroundFlags functionality is implemented here, not included to FS Plugin interface.
-        [DllExport(EntryPoint = "FsGetBackgroundFlags")]
+        [UnmanagedCallersOnly(EntryPoint = "FsGetBackgroundFlags")]
         public static int GetBackgroundFlags()
         {
             var result = FsBackgroundFlags.None;
@@ -913,7 +906,7 @@ namespace WfxWrapper {
 
         #region FsContentGetSupportedField
 
-        [DllExport(EntryPoint = "FsContentGetSupportedField")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetSupportedField")]
         public static int GetSupportedField(int fieldIndex, IntPtr fieldName, IntPtr units, int maxLen)
         {
             var result = ContentFieldType.NoMoreFields;
@@ -948,13 +941,13 @@ namespace WfxWrapper {
 
         #region FsContentGetValue
 
-        [DllExport(EntryPoint = "FsContentGetValue")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetValue")]
         public static int GetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
             return GetValueW(fileName, fieldIndex, unitIndex, fieldValue, maxLen, flags);
         }
 
-        [DllExport(EntryPoint = "FsContentGetValueW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetValueW")]
         public static int GetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
             GetValueResult result;
@@ -988,13 +981,13 @@ namespace WfxWrapper {
 
         #region FsContentStopGetValue
 
-        [DllExport(EntryPoint = "FsContentStopGetValue")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentStopGetValue")]
         public static void StopGetValue([MarshalAs(UnmanagedType.LPStr)] string fileName)
         {
             StopGetValueW(fileName);
         }
 
-        [DllExport(EntryPoint = "FsContentStopGetValueW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentStopGetValueW")]
         public static void StopGetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
         {
             _callSignature = "ContentStopGetValue";
@@ -1013,7 +1006,7 @@ namespace WfxWrapper {
 
         #region FsContentGetDefaultSortOrder
 
-        [DllExport(EntryPoint = "FsContentGetDefaultSortOrder")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetDefaultSortOrder")]
         public static int GetDefaultSortOrder(int fieldIndex)
         {
             var result = DefaultSortOrder.Asc;
@@ -1034,7 +1027,7 @@ namespace WfxWrapper {
 
         #region FsContentPluginUnloading
 
-        [DllExport(EntryPoint = "FsContentPluginUnloading")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentPluginUnloading")]
         public static void PluginUnloading()
         {
             if (ContentPlugin != null) {
@@ -1054,7 +1047,7 @@ namespace WfxWrapper {
 
         #region FsContentGetSupportedFieldFlags
 
-        [DllExport(EntryPoint = "FsContentGetSupportedFieldFlags")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetSupportedFieldFlags")]
         public static int GetSupportedFieldFlags(int fieldIndex)
         {
             var result = SupportedFieldOptions.None;
@@ -1075,13 +1068,13 @@ namespace WfxWrapper {
 
         #region FsContentSetValue
 
-        [DllExport(EntryPoint = "FsContentSetValue")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentSetValue")]
         public static int SetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
             return SetValueW(fileName, fieldIndex, unitIndex, fieldType, fieldValue, flags);
         }
 
-        [DllExport(EntryPoint = "FsContentSetValueW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentSetValueW")]
         public static int SetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
             SetValueResult result;
@@ -1107,7 +1100,7 @@ namespace WfxWrapper {
 
         #region FsContentGetDefaultView
 
-        [DllExport(EntryPoint = "FsContentGetDefaultView")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetDefaultView")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool GetDefaultView(IntPtr viewContents, IntPtr viewHeaders, IntPtr viewWidths, IntPtr viewOptions, int maxLen)
         {
@@ -1124,7 +1117,7 @@ namespace WfxWrapper {
             return false;
         }
 
-        [DllExport(EntryPoint = "FsContentGetDefaultViewW")]
+        [UnmanagedCallersOnly(EntryPoint = "FsContentGetDefaultViewW")]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool GetDefaultViewW(IntPtr viewContents, IntPtr viewHeaders, IntPtr viewWidths, IntPtr viewOptions, int maxLen)
         {

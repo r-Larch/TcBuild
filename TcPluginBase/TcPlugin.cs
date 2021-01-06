@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Remoting.Lifetime;
-using System.Security.Permissions;
 using System.Threading;
 
 
 namespace TcPluginBase {
-    [Serializable]
-    public class TcPlugin : MarshalByRefObject {
+    public class TcPlugin {
         public int PluginNumber { get; internal set; }
         public PluginDefaultParams DefaultParams { get; set; } // for unit tests
 
@@ -22,6 +19,7 @@ namespace TcPluginBase {
         protected bool IsBackgroundThread => Thread.CurrentThread.ManagedThreadId != _mainThreadId;
         protected static readonly string TcFolder = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         protected string PluginFolder { get; }
+
 
         public TcPlugin(Settings pluginSettings = null)
         {
@@ -40,25 +38,6 @@ namespace TcPluginBase {
         }
 
 
-        #region MarshalByRefObject - Lifetime initialization
-
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.Infrastructure)]
-        public override object InitializeLifetimeService()
-        {
-            var lease = (ILease) base.InitializeLifetimeService();
-            if (lease != null && lease.CurrentState == LeaseState.Initial) {
-                // By default we set infinite lifetime for each created plugin (initialLifeTime = 0)
-                lease.InitialLeaseTime = TimeSpan.Zero;
-            }
-
-            return lease;
-        }
-
-        #endregion
-
-
-        #region Plugin Event Handler
-
         public event EventHandler<PluginEventArgs> TcPluginEventHandler;
 
         public virtual int OnTcPluginEvent(PluginEventArgs e)
@@ -66,19 +45,5 @@ namespace TcPluginBase {
             TcPluginEventHandler?.Invoke(this, e);
             return e.Result;
         }
-
-        #endregion Plugin Event Handler
-
-
-        #region Other Methods
-
-        //protected void SetPluginFolder(string folderKey, string defaultFolder)
-        //{
-        //        folder = folder
-        //            .Replace("%TC%", TcFolder)
-        //            .Replace("%PLUGIN%", PluginFolder);
-        //}
-
-        #endregion Other Methods
     }
 }

@@ -15,7 +15,7 @@ namespace WdxWrapper {
 
         private static string _callSignature;
         private static ContentPlugin _plugin;
-        private static ContentPlugin Plugin => _plugin ?? (_plugin = TcPluginLoader.GetTcPlugin<ContentPlugin>(typeof(PluginClassPlaceholder)));
+        private static ContentPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ContentPlugin>(typeof(PluginClassPlaceholder));
 
 
         private ContentWrapper()
@@ -27,7 +27,7 @@ namespace WdxWrapper {
 
         #region ContentGetSupportedField
 
-        [DllExport(EntryPoint = "ContentGetSupportedField")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentGetSupportedField")]
         public static int GetSupportedField(int fieldIndex, IntPtr fieldName, IntPtr units, int maxLen)
         {
             var result = ContentFieldType.NoMoreFields;
@@ -60,13 +60,13 @@ namespace WdxWrapper {
 
         #region ContentGetValue
 
-        [DllExport(EntryPoint = "ContentGetValue")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentGetValue")]
         public static int GetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
             return GetValueW(fileName, fieldIndex, unitIndex, fieldValue, maxLen, flags);
         }
 
-        [DllExport(EntryPoint = "ContentGetValueW")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentGetValueW")]
         public static int GetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
             GetValueResult result;
@@ -98,13 +98,13 @@ namespace WdxWrapper {
 
         #region ContentStopGetValue
 
-        [DllExport(EntryPoint = "ContentStopGetValue")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentStopGetValue")]
         public static void StopGetValue([MarshalAs(UnmanagedType.LPStr)] string fileName)
         {
             StopGetValueW(fileName);
         }
 
-        [DllExport(EntryPoint = "ContentStopGetValueW")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentStopGetValueW")]
         public static void StopGetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
         {
             _callSignature = "ContentStopGetValue";
@@ -122,7 +122,7 @@ namespace WdxWrapper {
 
         #region ContentGetDefaultSortOrder
 
-        [DllExport(EntryPoint = "ContentGetDefaultSortOrder")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentGetDefaultSortOrder")]
         public static int GetDefaultSortOrder(int fieldIndex)
         {
             var result = DefaultSortOrder.Asc;
@@ -143,7 +143,7 @@ namespace WdxWrapper {
 
         #region ContentPluginUnloading
 
-        [DllExport(EntryPoint = "ContentPluginUnloading")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentPluginUnloading")]
         public static void PluginUnloading()
         {
             _callSignature = "ContentPluginUnloading";
@@ -161,7 +161,7 @@ namespace WdxWrapper {
 
         #region ContentGetSupportedFieldFlags
 
-        [DllExport(EntryPoint = "ContentGetSupportedFieldFlags")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentGetSupportedFieldFlags")]
         public static int GetSupportedFieldFlags(int fieldIndex)
         {
             var result = SupportedFieldOptions.None;
@@ -182,13 +182,13 @@ namespace WdxWrapper {
 
         #region ContentSetValue
 
-        [DllExport(EntryPoint = "ContentSetValue")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentSetValue")]
         public static int SetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
             return SetValueW(fileName, fieldIndex, unitIndex, fieldType, fieldValue, flags);
         }
 
-        [DllExport(EntryPoint = "ContentSetValueW")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentSetValueW")]
         public static int SetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
             SetValueResult result;
@@ -214,7 +214,7 @@ namespace WdxWrapper {
         #region ContentGetDetectString
 
         // ContentGetDetectString functionality is implemented here, not included to Content Plugin interface.
-        [DllExport(EntryPoint = "ContentGetDetectString")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentGetDetectString")]
         public static int GetDetectString(IntPtr detectString, int maxLen)
         {
             _callSignature = "GetDetectString";
@@ -235,7 +235,7 @@ namespace WdxWrapper {
         #region ContentSetDefaultParams
 
         // ContentSetDefaultParams functionality is implemented here, not included to Content Plugin interface.
-        [DllExport(EntryPoint = "ContentSetDefaultParams")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentSetDefaultParams")]
         public static void SetDefaultParams(ref PluginDefaultParams defParams)
         {
             _callSignature = "SetDefaultParams";
@@ -253,7 +253,7 @@ namespace WdxWrapper {
 
         #region ContentEditValue
 
-        [DllExport(EntryPoint = "ContentEditValue")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentEditValue")]
         public static int EditValue(IntPtr parentWin, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int maxLen, int flags, [MarshalAs(UnmanagedType.LPStr)] string langIdentifier)
         {
             SetValueResult result;
@@ -284,13 +284,13 @@ namespace WdxWrapper {
 
         #region ContentSendStateInformation
 
-        [DllExport(EntryPoint = "ContentSendStateInformation")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentSendStateInformation")]
         public static void SendStateInformation(int state, [MarshalAs(UnmanagedType.LPStr)] string path)
         {
             SendStateInformationW(state, path);
         }
 
-        [DllExport(EntryPoint = "ContentSendStateInformationW")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentSendStateInformationW")]
         public static void SendStateInformationW(int state, [MarshalAs(UnmanagedType.LPWStr)] string path)
         {
             _callSignature = "ContentSendStateInformation";
@@ -308,7 +308,7 @@ namespace WdxWrapper {
 
         #region ContentCompareFiles
 
-        [DllExport(EntryPoint = "ContentCompareFiles")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentCompareFiles")]
         public static int CompareFiles(ContentProgressCallback progressCallback, int compareIndex,
             [MarshalAs(UnmanagedType.LPStr)] string fileName1,
             [MarshalAs(UnmanagedType.LPStr)] string fileName2,
@@ -317,7 +317,7 @@ namespace WdxWrapper {
             return CompareFilesW(progressCallback, compareIndex, fileName1, fileName2, ref contentFileDetails);
         }
 
-        [DllExport(EntryPoint = "ContentCompareFilesW")]
+        [UnmanagedCallersOnly(EntryPoint = "ContentCompareFilesW")]
         public static int CompareFilesW(ContentProgressCallback progressCallback, int compareIndex,
             [MarshalAs(UnmanagedType.LPWStr)] string fileName1,
             [MarshalAs(UnmanagedType.LPWStr)] string fileName2,
