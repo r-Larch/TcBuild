@@ -50,15 +50,20 @@ namespace TcPluginBase.FileSystem {
         /// <summary> Total Commander should download the file and execute it locally. </summary>
         public static ExecResult Yourself => new ExecResult(ExecEnum.Yourself);
 
-        /// <summary> It was a (symbolic) link or .lnk file pointing to another file or directory. </summary>
+        /// <summary>
+        /// It was a (symbolic) link or .lnk file pointing to another file or directory.
+        /// You can also switch to a directory on the local harddisk! To do this,
+        /// return a path starting either with a drive letter, or an UNC location (\\server\share).
+        /// The maximum allowed length of such a path is MAX_PATH-1 = 259 characters!
+        /// </summary>
         /// <param name="symlinkTarget">The file or directory where the symlink points to.</param>
-        public static ExecResult SymLink(RemotePath symlinkTarget) => new ExecResult(ExecEnum.SymLink, symlinkTarget);
+        public static ExecResult SymLink(string symlinkTarget) => new ExecResult(ExecEnum.SymLink, symlinkTarget);
 
 
         internal ExecEnum Type;
-        internal RemotePath SymlinkTarget;
+        internal string SymlinkTarget;
 
-        private ExecResult(ExecEnum type, RemotePath symlinkTarget = default)
+        private ExecResult(ExecEnum type, string symlinkTarget = default)
         {
             Type = type;
             SymlinkTarget = symlinkTarget;

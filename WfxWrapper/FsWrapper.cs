@@ -494,7 +494,7 @@ namespace WfxWrapper {
             var rmtName = Marshal.PtrToStringAnsi(remoteName);
             var result = ExecuteFileInternal(mainWin, rmtName, verb);
 
-            if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
+            if (result.Type == ExecResult.ExecEnum.SymLink && !string.IsNullOrEmpty(result.SymlinkTarget)) {
                 TcUtils.WriteStringAnsi(result.SymlinkTarget, remoteName, 0);
             }
 
@@ -507,7 +507,7 @@ namespace WfxWrapper {
             var rmtName = Marshal.PtrToStringUni(remoteName);
             var result = ExecuteFileInternal(mainWin, rmtName, verb);
 
-            if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
+            if (result.Type == ExecResult.ExecEnum.SymLink && !string.IsNullOrEmpty(result.SymlinkTarget)) {
                 TcUtils.WriteStringUni(result.SymlinkTarget, remoteName, 0);
             }
 
@@ -516,12 +516,13 @@ namespace WfxWrapper {
 
         private static ExecResult ExecuteFileInternal(IntPtr mainWin, RemotePath remoteName, string verb)
         {
+            var result = ExecResult.Error;
             _callSignature = $"ExecuteFile '{remoteName}' - {verb}";
             try {
-                var result = Plugin.ExecuteFile(new TcWindow(mainWin), remoteName, verb);
+                result = Plugin.ExecuteFile(new TcWindow(mainWin), remoteName, verb);
 
                 var resStr = result.Type.ToString();
-                if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
+                if (result.Type == ExecResult.ExecEnum.SymLink && !string.IsNullOrEmpty(result.SymlinkTarget)) {
                     resStr += " (" + result.SymlinkTarget + ")";
                 }
 
@@ -531,7 +532,7 @@ namespace WfxWrapper {
                 ProcessException(ex);
             }
 
-            return ExecResult.Ok;
+            return result;
         }
 
         #endregion FsExecuteFile
