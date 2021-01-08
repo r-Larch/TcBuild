@@ -105,7 +105,7 @@ namespace TcBuild {
                         }
                     }
                     foreach (var file in satelliteAssemblyFiles.Where(_ => _.Exists)) {
-                        using (var entry = zip.CreateEntry($"{file.DirectoryName}/{file.Name}").Open())
+                        using (var entry = zip.CreateEntry($"{file.Directory.Name}/{file.Name}").Open())
                         using (var fileContents = file.OpenRead()) {
                             fileContents.CopyTo(entry);
                         }
