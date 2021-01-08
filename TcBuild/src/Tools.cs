@@ -92,7 +92,7 @@ namespace TcBuild {
         }
 
 
-        public bool CreateZip(FileInfo zipFile, IEnumerable<FileInfo> files)
+        public bool CreateZip(FileInfo zipFile, IEnumerable<FileInfo> files, IEnumerable<FileInfo> satelliteAssemblyFiles)
         {
             try {
                 zipFile.Delete();
@@ -104,8 +104,13 @@ namespace TcBuild {
                             fileContents.CopyTo(entry);
                         }
                     }
+                    foreach (var file in satelliteAssemblyFiles.Where(_ => _.Exists)) {
+                        using (var entry = zip.CreateEntry($"{file.DirectoryName}/{file.Name}").Open())
+                        using (var fileContents = file.OpenRead()) {
+                            fileContents.CopyTo(entry);
+                        }
+                    }
                 }
-
                 return true;
             }
             catch (Exception e) {

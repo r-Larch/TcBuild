@@ -96,7 +96,8 @@ namespace TcBuild {
                             //.Where(_ => _.Name != "Microsoft.Build.Framework.dll")
                             //.Where(_ => _.Name != "Microsoft.Build.Utilities.Core.dll")
                             //.Where(_ => _.Name != "System.Collections.Immutable.dll")
-                        )
+                        ),
+                        GetSatelliteAssemblyFiles()
                     );
                     if (!success) {
                         _log.LogWarning("ZIP Archiver is not found - Installation Archive is not created.");
@@ -114,6 +115,22 @@ namespace TcBuild {
             }
         }
 
+        private IEnumerable<FileInfo> GetSatelliteAssemblyFiles()
+        {
+            IEnumerable<FileInfo> allAssemblyFiles = new[] { AssemblyFile }.Concat(ReferenceFiles).Where(f => f.Extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase));
+            foreach (FileInfo assemblyFile in allAssemblyFiles)
+            {
+                foreach (FileInfo satelliteAssemblyFile in GetSatelliteAssemblyFiles(assemblyFile))
+                {
+                    yield return satelliteAssemblyFile;
+                }
+            }
+        }
+
+        private IEnumerable<FileInfo> GetSatelliteAssemblyFiles(FileInfo assemblyFile)
+        {
+            return assemblyFile.Directory.EnumerateFiles($"{Path.GetFileNameWithoutExtension(assemblyFile.Name)}.resources{assemblyFile.Extension}", SearchOption.AllDirectories);
+        }
 
         private void CreatePluginstFile(FileInfo iniFile, FileInfo outFile, PluginType pluginType)
         {
