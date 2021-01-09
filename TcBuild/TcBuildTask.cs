@@ -44,9 +44,13 @@ namespace TcBuild {
 
             ValidateAssemblyPath();
 
+            DirectoryInfo libDir = new FileInfo(TcPluginBase).Directory.Parent;
+            FileInfo rcExe = new FileInfo(Path.Combine(libDir.FullName, "RC.Exe"));
+
             var tools = new Tools(
                 ilasmPath: Path.Combine(MSBuildFrameworkToolsPath, "ilasm.exe"),
                 ildasmPath: new DirectoryInfo(FrameworkSDKRoot).GetFiles("ildasm.exe", SearchOption.AllDirectories).OrderByDescending(_ => _.DirectoryName).FirstOrDefault()?.FullName,
+                rcPath: rcExe.FullName, 
                 _log
             );
 

@@ -11,13 +11,19 @@ namespace TcBuild {
     public class Tools {
         private readonly string _ilasmPath;
         private readonly string _ildasmPath;
+        private readonly string _rcPath;
         private readonly ILogger _log;
 
-        public Tools(string ilasmPath, string ildasmPath, ILogger log)
+        internal Tools(string ilasmPath, string ildasmPath, ILogger log) : this(ilasmPath, ildasmPath, null, log)
+        {
+        }
+
+        public Tools(string ilasmPath, string ildasmPath, string rcPath, ILogger log)
         {
             _log = log;
             _ilasmPath = ilasmPath;
             _ildasmPath = ildasmPath;
+            _rcPath = rcPath;
 
             // MSBuildFrameworkToolsPath + ilasm.exe
             // FrameworkSDKRoot + ildasm.exe
@@ -35,8 +41,14 @@ namespace TcBuild {
                 throw new Exception("Cannot locate IL Disassembler ildasm.exe!");
             }
 
-            _log.LogInfo($"IL Disassembler: '{_ildasmPath}'");
-            _log.LogInfo($"IL Assembler   : '{_ilasmPath}'");
+            if (_rcPath != null && !File.Exists(_rcPath)) {
+                _log.LogError(_rcPath);
+                throw new Exception("Cannot locate Resource compiler rc.exe!");
+            }
+
+            _log.LogInfo($"IL Disassembler   : '{_ildasmPath}'");
+            _log.LogInfo($"IL Assembler      : '{_ilasmPath}'");
+            _log.LogInfo($"Resource compiler : '{_rcPath}'");
         }
 
 
@@ -62,7 +74,7 @@ namespace TcBuild {
         }
 
 
-        public void Assemble(FileInfo inFile, FileInfo outFile, bool x64, bool release = false)
+        public void Assemble(FileInfo inFile, FileInfo outFile, FileInfo resFile, bool x64, bool release = false)
         {
             outFile.Delete();
 
@@ -72,9 +84,9 @@ namespace TcBuild {
             args.Add($"/out:{Quote(outFile.FullName)}");
             args.Add($"/dll");
 
-            //if (resFile.Exists()) {
-            //    args.Add($"/res:{Quote(resFile.FullName)}");
-            //}
+            if (resFile?.Exists == true) {
+                args.Add($"/res:{Quote(resFile.FullName)}");
+            }
 
             if (x64) {
                 args.Add($"/x64");
@@ -119,6 +131,21 @@ namespace TcBuild {
             }
         }
 
+        public bool TryCreateResFile(FileInfo assemblyFile, FileInfo resFile)
+        {
+            if (_rcPath == null)
+                throw new InvalidOperationException("RC.exe path not specified.");
+            FileInfo icoFile = new FileInfo(Path.ChangeExtension(resFile.FullName, ".ico"));
+            FileInfo rcFile = new FileInfo(Path.ChangeExtension(resFile.FullName, ".rc"));
+            if (IconExtractor.ExtractIconFromExecutable(assemblyFile, icoFile))
+            {
+                File.WriteAllText(rcFile.FullName, $"1 ICON \"{icoFile.Name}\"");
+                if (!TryRun(_rcPath, Quote(rcFile.FullName)))
+                    throw new Exception($"RC.exe has failed create resource!\r\n{_rcPath} \"{rcFile.FullName}\"");
+                return true;
+            }
+            return false;
+        }
 
         private static string Quote(string arg)
         {

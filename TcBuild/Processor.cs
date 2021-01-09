@@ -62,14 +62,18 @@ namespace TcBuild {
 
                 token.ThrowIfCancellationRequested();
 
+                // ico resource
+                FileInfo resFile = new FileInfo(Path.Combine(workDir.FullName, $"{AssemblyFile.Name}.res"));
+                _tools.TryCreateResFile(AssemblyFile, resFile);
+
                 // create: x86
-                _tools.Assemble(wrapperSource, outFile, false, IsRelease);
+                _tools.Assemble(wrapperSource, outFile, resFile, false, IsRelease);
                 _log.LogInfo($"{outFile.FullName}");
 
                 token.ThrowIfCancellationRequested();
 
                 // create: x64
-                _tools.Assemble(wrapperSource, outFile64, true, IsRelease);
+                _tools.Assemble(wrapperSource, outFile64, resFile, true, IsRelease);
                 _log.LogInfo($"{outFile64.FullName}");
 
                 token.ThrowIfCancellationRequested();
