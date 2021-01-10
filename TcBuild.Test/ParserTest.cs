@@ -46,10 +46,12 @@ namespace TcBuild.Test {
 
             var MSBuildFrameworkToolsPath = @"C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\";
             var FrameworkSDKRoot = @"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\";
+            var libPath = @"..\..\..\..\TcBuild\lib\";
 
             var tools = new Tools(
                 ilasmPath: Path.Combine(MSBuildFrameworkToolsPath, "ilasm.exe"),
                 ildasmPath: new DirectoryInfo(FrameworkSDKRoot).GetFiles("ildasm.exe", SearchOption.AllDirectories).OrderByDescending(_ => _.DirectoryName).FirstOrDefault()?.FullName,
+                rcPath: Path.Combine(libPath, "RC.exe"),
                 logger
             );
 

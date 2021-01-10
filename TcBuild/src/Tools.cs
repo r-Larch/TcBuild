@@ -14,10 +14,6 @@ namespace TcBuild {
         private readonly string _rcPath;
         private readonly ILogger _log;
 
-        internal Tools(string ilasmPath, string ildasmPath, ILogger log) : this(ilasmPath, ildasmPath, null, log)
-        {
-        }
-
         public Tools(string ilasmPath, string ildasmPath, string rcPath, ILogger log)
         {
             _log = log;
