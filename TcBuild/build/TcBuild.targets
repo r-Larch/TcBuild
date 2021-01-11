@@ -2,21 +2,16 @@
 
   <PropertyGroup>
     <TcBuildPath Condition="$(TcBuildPath) == ''">$(MSBuildThisFileDirectory)..\</TcBuildPath>
-    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\net5.0-windows</TcBuildAssemblyDirectory>
+    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\netstandard2.0</TcBuildAssemblyDirectory>
     <TcPluginBase>$(TcBuildPath)lib\net5.0-windows\TcPluginBase.dll</TcPluginBase>
     <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuild.dll</TcBuildAssembly>
   </PropertyGroup>
 
   <UsingTask
     TaskName="TcBuild.TcBuildTask"
-    AssemblyFile = "$(TcBuildAssembly)" />
+    AssemblyFile="$(TcBuildAssembly)" />
 
-  <ItemGroup>
-    <!-- Add outputs and general glob to help with project cleanup -->
-    <!--<Clean Include="@(DnneNativeExportsOutputs);$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).*"/>-->
-  </ItemGroup>
-
-  <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
+  <!--<UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />-->
 
   <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
   <Target
@@ -29,8 +24,7 @@
       <TcBuild_DnneNativeOutputFile>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName)$(DnneNativeBinaryExt)</TcBuild_DnneNativeOutputFile>
       <TcBuild_DnneNativeSourceFiles>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).h;$(DnneNativeExportsBinaryPath)dnne.h</TcBuild_DnneNativeSourceFiles>
 
-      <TcBuild_PluginWrapperFile>...</TcBuild_PluginWrapperFile>
-      <TcBuild_PluginstFile>...</TcBuild_PluginstFile>
+      <TcBuild_GeneratedFiles></TcBuild_GeneratedFiles>
     </PropertyGroup>
 
     <Delete Files="$(TcBuild_DnneNativeSourceFiles)" />
@@ -41,21 +35,9 @@
       IntermediateDirectory="$(TargetDir)"
       ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)">
 
-      <Output TaskParameter="PluginWrapperFile" PropertyName="TcBuild_PluginWrapperFile" />
-      <Output TaskParameter="PluginstFile" PropertyName="TcBuild_PluginstFile" />
+      <Output TaskParameter="GeneratedFiles" PropertyName="TcBuild_GeneratedFiles" />
 
     </TcBuild.TcBuildTask>
-
-    <!--<Move
-      SourceFiles="$(TcBuild_DnneNativeOutputFile)"
-      DestinationFiles="$(TcBuild_PluginWrapperFile)" />-->
-
-    <!--
-      Make zip:
-        ...ReferenceCopyLocalPaths
-        TcBuild_PluginWrapperFile
-        TcBuild_PluginstFile
-    -->
 
   </Target>
 
@@ -63,7 +45,7 @@
     <CleanDependsOn>TcBuildClean;$(CleanDependsOn);</CleanDependsOn>
   </PropertyGroup>
   <Target Name="TcBuildClean">
-    <RemoveDir Directories="$(CacheDir)" />
+    <Delete Files="$(TcBuild_GeneratedFiles)" />
   </Target>
 
 </Project>

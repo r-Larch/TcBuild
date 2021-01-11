@@ -28,7 +28,7 @@ namespace TcBuildGenerator {
             }
 
             {
-                var fileName = $"{plugin.Type}.generated.cs";
+                var fileName = $"{plugin.Type}.wrapper.cs";
                 var wrapperSource = GenerateWrapperSource(plugin);
                 var fileSource = ModifySource(plugin, wrapperSource);
                 context.AddSource(fileName, fileSource);
@@ -36,10 +36,17 @@ namespace TcBuildGenerator {
 
             {
                 context.AddSource($"{plugin.Type}.attributes.cs", $@"
+                    using System;
+
                     [assembly:{TcInfos.TcPluginDefinitionAttribute}(""{plugin.Type}"", typeof(global::{plugin.ClassFullName}))]
 
                     internal class {TcInfos.TcPluginDefinitionAttribute} : Attribute {{
-                        public {TcInfos.TcPluginDefinitionAttribute}(string pluginType, Type type) {{ }}
+                        public {TcInfos.TcPluginDefinitionAttribute}(string pluginType, Type type) {{
+                            PluginType = pluginType;
+                            Type = type;
+                        }}
+                        public string PluginType {{ get; set; }}
+                        public Type Type {{ get; set; }}
                     }}
                 ");
             }

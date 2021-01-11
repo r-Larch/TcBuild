@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <!--<OutputPath>..\Build\</OutputPath>-->
+    <OutputPath>bin\</OutputPath>
 
     <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
     <Description>Base interfaces and classes for managed plugins for Total Commander.</Description>

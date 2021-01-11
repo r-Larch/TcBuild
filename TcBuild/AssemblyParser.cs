@@ -22,9 +22,6 @@ namespace TcBuild {
 
         internal PluginDefinition GetPluginDefinition()
         {
-            //AppDomain.ReflectionOnlyAssemblyResolve += ...
-            //var assembly = Assembly.ReflectionOnlyLoadFrom(_assembly.FullName);
-
             // Get the array of runtime assemblies. This will allow us to at least inspect types depending only on BCL.
             var runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
             var paths = new List<string>(runtimeAssemblies) {_assembly.FullName};
@@ -65,7 +62,7 @@ namespace TcBuild {
                     args[0].Value is string name &&
                     args[1].Value is Type type
                 ) => new PluginDefinition {
-                    Type = Enum.Parse<PluginType>(name),
+                    Type = (PluginType) Enum.Parse(typeof(PluginType), name),
                     ClassFullName = type.FullName,
                 },
                 _ => null
