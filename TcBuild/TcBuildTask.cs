@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -12,26 +12,20 @@ namespace TcBuild {
         private ILogger _log;
 
         [Required]
+        public string AssemblyName { get; set; }
+        [Required]
         public string AssemblyFile { get; set; }
-        [Required]
-        public string TcPluginBase { get; set; }
-        [Required]
-        public string ProjectDirectory { get; set; }
         [Required]
         public string IntermediateDirectory { get; set; }
         [Required]
         public ITaskItem[] ReferenceCopyLocalFiles { get; set; }
         [Required]
-        public string MSBuildFrameworkToolsPath { get; set; }
-        [Required]
-        public string FrameworkSDKRoot { get; set; }
-        [Required]
         public string Configuration { get; set; }
-        [Required]
-        public string CacheDir { get; set; }
 
-        //[Output]
-        //public string TargetExt { get; private set; }
+        [Output]
+        public string PluginWrapperFile { get; set; }
+        [Output]
+        public string PluginstFile { get; set; }
 
         public TcBuildTask() : base()
         {
@@ -44,25 +38,18 @@ namespace TcBuild {
 
             ValidateAssemblyPath();
 
-            var tools = new Tools(
-                ilasmPath: Path.Combine(MSBuildFrameworkToolsPath, "ilasm.exe"),
-                ildasmPath: new DirectoryInfo(FrameworkSDKRoot).GetFiles("ildasm.exe", SearchOption.AllDirectories).OrderByDescending(_ => _.DirectoryName).FirstOrDefault()?.FullName,
-                _log
-            );
-
-            var cacheDir = new DirectoryInfo(CacheDir);
-            if (!cacheDir.Exists) {
-                cacheDir.Create();
-            }
+            var tools = new Tools(_log);
 
             var processor = new Processor(_log, tools) {
                 AssemblyFile = new FileInfo(AssemblyFile),
-                TcPluginBase = new FileInfo(TcPluginBase),
-                IntermediateDirectory = new DirectoryInfo(IntermediateDirectory),
-                CacheDir = cacheDir,
                 ReferenceFiles = ReferenceCopyLocalFiles.Select(_ => new FileInfo(_.ItemSpec)).ToList(),
                 IsRelease = Configuration == "Release",
             };
+
+            //var assemblyFile = new FileInfo(AssemblyFile);
+            //PluginWrapperFile = Path.Combine(assemblyFile.DirectoryName!, GetOutputFileName(pluginType, x64: false));
+            //PluginstFile = Path.Combine(workDir.FullName, "pluginst.inf");
+
 
             return System.Threading.Tasks.Task.Run(async () => await processor.ExecuteAsync(_token.Token), _token.Token).Result;
         }
@@ -76,7 +63,6 @@ namespace TcBuild {
 
         private void ValidateAssemblyPath()
         {
-            AssemblyFile = Path.Combine(ProjectDirectory, AssemblyFile);
             if (!File.Exists(AssemblyFile)) {
                 throw new Exception("AssemblyFile '" + AssemblyFile + "' does not exists. If you have not done a build you can ignore this error.");
             }
