@@ -61,7 +61,7 @@ namespace TcBuildGenerator.Tests {
         public static Assembly? TryLoad(this AssemblyName assemblyName)
         {
             try {
-                return Assembly.Load(assemblyName);
+                return Assembly.Load(assemblyName.FullName);
             }
             catch {
                 return null;

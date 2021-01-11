@@ -2,14 +2,19 @@
 
   <PropertyGroup>
     <TcBuildPath Condition="$(TcBuildPath) == ''">$(MSBuildThisFileDirectory)..\</TcBuildPath>
-    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\net472</TcBuildAssemblyDirectory>
-    <TcPluginBase>$(TcBuildPath)lib\net472\TcPluginBase.dll</TcPluginBase>
+    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\net5.0-windows</TcBuildAssemblyDirectory>
+    <TcPluginBase>$(TcBuildPath)lib\net5.0-windows\TcPluginBase.dll</TcPluginBase>
     <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuild.dll</TcBuildAssembly>
-
-    <MsBuildMajorVersion>$([System.Version]::Parse($(MSBuildVersion)).Major)</MsBuildMajorVersion>
-
-    <CacheDir>$(IntermediateOutputPath)$(MSBuildProjectFile).TcBuild.cache\</CacheDir>
   </PropertyGroup>
+
+  <UsingTask
+    TaskName="TcBuild.TcBuildTask"
+    AssemblyFile = "$(TcBuildAssembly)" />
+
+  <ItemGroup>
+    <!-- Add outputs and general glob to help with project cleanup -->
+    <!--<Clean Include="@(DnneNativeExportsOutputs);$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).*"/>-->
+  </ItemGroup>
 
   <UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />
 
@@ -20,25 +25,37 @@
     Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true"
     DependsOnTargets="$(TcBuildDependsOnTargets)">
 
-    <Error Condition="($(MsBuildMajorVersion) &lt; 16) And $([MSBuild]::IsOsPlatform(OSX)) != true"
-           Text="TcBuild is only supported on MSBuild 16 and above. Current version: $(MsBuildMajorVersion)." />
+    <PropertyGroup>
+      <TcBuild_DnneNativeOutputFile>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName)$(DnneNativeBinaryExt)</TcBuild_DnneNativeOutputFile>
+      <TcBuild_DnneNativeSourceFiles>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).h;$(DnneNativeExportsBinaryPath)dnne.h</TcBuild_DnneNativeSourceFiles>
+
+      <TcBuild_PluginWrapperFile>...</TcBuild_PluginWrapperFile>
+      <TcBuild_PluginstFile>...</TcBuild_PluginstFile>
+    </PropertyGroup>
+
+    <Delete Files="$(TcBuild_DnneNativeSourceFiles)" />
 
     <TcBuild.TcBuildTask
-      Configuration="$(Configuration)"
       AssemblyFile="$(TargetPath)"
-      TcPluginBase="$(TcPluginBase)"
+      NativeAssemblyFile="$(TcBuild_DnneNativeOutputFile)"
       IntermediateDirectory="$(TargetDir)"
-      ProjectDirectory="$(MSBuildProjectDirectory)"
-      ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
-      MSBuildFrameworkToolsPath="$(MSBuildFrameworkToolsPath)"
-      FrameworkSDKRoot="$(FrameworkSDKRoot)"
-      CacheDir="$(CacheDir)">
+      ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)">
 
-      <!--<Output TODO can be used to set extension ??
-        TaskParameter="MyOutputPropertyName"
-        PropertyName="XmlPropertyName" />-->
+      <Output TaskParameter="PluginWrapperFile" PropertyName="TcBuild_PluginWrapperFile" />
+      <Output TaskParameter="PluginstFile" PropertyName="TcBuild_PluginstFile" />
 
     </TcBuild.TcBuildTask>
+
+    <!--<Move
+      SourceFiles="$(TcBuild_DnneNativeOutputFile)"
+      DestinationFiles="$(TcBuild_PluginWrapperFile)" />-->
+
+    <!--
+      Make zip:
+        ...ReferenceCopyLocalPaths
+        TcBuild_PluginWrapperFile
+        TcBuild_PluginstFile
+    -->
 
   </Target>
 

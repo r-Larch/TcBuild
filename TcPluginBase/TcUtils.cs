@@ -2,73 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using TcPluginBase.Content;
-using TcPluginBase.FileSystem;
-using TcPluginBase.Lister;
-using TcPluginBase.Packer;
-using TcPluginBase.QuickSearch;
 using FileTime = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 
 namespace TcPluginBase {
-    [Serializable]
-    internal enum PluginType {
-        Content,
-        FileSystem,
-        Lister,
-        Packer,
-        QuickSearch,
-        Unknown
-    }
-
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TcUtils {
         private const uint EmptyDateTimeHi = 0xFFFFFFFF;
         private const uint EmptyDateTimeLo = 0xFFFFFFFE;
-
-        #region Common Dictionaries
-
-        internal static Dictionary<PluginType, string> PluginInterfaces = new Dictionary<PluginType, string> {
-            {PluginType.Content, typeof(IContentPlugin).FullName},
-            {PluginType.FileSystem, typeof(IFsPlugin).FullName},
-            {PluginType.Lister, typeof(IListerPlugin).FullName},
-            {PluginType.Packer, typeof(IPackerPlugin).FullName},
-            {PluginType.QuickSearch, typeof(IQuickSearchPlugin).FullName}
-        };
-
-        internal static Dictionary<PluginType, Type> PluginInterfaceTypes = new Dictionary<PluginType, Type> {
-            {PluginType.Content, typeof(IContentPlugin)},
-            {PluginType.FileSystem, typeof(IFsPlugin)},
-            {PluginType.Lister, typeof(IListerPlugin)},
-            {PluginType.Packer, typeof(IPackerPlugin)},
-            {PluginType.QuickSearch, typeof(IQuickSearchPlugin)}
-        };
-
-        internal static Dictionary<PluginType, string> PluginNames = new Dictionary<PluginType, string> {
-            {PluginType.Content, "Content "},
-            {PluginType.FileSystem, "File System "},
-            {PluginType.Lister, "Lister "},
-            {PluginType.Packer, "Packer "},
-            {PluginType.QuickSearch, "QuickSearch "}
-        };
-
-        internal static readonly Dictionary<PluginType, string> PluginExtensions = new Dictionary<PluginType, string> {
-            {PluginType.Content, "wdx"},
-            {PluginType.FileSystem, "wfx"},
-            {PluginType.Lister, "wlx"},
-            {PluginType.Packer, "wcx"},
-            {PluginType.QuickSearch, "dll"}
-        };
-
-        internal static string[] BaseTypes = {
-            typeof(ContentPlugin).FullName,
-            typeof(FsPlugin).FullName,
-            typeof(ListerPlugin).FullName,
-            typeof(PackerPlugin).FullName,
-            typeof(QuickSearchPlugin).FullName,
-        };
-
-        #endregion Common Dictionaries
 
         #region Long Conversion Methods
 

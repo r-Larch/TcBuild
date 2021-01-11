@@ -13,12 +13,12 @@ namespace TcBuildGenerator.Tests {
             var classSymbol = Helper.GetClassSymbol(parentAssembly, @"
                 using System.IO;
                 using System.Collections.Generic;
-                using TcPluginBase;
+                using Microsoft.Extensions.Configuration;
                 using TcPluginBase.FileSystem;
 
                 namespace MyNamespace {
                     public class MyFsPlugin : FsPlugin {
-                        public MyFsPlugin(Settings pluginSettings) : base(pluginSettings)
+                        public MyFsPlugin(IConfiguration pluginSettings) : base(pluginSettings)
                         {
                         }
 
@@ -42,17 +42,17 @@ namespace TcBuildGenerator.Tests {
             Assert.AreEqual(1, plugins.Count);
             var plugin = plugins.Single();
 
-            Assert.AreEqual(PluginType.FsPlugin, plugin.Type);
+            Assert.AreEqual(PluginType.FileSystem, plugin.Type);
 
             Assert.AreEqual("MyNamespace", plugin.Namespace);
-            Assert.AreEqual("MyFsPlugin", plugin.ClassFullName);
+            Assert.AreEqual("MyNamespace.MyFsPlugin", plugin.ClassFullName);
 
             Assert.AreEqual(1, plugin.ImplementedMethods.Count);
             Assert.AreEqual("GetFiles", plugin.ImplementedMethods[0].MethodName);
             Assert.AreEqual("System.Collections.Generic.IEnumerable<TcPluginBase.FileSystem.FindData> GetFiles(TcPluginBase.FileSystem.RemotePath)", plugin.ImplementedMethods[0].Signature);
             Assert.AreEqual("MyNamespace.MyFsPlugin", plugin.ImplementedMethods[0].ContainingType);
 
-            Assert.AreEqual(PluginType.FsPlugin, plugin.Definition.Type);
+            Assert.AreEqual(PluginType.FileSystem, plugin.Definition.Type);
             Assert.AreEqual("IFsPlugin", plugin.Definition.Name);
             Assert.AreEqual(23, plugin.Definition.Methods.Count);
 

@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TcBuildGenerator.Tests", "T
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9209666C-8C8A-46E7-9750-9FE1C9FC7321}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsPlugin2", "FsPlugin2\FsPlugin2.csproj", "{C31DB698-5E9F-4580-9589-5BC997D39FA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -186,6 +188,18 @@ Global
 		{FC6D13D9-46F5-442C-8E26-DC3300D94BA1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{FC6D13D9-46F5-442C-8E26-DC3300D94BA1}.Release|x86.ActiveCfg = Release|Any CPU
 		{FC6D13D9-46F5-442C-8E26-DC3300D94BA1}.Release|x86.Build.0 = Release|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Debug|x86.Build.0 = Debug|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Release|x86.ActiveCfg = Release|Any CPU
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,6 +214,7 @@ Global
 		{DB827228-04B8-4C67-81C5-3804F84EF2DF} = {6CC36ED6-55ED-4F54-9D77-D9A7AFD90FDF}
 		{790B59AA-3F6D-45FA-BE26-6B6214479EAD} = {9209666C-8C8A-46E7-9750-9FE1C9FC7321}
 		{FC6D13D9-46F5-442C-8E26-DC3300D94BA1} = {6CC36ED6-55ED-4F54-9D77-D9A7AFD90FDF}
+		{C31DB698-5E9F-4580-9589-5BC997D39FA5} = {9209666C-8C8A-46E7-9750-9FE1C9FC7321}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EF0D11D-68CE-4427-A295-CFD001EF25CF}

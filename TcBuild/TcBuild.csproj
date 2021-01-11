@@ -3,51 +3,44 @@
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <OutputPath>bin\</OutputPath>
-    <!--<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>-->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Tool to build Total Commander Plugins</Description>
     <!--<DevelopmentDependency>true</DevelopmentDependency>-->
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <!--<IsTool>true</IsTool>-->
-    <!--<DebugType>embedded</DebugType>-->
-    <!--<DebugSymbols>true</DebugSymbols>-->
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="5.0.0" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\QSWrapper\QSWrapper.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj" PrivateAssets="All" />
     <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\WcxWrapper\WcxWrapper.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\WdxWrapper\WdxWrapper.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\WfxWrapper\WfxWrapper.csproj" PrivateAssets="All" />
-    <ProjectReference Include="..\WlxWrapper\WlxWrapper.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- build target -->
-    <Content Include=".\build\TcBuild.targets">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
+    <Content Update=".\build\*" Pack="true"
+             PackagePath="build"
+             Visible="true" />
+
+    <None Include="$(OutputPath)\TcBuildGenerator.*" Pack="true"
+          PackagePath="analyzers\dotnet\cs"
+          Visible="false" />
+
+    <None Include=".\..\TcPluginBase\bin\TcPluginBase.*" Pack="true"
+          PackagePath="lib\$(TargetFramework)"
+          Visible="false" />
+
+    <None Include="$(OutputPath)\*.*" Pack="true"
+          PackagePath="bin\$(TargetFramework)"
+          Visible="false" />
+
+    <None Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*" Pack="true"
+          PackagePath="bin\$(TargetFramework)"
+          Visible="false" />
+
   </ItemGroup>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeFilesInPackage</TargetsForTfmSpecificContentInPackage>
-  </PropertyGroup>
-  <Target Name="IncludeFilesInPackage">
-    <ItemGroup>
-      <!-- bin's for build target -->
-      <TfmSpecificPackageFile Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="bin\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\*.pdb" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="bin\$(TargetFramework)" />
-
-      <!-- references for target project -->
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="lib\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.pdb" PackagePath="lib\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.xml" PackagePath="lib\$(TargetFramework)" />
-    </ItemGroup>
-  </Target>
 
 </Project>

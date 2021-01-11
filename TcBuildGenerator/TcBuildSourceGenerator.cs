@@ -19,13 +19,29 @@ namespace TcBuildGenerator {
             visitor.Visit(context.Compilation.GlobalNamespace);
             var plugins = visitor.Plugins;
 
-            foreach (var plugin in plugins) {
-                // TODO handle plugin fs + content plugin
+            // TODO handle plugin fs + content plugin
+            var plugin = plugins.SingleOrDefault();
 
+            if (plugin == null) {
+                //context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(), ));
+                return;
+            }
+
+            {
                 var fileName = $"{plugin.Type}.generated.cs";
-                var fileSource = GenerateWrapperSource(plugin);
-                fileSource = ModifySource(plugin, fileSource);
+                var wrapperSource = GenerateWrapperSource(plugin);
+                var fileSource = ModifySource(plugin, wrapperSource);
                 context.AddSource(fileName, fileSource);
+            }
+
+            {
+                context.AddSource($"{plugin.Type}.attributes.cs", $@"
+                    [assembly:{TcInfos.TcPluginDefinitionAttribute}(""{plugin.Type}"", typeof(global::{plugin.ClassFullName}))]
+
+                    internal class {TcInfos.TcPluginDefinitionAttribute} : Attribute {{
+                        public {TcInfos.TcPluginDefinitionAttribute}(string pluginType, Type type) {{ }}
+                    }}
+                ");
             }
         }
 
@@ -82,7 +98,7 @@ namespace TcBuildGenerator {
         private static string GenerateWrapperSource(PluginData plugin)
         {
             return plugin.Type switch {
-                PluginType.FsPlugin => GetManifestResource("TcBuildGenerator.Wrapper.FsWrapper.cs"),
+                PluginType.FileSystem => GetManifestResource("TcBuildGenerator.Wrapper.FsWrapper.cs"),
                 _ => throw new ArgumentOutOfRangeException(nameof(plugin.Type), $"PluginType: '{plugin.Type}' not implemented!")
             };
         }

@@ -3,13 +3,9 @@ using Microsoft.CodeAnalysis;
 
 
 namespace TcBuildGenerator {
-    public enum PluginType {
-        FsPlugin,
-    }
-
     public class TcHelper {
         private static readonly Dictionary<string, PluginType> Plugins = new Dictionary<string, PluginType> {
-            {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FsPlugin}
+            {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem}
         };
 
         public static bool IsPluginClass(INamedTypeSymbol clazz, out PluginType pluginType, out INamedTypeSymbol pluginInterface)

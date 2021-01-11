@@ -82,8 +82,9 @@ namespace TcBuildGenerator {
         }
     }
 
+#nullable disable
 
-    public struct PluginData {
+    public class PluginData {
         public PluginType Type { get; set; }
         public string Namespace { get; set; }
         public string ClassFullName { get; set; }
@@ -96,4 +97,6 @@ namespace TcBuildGenerator {
         public string Signature { get; set; }
         public string ContainingType { get; set; }
     }
+
+#nullable restore
 }
