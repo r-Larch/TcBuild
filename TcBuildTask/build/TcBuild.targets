@@ -5,27 +5,30 @@
     <TcBuildAssemblyDirectory>$(TcBuildPath)bin\netstandard2.0</TcBuildAssemblyDirectory>
     <TcPluginBase>$(TcBuildPath)lib\net5.0-windows\TcPluginBase.dll</TcPluginBase>
     <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuild.dll</TcBuildAssembly>
+
+    <TcBuildDependsOnTargets>DnneBuildNativeExports</TcBuildDependsOnTargets>
+    <TcBuild_GeneratedFiles></TcBuild_GeneratedFiles>
   </PropertyGroup>
 
   <UsingTask
     TaskName="TcBuild.TcBuildTask"
     AssemblyFile="$(TcBuildAssembly)" />
 
-  <!--<UsingTask TaskName="TcBuild.TcBuildTask" AssemblyFile="$(TcBuildAssembly)" />-->
-
   <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
   <Target
     Name="TcBuildTarget"
+    Inputs="@(TargetPath)"
+    Outputs="@(TcBuild_GeneratedFiles)"
     AfterTargets="Build"
-    Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true"
-    DependsOnTargets="$(TcBuildDependsOnTargets)">
+    DependsOnTargets="$(TcBuildDependsOnTargets)"
+    Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true">
 
     <PropertyGroup>
       <TcBuild_DnneNativeOutputFile>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName)$(DnneNativeBinaryExt)</TcBuild_DnneNativeOutputFile>
       <TcBuild_DnneNativeSourceFiles>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).h;$(DnneNativeExportsBinaryPath)dnne.h</TcBuild_DnneNativeSourceFiles>
-
-      <TcBuild_GeneratedFiles></TcBuild_GeneratedFiles>
     </PropertyGroup>
+
+    <Message Text="Info: $(TcBuild_DnneNativeOutputFile)" Importance="high" />
 
     <Delete Files="$(TcBuild_DnneNativeSourceFiles)" />
 

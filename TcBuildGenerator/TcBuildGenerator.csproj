@@ -20,7 +20,19 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <!--<BuildOutputTargetFolder>bin</BuildOutputTargetFolder>-->
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(OutputPath)\TcBuildGenerator.*" Pack="true"
+          PackagePath="analyzers\dotnet\cs"
+          Visible="false" />
+  </ItemGroup>
+
+  <!--<PropertyGroup>
+    -->
+  <!--<BuildOutputTargetFolder>bin</BuildOutputTargetFolder>--><!--
 
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
@@ -30,16 +42,10 @@
   </PropertyGroup>
   <Target Name="IncludeFilesInPackage">
     <ItemGroup>
-      <!-- bin's for build target -->
       <TfmSpecificPackageFile Include="$(OutputPath)\*.dll" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="analyzers\dotnet\cs" />
       <TfmSpecificPackageFile Include="$(OutputPath)\*.pdb" Exclude="$(OutputPath)\System*.dll;$(OutputPath)\Microsoft*.dll" PackagePath="analyzers\dotnet\cs" />
-
-      <!-- references for target project -->
-      <!--<TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.dll" PackagePath="lib\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.pdb" PackagePath="lib\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)\TcPluginBase.xml" PackagePath="lib\$(TargetFramework)" />-->
     </ItemGroup>
-  </Target>
+  </Target>-->
 
 
   <!-- For every PackageReference with Pack=true, we include the assemblies from it in the package -->
