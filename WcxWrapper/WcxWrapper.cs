@@ -10,12 +10,6 @@ using TcPluginBase.Tools;
 
 namespace WcxWrapper {
     public class PackerWrapper {
-        static PackerWrapper()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(PackerWrapper).Assembly.Location).AssemblyResolve;
-        }
-
-
         private static string _callSignature;
         private static PackerPlugin _plugin;
         private static PackerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<PackerPlugin>(typeof(PluginClassPlaceholder));

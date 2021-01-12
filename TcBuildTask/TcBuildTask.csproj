@@ -3,12 +3,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
     <OutputPath>bin\</OutputPath>
+    <RootNamespace>TcBuild</RootNamespace>
     <Description>Tool to build Total Commander Plugins</Description>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>-->
 
-    <DevelopmentDependency>true</DevelopmentDependency>
+    <IsPackable>false</IsPackable>
 
   </PropertyGroup>
 
@@ -19,10 +20,10 @@
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Content Include="build\*.*" Pack="true" PackagePath="buildTransitive" Visible="true" />
     <None Include="$(OutputPath)\**\*.*" Pack="true" PackagePath="bin\" Visible="false" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <!--<ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
     <None Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*" Pack="true" PackagePath="bin\netstandard2.0" Visible="false" />

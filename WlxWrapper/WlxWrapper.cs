@@ -9,12 +9,6 @@ using TcPluginBase.Tools;
 
 namespace WlxWrapper {
     public class ListerWrapper {
-        static ListerWrapper()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(ListerWrapper).Assembly.Location).AssemblyResolve;
-        }
-
-
         private static string _callSignature;
         private static ListerPlugin _plugin;
         private static ListerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ListerPlugin>(typeof(PluginClassPlaceholder));

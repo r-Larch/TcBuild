@@ -10,12 +10,6 @@ using TcPluginBase.Tools;
 
 namespace WfxWrapper {
     public class FsWrapper {
-        static FsWrapper()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(FsWrapper).Assembly.Location).AssemblyResolve;
-        }
-
-
         private static string _callSignature;
         private static FsPlugin _plugin;
         private static FsPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<FsPlugin>(typeof(PluginClassPlaceholder));

@@ -18,12 +18,18 @@ namespace TcPluginBase.Tools {
         /// </summary>
         public static TPlugin GetTcPlugin<TPlugin>(Type pluginClass) where TPlugin : TcPlugin
         {
-            RegisterUnhandledExceptionHandler();
+            try {
+                RegisterUnhandledExceptionHandler();
 
-            var tcPlugin = CreatePluginInstance<TPlugin>(pluginClass);
-            tcPlugin.TcPluginEventHandler += TcCallback.HandleTcPluginEvent;
+                var tcPlugin = CreatePluginInstance<TPlugin>(pluginClass);
+                tcPlugin.TcPluginEventHandler += TcCallback.HandleTcPluginEvent;
 
-            return tcPlugin;
+                return tcPlugin;
+            }
+            catch (Exception e) {
+                ErrorDialog.Show("Plugin Load Exception", e);
+                throw;
+            }
         }
 
 
@@ -48,6 +54,7 @@ namespace TcPluginBase.Tools {
                 .Add(new JsonConfigurationSource {
                     FileProvider = new PhysicalFileProvider(Path.GetDirectoryName(assembly.Location)),
                     Path = $"settings.json",
+                    Optional = true,
                 })
                 .Build();
 
@@ -73,7 +80,7 @@ namespace TcPluginBase.Tools {
         {
             if (!_handlerRegistered) {
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) => {
-                    Trace.WriteLine($"[T{Thread.CurrentThread.ManagedThreadId}] AppDomain.UnhandledException: " + args.ExceptionObject.ToString());
+                    Trace.WriteLine($"[T{Thread.CurrentThread.ManagedThreadId}] AppDomain.UnhandledException: " + args.ExceptionObject);
                     Trace.Flush();
                 };
                 _handlerRegistered = true;

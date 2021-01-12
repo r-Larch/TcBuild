@@ -14,12 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TcBuild\TcBuild.csproj" />
+    <ProjectReference Include="..\TcBuildTask\TcBuildTask.csproj" />
     <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.IO.Compression" />
   </ItemGroup>
 
 </Project>

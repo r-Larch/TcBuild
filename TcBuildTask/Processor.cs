@@ -14,8 +14,9 @@ namespace TcBuild {
         private readonly ILogger _log;
         public FileInfo AssemblyFile { get; set; }
         public FileInfo NativeAssemblyFile { get; set; }
-        public DirectoryInfo IntermediateDirectory { get; set; }
+        public DirectoryInfo OutputDirectory { get; set; }
         public List<FileInfo> ReferenceFiles { get; set; }
+        public bool Is64Bit { get; set; }
 
 
         public Processor(ILogger log)
@@ -27,19 +28,15 @@ namespace TcBuild {
         public Task<string> ExecuteAsync(CancellationToken token = default)
         {
             // parse
-            var parser = new AssemblyParser(AssemblyFile, _log);
-            var plugin = parser.GetPluginDefinition();
+            var plugin = GetPluginDefinition(AssemblyFile);
             if (plugin == null) return null;
 
             token.ThrowIfCancellationRequested();
 
 
-            var is64Bit = true;
-
             // files
-            var settings = new FileInfo(Path.Combine(AssemblyFile.DirectoryName!, "settings.json"));
-            var wrapperFile = new FileInfo(Path.Combine(NativeAssemblyFile.DirectoryName!, GetOutputFileName(plugin.Type, x64: is64Bit)));
-            var zipFile = new FileInfo(Path.Combine(IntermediateDirectory.FullName, Path.ChangeExtension(AssemblyFile.Name, ".zip")));
+            var wrapperFile = new FileInfo(Path.Combine(NativeAssemblyFile.DirectoryName!, GetOutputFileName(plugin.Type, x64: Is64Bit)));
+            var zipFile = new FileInfo(Path.Combine(OutputDirectory.FullName, Path.ChangeExtension(AssemblyFile.Name, ".zip")));
 
             token.ThrowIfCancellationRequested();
 
@@ -52,31 +49,56 @@ namespace TcBuild {
 
 
             // rename
+            if (wrapperFile.Exists) wrapperFile.Delete();
             NativeAssemblyFile.MoveTo(wrapperFile.FullName);
+
+
+            // get all references
+            var outputFiles = OutputDirectory.GetFiles("*", SearchOption.AllDirectories).ToList();
+            var references = outputFiles
+                .Where(_ => !_.Name.StartsWith($"{Path.GetFileNameWithoutExtension(AssemblyFile.Name)}NE."))
+                .Where(_ => _.Name != "dnne.h");
+
 
             token.ThrowIfCancellationRequested();
 
 
             // zip
             if (plugin.Type != PluginType.QuickSearch) {
-                using var zip = new ZipFile(zipFile)
+                if (zipFile.Exists) zipFile.Delete();
+                using var zip = new ZipFile(zipFile, OutputDirectory)
                         .Add("pluginst.inf", PluginstFileContents(wrapperFile, plugin.Type))
-                        .Add(wrapperFile)
-                        .Add(settings)
-                        .Add(AssemblyFile)
-                        .Add(new FileInfo(Path.ChangeExtension(AssemblyFile.FullName, ".pdb")))
-                        .AddRange(ReferenceFiles.Where(_ => _.Extension != ".xml" && _.Name != "TcPluginBase.dll"))
+                        .AddRange(references)
                     ;
             }
 
 
+            // delete all files and only keep the zip
+            //foreach (var file in outputFiles) {
+            //    try {
+            //        file.Delete();
+            //    }
+            //    catch {
+            //        // Ignore - file is locked
+            //    }
+            //}
+
+
             // files for clean
-            var generatedFiles = string.Join(";", new {
-                wrapperFile,
-                zipFile,
-            });
+            var generatedFiles = string.Join(";",
+                wrapperFile.FullName,
+                zipFile.FullName
+            );
 
             return Task.FromResult(generatedFiles);
+        }
+
+
+        private PluginDefinition GetPluginDefinition(FileInfo assemblyFile)
+        {
+            using var parser = new AssemblyParser(assemblyFile, _log);
+            var plugin = parser.GetPluginDefinition();
+            return plugin;
         }
 
 
@@ -109,7 +131,7 @@ namespace TcBuild {
         }
 
 
-        private string GetOutputFileName(TcBuildGenerator.PluginType pluginType, bool x64)
+        private string GetOutputFileName(PluginType pluginType, bool x64)
         {
             var name = pluginType == PluginType.QuickSearch ? "tcmatch" : Path.GetFileNameWithoutExtension(AssemblyFile.Name);
             var extension = "." + TcInfos.PluginExtensions[pluginType];

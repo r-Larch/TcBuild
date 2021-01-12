@@ -8,11 +8,6 @@ using TcPluginBase.Tools;
 
 namespace QSWrapper {
     public class QuickSearchWrapper {
-        static QuickSearchWrapper()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(QuickSearchWrapper).Assembly.Location).AssemblyResolve;
-        }
-
         private static string _callSignature;
         private static QuickSearchPlugin _plugin;
         private static QuickSearchPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<QuickSearchPlugin>(typeof(PluginClassPlaceholder));

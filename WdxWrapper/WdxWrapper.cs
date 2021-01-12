@@ -8,11 +8,6 @@ using TcPluginBase.Tools;
 
 namespace WdxWrapper {
     public class ContentWrapper {
-        static ContentWrapper()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += new RelativeAssemblyResolver(typeof(ContentWrapper).Assembly.Location).AssemblyResolve;
-        }
-
         private static string _callSignature;
         private static ContentPlugin _plugin;
         private static ContentPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ContentPlugin>(typeof(PluginClassPlaceholder));

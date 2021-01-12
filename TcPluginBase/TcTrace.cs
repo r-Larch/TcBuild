@@ -2,12 +2,20 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
+using Microsoft.VisualBasic.Logging;
 
 
 namespace TcPluginBase {
     [EditorBrowsable(EditorBrowsableState.Never)]
     public static class TcTrace {
 #if TRACE
+
+        static TcTrace()
+        {
+            //Trace.Listeners.Insert(0, new DefaultTraceListener {
+            //    LogFileName =
+            //});
+        }
 
         private static readonly TraceSwitch TcPluginTraceSwitch = new TraceSwitch("DotNetPlugins", "All .NET plugins", "Warning");
 

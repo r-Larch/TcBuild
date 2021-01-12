@@ -8,17 +8,21 @@ using System.Text;
 namespace TcBuild {
     public class ZipFile : IDisposable {
         private readonly ZipArchive _zip;
+        private readonly string _baseDirectory;
 
-        public ZipFile(FileInfo zipFile)
+        public ZipFile(FileInfo zipFile, DirectoryInfo baseDirectory)
         {
-            zipFile.Delete();
+            _baseDirectory = baseDirectory.FullName.TrimEnd('\\') + '\\';
             _zip = new ZipArchive(zipFile.OpenWrite(), ZipArchiveMode.Create);
         }
 
         public ZipFile Add(FileInfo file)
         {
-            using var fileContents = file.OpenRead();
-            Add(file.Name, fileContents);
+            if (file.Exists) {
+                using var fileContents = file.OpenRead();
+                var fileName = file.FullName.Replace(_baseDirectory, "");
+                Add(fileName, fileContents);
+            }
 
             return this;
         }

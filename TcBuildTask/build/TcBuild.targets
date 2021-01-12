@@ -10,6 +10,10 @@
     <TcBuild_GeneratedFiles></TcBuild_GeneratedFiles>
   </PropertyGroup>
 
+  <PropertyGroup Label="Target Project Configuration">
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
   <UsingTask
     TaskName="TcBuild.TcBuildTask"
     AssemblyFile="$(TcBuildAssembly)" />
@@ -17,15 +21,16 @@
   <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
   <Target
     Name="TcBuildTarget"
-    Inputs="@(TargetPath)"
-    Outputs="@(TcBuild_GeneratedFiles)"
     AfterTargets="Build"
     DependsOnTargets="$(TcBuildDependsOnTargets)"
-    Condition="Exists(@(IntermediateAssembly)) And $(DesignTimeBuild) != true">
+    Condition="$(DesignTimeBuild) != true">
 
     <PropertyGroup>
       <TcBuild_DnneNativeOutputFile>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName)$(DnneNativeBinaryExt)</TcBuild_DnneNativeOutputFile>
       <TcBuild_DnneNativeSourceFiles>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).h;$(DnneNativeExportsBinaryPath)dnne.h</TcBuild_DnneNativeSourceFiles>
+
+      <DnneRuntimeIdentifier>$(RuntimeIdentifier)</DnneRuntimeIdentifier>
+      <DnneRuntimeIdentifier Condition="'$(DnneRuntimeIdentifier)'==''">$(NETCoreSdkRuntimeIdentifier)</DnneRuntimeIdentifier>
     </PropertyGroup>
 
     <Message Text="Info: $(TcBuild_DnneNativeOutputFile)" Importance="high" />
@@ -35,8 +40,11 @@
     <TcBuild.TcBuildTask
       AssemblyFile="$(TargetPath)"
       NativeAssemblyFile="$(TcBuild_DnneNativeOutputFile)"
-      IntermediateDirectory="$(TargetDir)"
-      ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)">
+      OutputDirectory="$(TargetDir)"
+      ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
+
+      RuntimeId="$(DnneRuntimeIdentifier)"
+      Architecture="$(TargetedSDKArchitecture)">
 
       <Output TaskParameter="GeneratedFiles" PropertyName="TcBuild_GeneratedFiles" />
 

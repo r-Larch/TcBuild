@@ -16,9 +16,14 @@ namespace TcBuild {
         [Required]
         public string NativeAssemblyFile { get; set; }
         [Required]
-        public string IntermediateDirectory { get; set; }
+        public string OutputDirectory { get; set; }
         [Required]
         public ITaskItem[] ReferenceCopyLocalFiles { get; set; }
+
+        [Required]
+        public string RuntimeId { get; set; }
+        [Required]
+        public string Architecture { get; set; }
 
         [Output]
         public string GeneratedFiles { get; set; }
@@ -34,20 +39,35 @@ namespace TcBuild {
 
             if (!File.Exists(AssemblyFile)) {
                 _log.LogWarning("AssemblyFile '" + AssemblyFile + "' does not exists. If you have not done a build you can ignore this error.");
-                throw new Exception("AssemblyFile '" + AssemblyFile + "' does not exists. If you have not done a build you can ignore this error.");
-                // return false;
+                return false;
             }
 
             var processor = new Processor(_log) {
                 AssemblyFile = new FileInfo(AssemblyFile),
                 NativeAssemblyFile = new FileInfo(NativeAssemblyFile),
-                IntermediateDirectory = new DirectoryInfo(IntermediateDirectory),
+                OutputDirectory = new DirectoryInfo(OutputDirectory),
                 ReferenceFiles = ReferenceCopyLocalFiles.Select(_ => new FileInfo(_.ItemSpec)).ToList(),
+                Is64Bit = Is64Bit
             };
 
             GeneratedFiles = Task.Run(async () => await processor.ExecuteAsync(_token.Token), _token.Token).Result;
 
             return true;
+        }
+
+
+        public bool Is64Bit {
+            get {
+                // same detections as DNNE uses:
+                // https://github.com/AaronRobinsonMSFT/DNNE/blob/bf86d7d4fc575fb3e2a57d197a73896159e0c90b/src/msbuild/DNNE.BuildTasks/Windows.cs#L104
+                return Architecture.ToLower() switch {
+                    "x64" => true,
+                    "amd64" => true,
+                    "x86" => false,
+                    "msil" => RuntimeId.Contains("x64"), // e.g. win-x86, win-x64, etc
+                    _ => IntPtr.Size == 8, // Fallback is the process bitness
+                };
+            }
         }
 
 
