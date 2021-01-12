@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net472</TargetFrameworks>
     <OutputPath>bin\</OutputPath>
     <Description>Tool to build Total Commander Plugins</Description>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>
 
-    <!--<DevelopmentDependency>true</DevelopmentDependency>-->
-
-    <!--<IsPackable>false</IsPackable>-->
-
-    <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
+    <DevelopmentDependency>true</DevelopmentDependency>
 
   </PropertyGroup>
 
@@ -24,29 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="build\*.*" Pack="true"
-             PackagePath="buildTransitive"
-             Visible="true" />
-
-    <None Include="$(OutputPath)\*.*" Pack="true"
-          PackagePath="bin\$(TargetFramework)"
-          Visible="false" />
-
-    <None Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*" Pack="true"
-          PackagePath="bin\$(TargetFramework)"
-          Visible="false" />
-
+    <Content Include="build\*.*" Pack="true" PackagePath="buildTransitive" Visible="true" />
+    <None Include="$(OutputPath)\**\*.*" Pack="true" PackagePath="bin\" Visible="false" />
   </ItemGroup>
 
-
-  <!--<ItemGroup>
-    <ResourceSourceFiles Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*.*"/>
-  </ItemGroup>
-
-  <Target Name="CopyResources" AfterTargets="Build">
-    <Copy SourceFiles="@(ResourceSourceFiles)"
-          DestinationFolder="bin\$(TargetFramework)" />
-  </Target>-->
+  <!--<ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <None Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*" Pack="true" PackagePath="bin\netstandard2.0" Visible="false" />
+  </ItemGroup>-->
 
   <ItemGroup>
     <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj" PrivateAssets="All" />
