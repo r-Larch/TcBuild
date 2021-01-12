@@ -9,10 +9,10 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Content Include="..\TcBuildTask\build\**\*">
       <PackagePath>build</PackagePath>
-      <!--<PackagePath>buildTransitive</PackagePath>-->
+      --><!--<PackagePath>buildTransitive</PackagePath>--><!--
       <Visible>false</Visible>
       <Pack>true</Pack>
     </Content>
@@ -22,15 +22,15 @@
       <Visible>false</Visible>
       <Pack>true</Pack>
     </None>
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
-    <PackageReference Include="DNNE" Version="1.0.17" PrivateAssets="None" ExcludeAssets="Build" />
+    <!--<PackageReference Include="DNNE" Version="1.0.17" PrivateAssets="None" ExcludeAssets="Build" />-->
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj" PrivateAssets="None" />
-    <ProjectReference Include="..\TcBuildTask\TcBuildTask.csproj" PrivateAssets="All" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\TcBuildTask\TcBuildTask.csproj" PrivateAssets="None" />
     <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" PrivateAssets="None" />
   </ItemGroup>
 

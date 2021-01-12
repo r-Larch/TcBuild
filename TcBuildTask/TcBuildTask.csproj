@@ -5,30 +5,48 @@
     <OutputPath>bin\</OutputPath>
     <Description>Tool to build Total Commander Plugins</Description>
 
-    <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IncludeBuildOutput>false</IncludeBuildOutput>-->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
 
     <!--<DevelopmentDependency>true</DevelopmentDependency>-->
 
-    <IsPackable>false</IsPackable>
+    <!--<IsPackable>false</IsPackable>-->
+
+    <!--<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>-->
 
   </PropertyGroup>
 
   <ItemGroup>
-    
+    <PackageReference Include="DNNE" Version="1.0.17" PrivateAssets="None" ExcludeAssets="Build" />
     <PackageReference Include="System.Reflection.MetadataLoadContext" Version="5.0.0" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="build\*.*" Pack="true"
+             PackagePath="buildTransitive"
+             Visible="true" />
+
+    <None Include="$(OutputPath)\*.*" Pack="true"
+          PackagePath="bin\$(TargetFramework)"
+          Visible="false" />
+
+    <None Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*" Pack="true"
+          PackagePath="bin\$(TargetFramework)"
+          Visible="false" />
+
+  </ItemGroup>
+
+
+  <!--<ItemGroup>
     <ResourceSourceFiles Include="$(PkgSystem_Reflection_MetadataLoadContext)\lib\netstandard2.0\*.*"/>
   </ItemGroup>
 
   <Target Name="CopyResources" AfterTargets="Build">
     <Copy SourceFiles="@(ResourceSourceFiles)"
           DestinationFolder="bin\$(TargetFramework)" />
-  </Target>
+  </Target>-->
 
   <ItemGroup>
     <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj" PrivateAssets="All" />

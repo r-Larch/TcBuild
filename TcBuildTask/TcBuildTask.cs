@@ -34,7 +34,8 @@ namespace TcBuild {
 
             if (!File.Exists(AssemblyFile)) {
                 _log.LogWarning("AssemblyFile '" + AssemblyFile + "' does not exists. If you have not done a build you can ignore this error.");
-                return false;
+                throw new Exception("AssemblyFile '" + AssemblyFile + "' does not exists. If you have not done a build you can ignore this error.");
+                // return false;
             }
 
             var processor = new Processor(_log) {
