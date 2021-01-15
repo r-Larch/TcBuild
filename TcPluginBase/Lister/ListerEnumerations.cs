@@ -31,7 +31,7 @@ namespace TcPluginBase.Lister {
     /// Used as result type for most Lister plugin methods
     /// </summary>
     public enum ListerResult {
-        OK = 0,
+        Ok = 0,
         Error
     }
 

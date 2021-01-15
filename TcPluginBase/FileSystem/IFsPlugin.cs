@@ -23,10 +23,10 @@ namespace TcPluginBase.FileSystem {
         #region Mandatory Methods
 
         [TcMethod("FsFindFirst", "FsFindFirstW", Mandatory = true)]
-        object FindFirst(RemotePath path, out FindData findData);
+        object? FindFirst(RemotePath path, out FindData? findData);
 
         [TcMethod("FsFindNext", "FsFindNextW", Mandatory = true)]
-        bool FindNext(ref object o, out FindData findData);
+        bool FindNext(ref object o, out FindData? findData);
 
         [TcMethod("FsFindClose", Mandatory = true)]
         int FindClose(object o);
@@ -39,7 +39,7 @@ namespace TcPluginBase.FileSystem {
         /// FsGetDefRootName is called only when the plugin is installed. It asks the plugin for the default root name which should appear in the Network Neighborhood. This root name is NOT part of the path passed to the plugin when Wincmd accesses the plugin file system! The root will always be "\", and all subpaths will be built from the directory names returned by the plugin.
         /// Example: The root name may be "Linux file system" for a plugin which accesses Linux drives.If this function isn't implemented, Wincmd will suggest the name of the DLL (without extension .DLL) as the plugin root. This function is called directly after loading the plugin (when the user installs it), FsInit() is NOT called when installing the plugin.
         /// </summary>
-        string RootName { get; }
+        string? RootName { get; }
 
 
         FsBackgroundFlags BackgroundFlags { get; }

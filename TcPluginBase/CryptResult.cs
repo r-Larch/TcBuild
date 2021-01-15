@@ -1,7 +1,7 @@
 ﻿namespace TcPluginBase {
     public enum CryptResult {
         /// <summary>Success.</summary>
-        OK = 0,
+        Ok = 0,
 
         /// <summary>Password not found in password store.</summary>
         PasswordNotFound,

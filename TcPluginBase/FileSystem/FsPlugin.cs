@@ -10,9 +10,9 @@ using TcPluginBase.Content;
 
 namespace TcPluginBase.FileSystem {
     public abstract class FsPlugin : TcPlugin, IFsPlugin {
-        public ContentPlugin ContentPlugin { get; set; }
+        public ContentPlugin? ContentPlugin { get; set; }
 
-        public virtual string RootName { get; set; }
+        public virtual string? RootName { get; set; }
         public override string TraceTitle => Title;
         public FsBackgroundFlags BackgroundFlags { get; set; } = FsBackgroundFlags.Download | FsBackgroundFlags.Upload;
 
@@ -24,7 +24,7 @@ namespace TcPluginBase.FileSystem {
         /// Gets set by FsSetCryptCallback
         /// You can use it to save and load passwords
         /// </summary>
-        public FsPassword Password { get; set; }
+        public FsPassword? Password { get; set; }
         public FsPrompt Prompt { get; set; }
 
 
@@ -44,17 +44,12 @@ namespace TcPluginBase.FileSystem {
             return new FindData[0];
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="findData"></param>
+
         /// <exception cref="NoMoreFilesException"></exception>
-        /// <returns></returns>
-        public virtual object FindFirst(RemotePath path, out FindData findData)
+        public virtual object? FindFirst(RemotePath path, out FindData? findData)
         {
             var enumerable = GetFiles(path);
-            if (enumerable != null) {
+            if (enumerable != null!) {
                 var enumerator = enumerable.GetEnumerator();
                 if (enumerator.MoveNext()) {
                     findData = enumerator.Current;
@@ -67,9 +62,9 @@ namespace TcPluginBase.FileSystem {
             return null;
         }
 
-        public virtual bool FindNext(ref object o, out FindData findData)
+        public virtual bool FindNext(ref object o, out FindData? findData)
         {
-            if (o is IEnumerator<FindData> fsEnum) {
+            if (o is IEnumerator<FindData?> fsEnum) {
                 if (fsEnum.MoveNext()) {
                     var current = fsEnum.Current;
                     if (current != null) {
@@ -216,18 +211,13 @@ namespace TcPluginBase.FileSystem {
             }
 
             var cmd = verb.Split(' ')[0].ToLower();
-            switch (cmd) {
-                case "open":
-                    return ExecuteOpen(mainWin, remoteName);
-                case "properties":
-                    return ExecuteProperties(mainWin, remoteName);
-                case "chmod":
-                    return ExecuteCommand(mainWin, remoteName, verb.Trim());
-                case "quote":
-                    return ExecuteCommand(mainWin, remoteName, verb.Substring(6).Trim());
-                default:
-                    return ExecResult.Yourself;
-            }
+            return cmd switch {
+                "open" => ExecuteOpen(mainWin, remoteName),
+                "properties" => ExecuteProperties(mainWin, remoteName),
+                "chmod" => ExecuteCommand(mainWin, remoteName, verb.Trim()),
+                "quote" => ExecuteCommand(mainWin, remoteName, verb.Substring(6).Trim()),
+                _ => ExecResult.Yourself
+            };
         }
 
         public virtual ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName)
@@ -301,7 +291,7 @@ namespace TcPluginBase.FileSystem {
 
         public virtual string GetLocalName(RemotePath remoteName, int maxLen)
         {
-            return null;
+            return null!;
         }
 
         public virtual bool IsTempFilePanel()
@@ -353,7 +343,7 @@ namespace TcPluginBase.FileSystem {
             OnTcPluginEvent(new LogEventArgs(PluginNumber, (int) msgType, logText));
         }
 
-        internal virtual bool RequestProc(RequestType requestType, string customTitle, string customText, ref string returnedText, int maxLen)
+        internal virtual bool RequestProc(RequestType requestType, string? customTitle, string? customText, ref string? returnedText, int maxLen)
         {
             var e = new RequestEventArgs(PluginNumber, (int) requestType, customTitle, customText, returnedText, maxLen);
             if (OnTcPluginEvent(e) != 0) {

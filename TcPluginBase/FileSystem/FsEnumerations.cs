@@ -43,7 +43,7 @@ namespace TcPluginBase.FileSystem {
     /// <summary> Used as result type for ExecuteOpen, ExecuteProperties, and ExecuteCommand methods </summary>
     public struct ExecResult {
         /// <summary> Command was executed successfully, no further action is needed. </summary>
-        public static ExecResult Ok => new ExecResult(ExecEnum.OK);
+        public static ExecResult Ok => new ExecResult(ExecEnum.Ok);
 
         /// <summary> Execution failed. </summary>
         public static ExecResult Error => new ExecResult(ExecEnum.Error);
@@ -63,9 +63,9 @@ namespace TcPluginBase.FileSystem {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ExecEnum Type;
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string SymlinkTarget;
+        public string? SymlinkTarget;
 
-        private ExecResult(ExecEnum type, string symlinkTarget = default)
+        private ExecResult(ExecEnum type, string? symlinkTarget = default)
         {
             Type = type;
             SymlinkTarget = symlinkTarget;
@@ -73,7 +73,7 @@ namespace TcPluginBase.FileSystem {
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public enum ExecEnum {
-            OK = 0,
+            Ok = 0,
             Error = 1,
             Yourself = -1,
             SymLink = -2,
@@ -114,14 +114,14 @@ namespace TcPluginBase.FileSystem {
         /// </summary>
         /// <param name="icon"></param>
         /// <param name="iconName">Name of the icon. Total Commander can use this to cache the icon</param>
-        public static ExtractIconResult Extracted(Icon icon, string iconName = null) => new ExtractIconResult {Value = ExtractIconEnum.Extracted, Icon = icon, IconName = iconName};
+        public static ExtractIconResult Extracted(Icon icon, string? iconName = null) => new ExtractIconResult {Value = ExtractIconEnum.Extracted, Icon = icon, IconName = iconName};
 
         /// <summary>
         /// The icon MUST be destroyed by Total Commander, e.g. because it was created with CreateIcon(), or extracted with ExtractIconEx().
         /// </summary>
         /// <param name="icon"></param>
         /// <param name="iconName">Name of the icon. Total Commander can use this to cache the icon</param>
-        public static ExtractIconResult ExtractedDestroy(Icon icon, string iconName = null) => new ExtractIconResult {Value = ExtractIconEnum.ExtractedDestroy, Icon = icon, IconName = iconName};
+        public static ExtractIconResult ExtractedDestroy(Icon icon, string? iconName = null) => new ExtractIconResult {Value = ExtractIconEnum.ExtractedDestroy, Icon = icon, IconName = iconName};
 
         /// <summary>
         /// This attempts to load the Icon from the specified filePath.
@@ -156,7 +156,7 @@ namespace TcPluginBase.FileSystem {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public Icon Icon { get; set; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string IconName { get; set; }
+        public string? IconName { get; set; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public enum ExtractIconEnum {
@@ -176,9 +176,9 @@ namespace TcPluginBase.FileSystem {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public FileSystemExitCode Code { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string FileName { get; }
+        public string? FileName { get; }
 
-        private GetFileResult(FileSystemExitCode code, string fileName = null)
+        private GetFileResult(FileSystemExitCode code, string? fileName = null)
         {
             Code = code;
             FileName = fileName;
@@ -209,9 +209,9 @@ namespace TcPluginBase.FileSystem {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public FileSystemExitCode Code { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string FileName { get; }
+        public string? FileName { get; }
 
-        private PutFileResult(FileSystemExitCode code, string fileName = null)
+        private PutFileResult(FileSystemExitCode code, string? fileName = null)
         {
             Code = code;
             FileName = fileName;
@@ -308,7 +308,7 @@ namespace TcPluginBase.FileSystem {
         /// <param name="bitmap"></param>
         /// <param name="bitmapName">Name of the bitmap. Total Commander can use this to cache the bitmap</param>
         /// <param name="cache">false to NOT cache the image</param>
-        public static PreviewBitmapResult Extracted(Bitmap bitmap, string bitmapName = null, bool cache = true) => new PreviewBitmapResult {
+        public static PreviewBitmapResult Extracted(Bitmap bitmap, string? bitmapName = null, bool cache = true) => new PreviewBitmapResult {
             Value = PreviewBitmapEnum.Extracted,
             Bitmap = bitmap ?? throw new ArgumentNullException(nameof(bitmap)),
             BitmapName = bitmapName,
@@ -335,7 +335,7 @@ namespace TcPluginBase.FileSystem {
 
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string BitmapName { get; private set; }
+        public string? BitmapName { get; private set; }
         [EditorBrowsable(EditorBrowsableState.Never)]
         public PreviewBitmapEnum Value { get; private set; }
         [EditorBrowsable(EditorBrowsableState.Never)]

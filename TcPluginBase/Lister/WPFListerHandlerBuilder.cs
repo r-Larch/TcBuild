@@ -9,10 +9,14 @@ using WPFUserControl = System.Windows.Controls.UserControl;
 
 
 namespace TcPluginBase.Lister {
-    public class WPFListerHandlerBuilder : IListerHandlerBuilder {
-        public ListerPlugin Plugin { get; set; }
+    public class WpfListerHandlerBuilder : IListerHandlerBuilder {
+        private readonly ListerPlugin _plugin;
+        private ElementHost? _elementHost;
 
-        private ElementHost elementHost = null;
+        public WpfListerHandlerBuilder(ListerPlugin plugin)
+        {
+            _plugin = plugin;
+        }
 
         #region Keyboard Handler
 
@@ -28,22 +32,23 @@ namespace TcPluginBase.Lister {
             Key.P //, Key.A, Key.C,
         };
 
+
         private void wpfControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape) {
-                Plugin.CloseParentWindow();
+                _plugin.CloseParentWindow();
                 e.Handled = true;
             }
             else if (SentToParentCtrlKeys.Contains(e.Key)
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Control) != 0
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Alt) == 0) {
                 int code = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key) | (int) Keys.Control;
-                Plugin.SendKeyToParentWindow(code);
+                _plugin.SendKeyToParentWindow(code);
             }
             else if (SentToParentKeys.Contains(e.Key)
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Control) == 0
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Alt) == 0) {
-                Plugin.SendKeyToParentWindow(System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key));
+                _plugin.SendKeyToParentWindow(System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key));
             }
         }
 
@@ -53,14 +58,14 @@ namespace TcPluginBase.Lister {
         {
             if (listerControl != null) {
                 if (listerControl is WPFUserControl wpfControl) {
-                    elementHost = new ElementHost {
+                    _elementHost = new ElementHost {
                         Dock = DockStyle.Fill,
                         Child = wpfControl
                     };
                     wpfControl.KeyDown += wpfControl_KeyDown;
-                    elementHost.Focus();
+                    _elementHost.Focus();
                     wpfControl.Focus();
-                    return elementHost.Handle;
+                    return _elementHost.Handle;
                 }
 
                 throw new Exception("Unexpected WPF control type: " + listerControl.GetType());

@@ -19,11 +19,11 @@ namespace TcPluginBase.Tools {
 
     [Serializable]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public delegate bool RequestCallback(int pluginNumber, int requestType, [MarshalAs(UnmanagedType.LPStr)] string customTitle, [MarshalAs(UnmanagedType.LPStr)] string customText, IntPtr returnedText, int maxLen);
+    public delegate bool RequestCallback(int pluginNumber, int requestType, [MarshalAs(UnmanagedType.LPStr)] string? customTitle, [MarshalAs(UnmanagedType.LPStr)] string? customText, IntPtr returnedText, int maxLen);
 
     [Serializable]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public delegate bool RequestCallbackW(int pluginNumber, int requestType, [MarshalAs(UnmanagedType.LPWStr)] string customTitle, [MarshalAs(UnmanagedType.LPWStr)] string customText, IntPtr returnedText, int maxLen);
+    public delegate bool RequestCallbackW(int pluginNumber, int requestType, [MarshalAs(UnmanagedType.LPWStr)] string? customTitle, [MarshalAs(UnmanagedType.LPWStr)] string? customText, IntPtr returnedText, int maxLen);
 
     [Serializable]
     public delegate int FsCryptCallback(int pluginNumber, int cryptoNumber, int mode, [MarshalAs(UnmanagedType.LPStr)] string connectionName, IntPtr password, int maxLen);

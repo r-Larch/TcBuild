@@ -31,7 +31,7 @@ namespace TcPluginBase.FileSystem {
         public RemoteInfo(IntPtr ptr)
         {
             if (ptr != IntPtr.Zero) {
-                TcRemoteInfo data = (TcRemoteInfo) Marshal.PtrToStructure(ptr, typeof(TcRemoteInfo));
+                var data = (TcRemoteInfo) Marshal.PtrToStructure(ptr, typeof(TcRemoteInfo))!;
                 Size = TcUtils.GetULong(data.sizeHigh, data.sizeLow);
                 LastWriteTime = TcUtils.FromFileTime(data.lastWriteTime);
                 Attributes = (FileAttributes) data.attr;

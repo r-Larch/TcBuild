@@ -44,10 +44,10 @@ namespace TcPluginBase.FileSystem {
 
         /// <summary>Returns a new RemotePath consisting of the current Path without trailing slash.</summary>
         public RemotePath PathWithoutTrailingSlash => TrailingSlash
-            ? Path.Substring(0, Path.Length - 1)
+            ? Path[0..^1]
             : Path;
 
-        public RemotePath(string path)
+        public RemotePath(string? path)
         {
             if (string.IsNullOrEmpty(path)) {
                 Path = string.Empty;
@@ -64,7 +64,7 @@ namespace TcPluginBase.FileSystem {
         }
 
 
-        public string GetSegment(int level)
+        public string? GetSegment(int level)
         {
             var index = level - 1;
             if (index < 0) {
@@ -110,7 +110,7 @@ namespace TcPluginBase.FileSystem {
             return remotePath.ToString();
         }
 
-        public static implicit operator RemotePath(string path)
+        public static implicit operator RemotePath(string? path)
         {
             return new RemotePath(path);
         }

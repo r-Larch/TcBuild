@@ -17,7 +17,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskUserName(string title = null, string preValue = "")
+        public string? AskUserName(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.UserName, title, null, ref value, 2048)) {
@@ -31,7 +31,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskPassword(string title = null, string preValue = "")
+        public string? AskPassword(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.Password, title, null, ref value, 2048)) {
@@ -45,7 +45,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskUserNameFirewall(string title = null, string preValue = "")
+        public string? AskUserNameFirewall(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.UserNameFirewall, title, null, ref value, 2048)) {
@@ -59,7 +59,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskPasswordFirewall(string title = null, string preValue = "")
+        public string? AskPasswordFirewall(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.PasswordFirewall, title, null, ref value, 2048)) {
@@ -73,7 +73,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskAccount(string title = null, string preValue = "")
+        public string? AskAccount(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.Account, title, null, ref value, 2048)) {
@@ -87,7 +87,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskTargetDir(string title = null, string preValue = "")
+        public string? AskTargetDir(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.TargetDir, title, null, ref value, 2048)) {
@@ -101,7 +101,7 @@
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskUrl(string title = null, string preValue = "")
+        public string? AskUrl(string? title = null, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.Url, title, null, ref value, 2048)) {
@@ -118,7 +118,7 @@
         /// <param name="text">Override the text default text. Set this to <c>null</c> or an empty string to use the default text. The default text will be translated to the language set in the calling program.</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
-        public string AskOther(string title, string text, string preValue = "")
+        public string? AskOther(string title, string text, string preValue = "")
         {
             var value = preValue;
             if (_plugin.RequestProc(RequestType.Other, title, text, ref value, 2048)) {
@@ -134,7 +134,7 @@
         /// <param name="text">Override the text default text. Set this to <c>null</c> or an empty string to use the default text. The default text will be translated to the language set in the calling program.</param>
         public void MsgOk(string title, string text)
         {
-            string _ = null;
+            string? _ = null;
             _plugin.RequestProc(RequestType.MsgOk, title, text, ref _, 45);
         }
 
@@ -145,7 +145,7 @@
         /// <returns><c>true</c> if the user clicked Yes, <c>false</c> otherwise.</returns>
         public bool MsgYesNo(string title, string text)
         {
-            string _ = null;
+            string? _ = null;
             if (_plugin.RequestProc(RequestType.MsgYesNo, title, text, ref _, 45)) {
                 return true;
             }
@@ -160,7 +160,7 @@
         /// <returns><c>true</c> if the user clicked OK, <c>false</c> otherwise.</returns>
         public bool MsgOkCancel(string title, string text)
         {
-            string _ = null;
+            string? _ = null;
             if (_plugin.RequestProc(RequestType.MsgOkCancel, title, text, ref _, 45)) {
                 return true;
             }

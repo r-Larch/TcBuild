@@ -7,11 +7,11 @@ namespace TcPluginBase.Content {
     [Serializable]
     public class ContentValue {
         private bool _changed;
-        private string _strValue;
+        private string? _strValue;
 
         #region Properties
 
-        public string StrValue {
+        public string? StrValue {
             get => _strValue;
             set {
                 if (!(value ?? string.Empty).Equals(_strValue ?? string.Empty)) {
@@ -88,14 +88,14 @@ namespace TcPluginBase.Content {
             if (ptr != IntPtr.Zero && _changed) {
                 switch (FieldType) {
                     case ContentFieldType.Numeric32:
-                        Marshal.WriteInt32(ptr, Int32.Parse(_strValue));
+                        Marshal.WriteInt32(ptr, Int32.Parse(_strValue!));
                         break;
                     case ContentFieldType.Numeric64:
-                        Marshal.WriteInt64(ptr, Int64.Parse(_strValue));
+                        Marshal.WriteInt64(ptr, Int64.Parse(_strValue!));
                         break;
                     case ContentFieldType.NumericFloating:
-                        string altStr = null;
-                        string floatStr = _strValue;
+                        string? altStr = null;
+                        string floatStr = _strValue!;
                         if (floatStr.Contains("|")) {
                             int pos = floatStr.IndexOf("|", StringComparison.Ordinal);
                             altStr = floatStr.Substring(pos + 1);
@@ -111,15 +111,15 @@ namespace TcPluginBase.Content {
 
                         break;
                     case ContentFieldType.Date:
-                        DateTime date = DateTime.Parse(_strValue);
+                        DateTime date = DateTime.Parse(_strValue!);
                         Marshal.Copy(new[] {(Int16) date.Year, (Int16) date.Month, (Int16) date.Day}, 0, ptr, 3);
                         break;
                     case ContentFieldType.Time:
-                        DateTime time = DateTime.Parse(_strValue);
+                        DateTime time = DateTime.Parse(_strValue!);
                         Marshal.Copy(new[] {(Int16) time.Hour, (Int16) time.Minute, (Int16) time.Second}, 0, ptr, 3);
                         break;
                     case ContentFieldType.Boolean:
-                        Marshal.WriteInt32(ptr, Boolean.Parse(_strValue) ? 1 : 0);
+                        Marshal.WriteInt32(ptr, Boolean.Parse(_strValue!) ? 1 : 0);
                         break;
                     case ContentFieldType.MultipleChoice:
                     case ContentFieldType.String:
@@ -130,7 +130,7 @@ namespace TcPluginBase.Content {
                         TcUtils.WriteStringAnsi(_strValue, ptr, 0);
                         break;
                     case ContentFieldType.DateTime:
-                        Marshal.WriteInt64(ptr, DateTime.Parse(_strValue).ToFileTime());
+                        Marshal.WriteInt64(ptr, DateTime.Parse(_strValue!).ToFileTime());
                         break;
                     case ContentFieldType.WideString:
                         TcUtils.WriteStringUni(_strValue, ptr, 0);

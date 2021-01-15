@@ -3,7 +3,7 @@
 
 namespace TcPluginBase.Content {
     public abstract class ContentPlugin : TcPlugin, IContentPlugin {
-        public virtual string DetectString { get; set; }
+        public virtual string? DetectString { get; set; }
         public override string TraceTitle => Title;
 
 
@@ -57,10 +57,10 @@ namespace TcPluginBase.Content {
         // method used in WFX plugins only
         public virtual bool GetDefaultView(out string viewContents, out string viewHeaders, out string viewWidths, out string viewOptions, int maxLen)
         {
-            viewContents = null;
-            viewHeaders = null;
-            viewWidths = null;
-            viewOptions = null;
+            viewContents = null!;
+            viewHeaders = null!;
+            viewWidths = null!;
+            viewOptions = null!;
             return false;
         }
 

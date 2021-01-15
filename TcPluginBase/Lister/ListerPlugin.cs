@@ -24,7 +24,7 @@ namespace TcPluginBase.Lister {
 
         public Color BitmapBackgroundColor { get; set; }
 
-        public string DetectString { get; set; }
+        public string? DetectString { get; set; }
 
         public IntPtr ListerHandle { private get; set; }
 
@@ -32,7 +32,7 @@ namespace TcPluginBase.Lister {
 
         public bool IsQuickView { get; set; }
 
-        public object FocusedControl { get; protected set; }
+        public object? FocusedControl { get; protected set; }
 
         #endregion Properties
 
@@ -89,7 +89,7 @@ namespace TcPluginBase.Lister {
             return 0;
         }
 
-        public virtual Bitmap GetPreviewBitmap(string fileToLoad, int width, int height, byte[] contentBuf)
+        public virtual Bitmap? GetPreviewBitmap(string fileToLoad, int width, int height, byte[] contentBuf)
         {
             return null;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace TcPluginBase.FileSystem {
@@ -52,6 +53,7 @@ namespace TcPluginBase.FileSystem {
             _data.AddOrUpdate(key, data, (k, v) => data);
         }
 
+        [return: MaybeNull]
         public T GetData<T>(string key)
         {
             if (_data.TryGetValue(key, out var data)) {
@@ -65,7 +67,7 @@ namespace TcPluginBase.FileSystem {
         public void Disconnect()
         {
             _plugin.LogProc(LogMsgType.Details, $"disconnect {ConnectionRoot}");
-            _plugin.LogProc(LogMsgType.Disconnect, null);
+            _plugin.LogProc(LogMsgType.Disconnect, string.Empty);
 
             foreach (var keyValuePair in _data) {
                 if (keyValuePair.Value is IDisposable disposable) {

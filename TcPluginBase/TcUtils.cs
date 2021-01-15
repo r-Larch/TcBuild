@@ -157,7 +157,7 @@ namespace TcPluginBase {
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void WriteStringAnsi(string str, IntPtr addr, int length)
+        public static void WriteStringAnsi(string? str, IntPtr addr, int length)
         {
             if (string.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);
@@ -177,7 +177,7 @@ namespace TcPluginBase {
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void WriteStringUni(string str, IntPtr addr, int length)
+        public static void WriteStringUni(string? str, IntPtr addr, int length)
         {
             if (string.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);

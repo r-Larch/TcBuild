@@ -10,20 +10,14 @@ namespace TcPluginBase.FileSystem {
 
         protected override CryptResult GetCryptResult(int tcCryptResult)
         {
-            switch (tcCryptResult) {
-                case (int) FileSystemExitCode.OK:
-                    return CryptResult.OK;
-                case (int) FileSystemExitCode.NotSupported:
-                    return CryptResult.Failed;
-                case (int) FileSystemExitCode.FileNotFound:
-                    return CryptResult.NoMasterPassword;
-                case (int) FileSystemExitCode.ReadError:
-                    return CryptResult.PasswordNotFound;
-                case (int) FileSystemExitCode.WriteError:
-                    return CryptResult.WriteError;
-                default:
-                    return CryptResult.PasswordNotFound;
-            }
+            return (FileSystemExitCode) tcCryptResult switch {
+                FileSystemExitCode.OK => CryptResult.Ok,
+                FileSystemExitCode.NotSupported => CryptResult.Failed,
+                FileSystemExitCode.FileNotFound => CryptResult.NoMasterPassword,
+                FileSystemExitCode.ReadError => CryptResult.PasswordNotFound,
+                FileSystemExitCode.WriteError => CryptResult.WriteError,
+                _ => CryptResult.PasswordNotFound
+            };
         }
     }
 }

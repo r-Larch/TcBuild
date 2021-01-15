@@ -21,10 +21,10 @@ namespace WlxWrapper {
             try {
                 var guiType = listerPlugin.GuiType;
                 if (guiType == GuiType.WinForms) {
-                    return new WFListerHandlerBuilder {Plugin = listerPlugin};
+                    return new FormsListerHandlerBuilder(listerPlugin);
                 }
                 else {
-                    return new WPFListerHandlerBuilder {Plugin = listerPlugin};
+                    return new WpfListerHandlerBuilder(listerPlugin);
                 }
             }
             catch {

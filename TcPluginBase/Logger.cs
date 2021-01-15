@@ -14,9 +14,9 @@ namespace TcPluginBase {
     }
 
     public class Logger : ILogger {
-        private readonly string _title;
-        private readonly Func<string> _getTitle;
-        private string Title => _title ?? _getTitle?.Invoke();
+        private readonly string? _title;
+        private readonly Func<string>? _getTitle;
+        private string? Title => _title ?? _getTitle?.Invoke();
 
         public Logger(string title)
         {
@@ -38,8 +38,8 @@ namespace TcPluginBase {
             var errors = new List<Exception>();
             do {
                 errors.Add(e);
-                e = e.InnerException;
-            } while (e != null);
+                e = e.InnerException!;
+            } while (e != null!);
 
             var sb = new StringBuilder();
             sb.AppendLine(message);

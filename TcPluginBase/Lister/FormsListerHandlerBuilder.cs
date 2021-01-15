@@ -5,8 +5,13 @@ using System.Windows.Forms;
 
 namespace TcPluginBase.Lister {
     [Serializable]
-    public class WFListerHandlerBuilder : IListerHandlerBuilder {
-        public ListerPlugin Plugin { get; set; }
+    public class FormsListerHandlerBuilder : IListerHandlerBuilder {
+        private readonly ListerPlugin _plugin;
+
+        public FormsListerHandlerBuilder(ListerPlugin plugin)
+        {
+            _plugin = plugin;
+        }
 
         #region Keyboard Handler
 
@@ -22,18 +27,18 @@ namespace TcPluginBase.Lister {
             Keys.A, Keys.C, Keys.P
         };
 
-        private void wfControl_KeyDown(object sender, KeyEventArgs e)
+        private void wfControl_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape) {
-                Plugin.CloseParentWindow();
+                _plugin.CloseParentWindow();
                 e.Handled = true;
             }
             else if (SentToParentCtrlKeys.Contains(e.KeyCode) && e.Control && !e.Alt) {
                 int code = e.KeyValue | (int) Keys.Control;
-                Plugin.SendKeyToParentWindow(code);
+                _plugin.SendKeyToParentWindow(code);
             }
             else if (SentToParentKeys.Contains(e.KeyCode) && !e.Control && !e.Alt) {
-                Plugin.SendKeyToParentWindow(e.KeyValue);
+                _plugin.SendKeyToParentWindow(e.KeyValue);
             }
         }
 
@@ -43,7 +48,7 @@ namespace TcPluginBase.Lister {
         {
             if (listerControl != null) {
                 if (listerControl is UserControl userControl) {
-                    if (Plugin.FocusedControl is Control control) {
+                    if (_plugin.FocusedControl is Control control) {
                         control.KeyDown += wfControl_KeyDown;
                     }
 

@@ -31,7 +31,7 @@ namespace TcPluginBase.Lister {
         int NotificationReceived(object control, int message, int wParam, int lParam);
 
         [TcMethod("ListGetPreviewBitmap", "ListGetPreviewBitmapW")]
-        Bitmap GetPreviewBitmap(string fileToLoad, int width, int height, byte[] contentBuf);
+        Bitmap? GetPreviewBitmap(string fileToLoad, int width, int height, byte[] contentBuf);
 
         [TcMethod("ListSearchDialog")]
         ListerResult SearchDialog(object control, bool findNext);
