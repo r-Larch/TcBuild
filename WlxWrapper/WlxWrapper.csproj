@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <!--<OutputPath>..\Build\</OutputPath>-->
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
