@@ -154,7 +154,7 @@ namespace TcPluginBase.FileSystem {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ExtractIconEnum Value { get; set; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Icon Icon { get; set; }
+        public Icon? Icon { get; set; }
         [EditorBrowsable(EditorBrowsableState.Never)]
         public string? IconName { get; set; }
 
@@ -339,7 +339,7 @@ namespace TcPluginBase.FileSystem {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public PreviewBitmapEnum Value { get; private set; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Bitmap Bitmap { get; private set; }
+        public Bitmap? Bitmap { get; private set; }
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool Cache { get; private set; }
 

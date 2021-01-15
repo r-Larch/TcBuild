@@ -64,7 +64,7 @@ namespace TcPluginBase {
 
 #endif
 
-        public static void TraceCall(TcPlugin? plugin, TraceLevel level, string callSignature, string result)
+        public static void TraceCall(TcPlugin? plugin, TraceLevel level, string? callSignature, string? result)
         {
 #if TRACE
             var text = callSignature + (string.IsNullOrEmpty(result) ? null : ": " + result);

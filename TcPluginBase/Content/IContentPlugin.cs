@@ -27,7 +27,7 @@
         SupportedFieldOptions GetSupportedFieldFlags(int fieldIndex);
 
         [TcMethod("ContentSetValue", "ContentSetValueW", "FsContentSetValueW", "FsContentSetValue")]
-        SetValueResult SetValue(string fileName, int fieldIndex, int unitIndex, ContentFieldType fieldType, string fieldValue, SetValueFlags flags);
+        SetValueResult SetValue(string fileName, int fieldIndex, int unitIndex, ContentFieldType fieldType, string? fieldValue, SetValueFlags flags);
 
 
         // functions used in WDX plugins only
@@ -45,7 +45,7 @@
         // function used in WFX plugins only
 
         [TcMethod("FsContentGetDefaultView", "FsContentGetDefaultViewW")]
-        bool GetDefaultView(out string viewContents, out string viewHeaders, out string viewWidths, out string viewOptions, int maxLen);
+        bool GetDefaultView(out string? viewContents, out string? viewHeaders, out string? viewWidths, out string? viewOptions, int maxLen);
 
         #endregion Optional Methods
     }

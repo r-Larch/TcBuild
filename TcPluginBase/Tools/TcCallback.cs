@@ -76,7 +76,7 @@ namespace TcPluginBase.Tools {
         private static FsCryptCallback? _fsCryptCallback;
         private static FsCryptCallbackW? _fsCryptCallbackW;
 
-        public static void SetFsPluginCallbacks(ProgressCallback progress, ProgressCallbackW progressW, LogCallback log, LogCallbackW logW, RequestCallback request, RequestCallbackW requestW, FsCryptCallback crypt, FsCryptCallbackW cryptW)
+        public static void SetFsPluginCallbacks(ProgressCallback? progress, ProgressCallbackW? progressW, LogCallback? log, LogCallbackW? logW, RequestCallback? request, RequestCallbackW? requestW, FsCryptCallback? crypt, FsCryptCallbackW? cryptW)
         {
             _progressCallback ??= progress;
             _progressCallbackW ??= progressW;

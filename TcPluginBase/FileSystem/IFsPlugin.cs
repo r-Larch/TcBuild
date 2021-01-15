@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace TcPluginBase.FileSystem {
         object? FindFirst(RemotePath path, out FindData? findData);
 
         [TcMethod("FsFindNext", "FsFindNextW", Mandatory = true)]
-        bool FindNext(ref object o, out FindData? findData);
+        bool FindNext(ref object o, [NotNullWhen(true)] out FindData? findData);
 
         [TcMethod("FsFindClose", Mandatory = true)]
         int FindClose(object o);
@@ -197,7 +198,7 @@ namespace TcPluginBase.FileSystem {
         /// <param name="maxLen">Maximum number of characters you can return in RemoteName, including the final 0.</param>
         /// <returns>Return the path of the file on the local file system, e.g. c:\windows\file.ext or null if it does not point to a local file.</returns>
         [TcMethod("FsGetLocalName", "FsGetLocalNameW")]
-        string GetLocalName(RemotePath remoteName, int maxLen);
+        string? GetLocalName(RemotePath remoteName, int maxLen);
 
         // FsContent... methods - are determined in IContentPlugin interface
 

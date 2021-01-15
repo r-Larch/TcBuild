@@ -49,18 +49,18 @@ namespace TcPluginBase.Content {
             return SupportedFieldOptions.None;
         }
 
-        public virtual SetValueResult SetValue(string fileName, int fieldIndex, int unitIndex, ContentFieldType fieldType, string fieldValue, SetValueFlags flags)
+        public virtual SetValueResult SetValue(string fileName, int fieldIndex, int unitIndex, ContentFieldType fieldType, string? fieldValue, SetValueFlags flags)
         {
             return SetValueResult.NoSuchField;
         }
 
         // method used in WFX plugins only
-        public virtual bool GetDefaultView(out string viewContents, out string viewHeaders, out string viewWidths, out string viewOptions, int maxLen)
+        public virtual bool GetDefaultView(out string? viewContents, out string? viewHeaders, out string? viewWidths, out string? viewOptions, int maxLen)
         {
-            viewContents = null!;
-            viewHeaders = null!;
-            viewWidths = null!;
-            viewOptions = null!;
+            viewContents = null;
+            viewHeaders = null;
+            viewWidths = null;
+            viewOptions = null;
             return false;
         }
 

@@ -66,7 +66,7 @@ namespace TcPluginBase.Tools {
         }
 
 
-        public static void ProcessException(TcPlugin? plugin, string callSignature, Exception ex)
+        public static void ProcessException(TcPlugin? plugin, string? callSignature, Exception ex)
         {
 #if TRACE
             var pluginTitle = plugin == null ? "NULL" : plugin.TraceTitle;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,7 +63,7 @@ namespace TcPluginBase.FileSystem {
             return null;
         }
 
-        public virtual bool FindNext(ref object o, out FindData? findData)
+        public virtual bool FindNext(ref object o, [NotNullWhen(true)] out FindData? findData)
         {
             if (o is IEnumerator<FindData?> fsEnum) {
                 if (fsEnum.MoveNext()) {
@@ -289,9 +290,9 @@ namespace TcPluginBase.FileSystem {
             return PreviewBitmapResult.None;
         }
 
-        public virtual string GetLocalName(RemotePath remoteName, int maxLen)
+        public virtual string? GetLocalName(RemotePath remoteName, int maxLen)
         {
-            return null!;
+            return null;
         }
 
         public virtual bool IsTempFilePanel()
