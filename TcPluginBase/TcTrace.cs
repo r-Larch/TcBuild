@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
-using Microsoft.VisualBasic.Logging;
 
 
 namespace TcPluginBase {
@@ -19,12 +18,12 @@ namespace TcPluginBase {
 
         private static readonly TraceSwitch TcPluginTraceSwitch = new TraceSwitch("DotNetPlugins", "All .NET plugins", "Warning");
 
-        public static void TraceOut(TraceLevel level, string text, string category)
+        public static void TraceOut(TraceLevel level, string text, string? category)
         {
             TraceOut(level, text, category, 0);
         }
 
-        public static void TraceOut(TraceLevel level, string text, string category, int indent)
+        public static void TraceOut(TraceLevel level, string text, string? category, int indent)
         {
             if (
                 level.Equals(TraceLevel.Error) && TcPluginTraceSwitch.TraceError ||
@@ -65,7 +64,7 @@ namespace TcPluginBase {
 
 #endif
 
-        public static void TraceCall(TcPlugin plugin, TraceLevel level, string callSignature, string result)
+        public static void TraceCall(TcPlugin? plugin, TraceLevel level, string callSignature, string result)
         {
 #if TRACE
             var text = callSignature + (string.IsNullOrEmpty(result) ? null : ": " + result);

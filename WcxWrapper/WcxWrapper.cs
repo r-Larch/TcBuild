@@ -42,15 +42,15 @@ namespace WcxWrapper {
         public static IntPtr OpenArchiveInternal(OpenArchiveData data)
         {
             var result = IntPtr.Zero;
-            _callSignature = $"OpenArchive {data.ArchiveName} ({data.Mode.ToString()})";
+            _callSignature = $"OpenArchive {data.ArchiveName} ({data.Mode})";
             try {
-                object o = Plugin.OpenArchive(ref data);
+                var o = Plugin.OpenArchive(ref data);
                 if (o != null && data.Result == PackerResult.OK) {
                     result = TcHandles.AddHandle(o);
                     data.Update();
                 }
 
-                TraceCall(TraceLevel.Info, result == IntPtr.Zero ? $"Error ({data.Result.ToString()})" : result.ToString());
+                TraceCall(TraceLevel.Info, result == IntPtr.Zero ? $"Error ({data.Result})" : result.ToString());
             }
             catch (Exception ex) {
                 ProcessException(ex);

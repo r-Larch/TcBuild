@@ -13,7 +13,7 @@ namespace TcPluginBase {
         private readonly CancellationTokenSource _token;
         public CancellationToken Token => _token.Token;
 
-        private class MyFunc {
+        private struct MyFunc {
             public Func<object> Func { get; set; }
             public object Result { get; set; }
             public Exception Exception { get; set; }
@@ -21,7 +21,7 @@ namespace TcPluginBase {
             public bool Done { get; set; }
         }
 
-        private class MyAction {
+        private struct MyAction {
             public Action Action { get; set; }
         }
 

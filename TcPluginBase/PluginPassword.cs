@@ -97,7 +97,7 @@ namespace TcPluginBase {
         {
             var e = new CryptEventArgs(_plugin.PluginNumber, _cryptoNumber, (int) mode, storeName, password);
             var result = GetCryptResult(_plugin.OnTcPluginEvent(e));
-            if (result == CryptResult.OK) {
+            if (result == CryptResult.Ok) {
                 password = e.Password;
             }
 

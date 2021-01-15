@@ -5,6 +5,7 @@
     <OutputPath>bin\</OutputPath>
     <RootNamespace>TcBuild</RootNamespace>
     <Description>Tool to build Total Commander Plugins</Description>
+    <Nullable>enable</Nullable>
 
     <!--<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeBuildOutput>false</IncludeBuildOutput>-->

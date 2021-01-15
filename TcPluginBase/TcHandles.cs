@@ -44,7 +44,7 @@ namespace TcPluginBase {
             }
         }
 
-        public static object GetObject(IntPtr handle)
+        public static object? GetObject(IntPtr handle)
         {
             lock (HandleSyncObj) {
                 return HandleDictionary.ContainsKey(handle) ? HandleDictionary[handle].Obj : null;

@@ -6,14 +6,14 @@ namespace TcPluginBase.Packer {
     // Used as parameter type for OpenArchive method
     [Serializable]
     public class OpenArchiveData {
-        private readonly IntPtr ptr;
-        private TcOpenArchiveData data;
-        private TcOpenArchiveDataW dataW;
-        private bool isUnicode;
+        private readonly IntPtr _ptr;
+        private TcOpenArchiveData _data;
+        private TcOpenArchiveDataW _dataW;
+        private bool _isUnicode;
 
         #region Properties
 
-        public string ArchiveName { get; private set; }
+        public string? ArchiveName { get; private set; }
         public ArcOpenMode Mode { get; private set; }
         public PackerResult Result { get; set; }
 
@@ -29,18 +29,18 @@ namespace TcPluginBase.Packer {
 
         public OpenArchiveData(IntPtr ptr, bool isUnicode)
         {
-            this.ptr = ptr;
-            this.isUnicode = isUnicode;
+            this._ptr = ptr;
+            this._isUnicode = isUnicode;
             if (ptr != IntPtr.Zero) {
                 if (isUnicode) {
-                    dataW = (TcOpenArchiveDataW) Marshal.PtrToStructure(ptr, typeof(TcOpenArchiveDataW));
-                    ArchiveName = dataW.ArchiveName;
-                    Mode = (ArcOpenMode) dataW.Mode;
+                    _dataW = (TcOpenArchiveDataW) Marshal.PtrToStructure(ptr, typeof(TcOpenArchiveDataW))!;
+                    ArchiveName = _dataW.ArchiveName;
+                    Mode = (ArcOpenMode) _dataW.Mode;
                 }
                 else {
-                    data = (TcOpenArchiveData) Marshal.PtrToStructure(ptr, typeof(TcOpenArchiveData));
-                    ArchiveName = data.ArchiveName;
-                    Mode = (ArcOpenMode) data.Mode;
+                    _data = (TcOpenArchiveData) Marshal.PtrToStructure(ptr, typeof(TcOpenArchiveData))!;
+                    ArchiveName = _data.ArchiveName;
+                    Mode = (ArcOpenMode) _data.Mode;
                 }
             }
         }
@@ -49,14 +49,14 @@ namespace TcPluginBase.Packer {
 
         public void Update()
         {
-            if (ptr != IntPtr.Zero) {
-                if (isUnicode) {
-                    dataW.Result = (int) Result;
-                    Marshal.StructureToPtr(dataW, ptr, false);
+            if (_ptr != IntPtr.Zero) {
+                if (_isUnicode) {
+                    _dataW.Result = (int) Result;
+                    Marshal.StructureToPtr(_dataW, _ptr, false);
                 }
                 else {
-                    data.Result = (int) Result;
-                    Marshal.StructureToPtr(data, ptr, false);
+                    _data.Result = (int) Result;
+                    Marshal.StructureToPtr(_data, _ptr, false);
                 }
             }
         }

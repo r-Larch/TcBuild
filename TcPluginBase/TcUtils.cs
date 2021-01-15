@@ -110,7 +110,7 @@ namespace TcPluginBase {
 
         #region Unmanaged String Methods
 
-        internal static string ReadStringAnsi(IntPtr addr)
+        internal static string? ReadStringAnsi(IntPtr addr)
         {
             return (addr == IntPtr.Zero)
                 ? string.Empty
@@ -119,11 +119,11 @@ namespace TcPluginBase {
 
         internal static List<string> ReadStringListAnsi(IntPtr addr)
         {
-            List<string> result = new List<string>();
+            var result = new List<string>();
             if (addr != IntPtr.Zero) {
                 while (true) {
-                    string s = ReadStringAnsi(addr);
-                    if (String.IsNullOrEmpty(s))
+                    var s = ReadStringAnsi(addr);
+                    if (string.IsNullOrEmpty(s))
                         break;
                     result.Add(s);
                     addr = new IntPtr(addr.ToInt64() + s.Length + 1);
@@ -133,7 +133,7 @@ namespace TcPluginBase {
             return result;
         }
 
-        internal static string ReadStringUni(IntPtr addr)
+        internal static string? ReadStringUni(IntPtr addr)
         {
             return (addr == IntPtr.Zero)
                 ? string.Empty
@@ -142,11 +142,11 @@ namespace TcPluginBase {
 
         internal static List<string> ReadStringListUni(IntPtr addr)
         {
-            List<string> result = new List<string>();
+            var result = new List<string>();
             if (addr != IntPtr.Zero) {
                 while (true) {
-                    string s = ReadStringUni(addr);
-                    if (String.IsNullOrEmpty(s))
+                    var s = ReadStringUni(addr);
+                    if (string.IsNullOrEmpty(s))
                         break;
                     result.Add(s);
                     addr = new IntPtr(addr.ToInt64() + (s.Length + 1) * 2);
@@ -159,15 +159,15 @@ namespace TcPluginBase {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void WriteStringAnsi(string str, IntPtr addr, int length)
         {
-            if (String.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);
             else {
-                int strLen = str.Length;
+                var strLen = str.Length;
                 if (length > 0 && strLen >= length)
                     strLen = length - 1;
-                int i = 0;
-                Byte[] bytes = new Byte[strLen + 1];
-                foreach (char ch in str.Substring(0, strLen)) {
+                var i = 0;
+                var bytes = new byte[strLen + 1];
+                foreach (var ch in str.Substring(0, strLen)) {
                     bytes[i++] = Convert.ToByte(ch);
                 }
 
@@ -179,10 +179,10 @@ namespace TcPluginBase {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void WriteStringUni(string str, IntPtr addr, int length)
         {
-            if (String.IsNullOrEmpty(str))
+            if (string.IsNullOrEmpty(str))
                 Marshal.WriteIntPtr(addr, IntPtr.Zero);
             else {
-                int strLen = str.Length;
+                var strLen = str.Length;
                 if (length > 0 && strLen >= length)
                     strLen = length - 1;
                 Marshal.Copy((str + (char) 0).ToCharArray(0, strLen + 1), 0, addr, strLen + 1);

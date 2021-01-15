@@ -7,7 +7,7 @@ namespace TcPluginBase.Packer {
         #region Mandatory Methods
 
         [TcMethod("OpenArchive", "OpenArchiveW", Mandatory = true)]
-        object OpenArchive(ref OpenArchiveData archiveData);
+        object? OpenArchive(ref OpenArchiveData archiveData);
 
         [TcMethod("ReadHeaderEx", "ReadHeaderExW", Mandatory = true)]
         PackerResult ReadHeader(ref object arcData, out HeaderData headerData);
@@ -32,7 +32,7 @@ namespace TcPluginBase.Packer {
         void ConfigurePacker(TcWindow parentWin);
 
         [TcMethod("StartMemPack", "StartMemPackW")]
-        object StartMemPack(MemPackOptions options, string fileName);
+        object? StartMemPack(MemPackOptions options, string fileName);
 
         [TcMethod("PackToMem")]
         PackerResult PackToMem(ref object memData, byte[] bufIn, ref int taken, byte[] bufOut, ref int written, int seekBy);

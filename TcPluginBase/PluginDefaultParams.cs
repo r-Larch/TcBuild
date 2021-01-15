@@ -14,11 +14,11 @@ namespace TcPluginBase {
         /// <summary>
         /// Low value of plugin interface version. This is the value after the comma, multiplied by 100! Example. For plugin interface version 1.3, the low DWORD is 30 and the high DWORD is 1.
         /// </summary>
-        public Int32 PluginInterfaceVersionLow;
+        public int PluginInterfaceVersionLow;
         /// <summary>
         /// High value of plugin interface version.
         /// </summary>
-        public Int32 PluginInterfaceVersionHi;
+        public int PluginInterfaceVersionHi;
 
         /// <summary>
         /// Suggested location+name of the ini file where the plugin could store its data.

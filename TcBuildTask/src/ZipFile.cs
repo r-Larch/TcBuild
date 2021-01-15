@@ -36,7 +36,7 @@ namespace TcBuild {
             return this;
         }
 
-        public ZipFile Add(string fileName, string fileContents, Encoding encoding = default)
+        public ZipFile Add(string fileName, string fileContents, Encoding? encoding = default)
         {
             using var entry = _zip.CreateEntry(fileName).Open();
             using var sw = new StreamWriter(entry, encoding ?? Encoding.Default);

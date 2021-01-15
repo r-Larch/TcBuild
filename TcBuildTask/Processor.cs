@@ -12,12 +12,16 @@ using Task = System.Threading.Tasks.Task;
 namespace TcBuild {
     public class Processor {
         private readonly ILogger _log;
+
+#nullable disable
+
         public FileInfo AssemblyFile { get; set; }
         public FileInfo NativeAssemblyFile { get; set; }
         public DirectoryInfo OutputDirectory { get; set; }
         public List<FileInfo> ReferenceFiles { get; set; }
         public bool Is64Bit { get; set; }
 
+#nullable enable
 
         public Processor(ILogger log)
         {
@@ -29,7 +33,7 @@ namespace TcBuild {
         {
             // parse
             var plugin = GetPluginDefinition(AssemblyFile);
-            if (plugin == null) return null;
+            if (plugin == null) return Task.FromResult(string.Empty);
 
             token.ThrowIfCancellationRequested();
 
@@ -94,7 +98,7 @@ namespace TcBuild {
         }
 
 
-        private PluginDefinition GetPluginDefinition(FileInfo assemblyFile)
+        private PluginDefinition? GetPluginDefinition(FileInfo assemblyFile)
         {
             using var parser = new AssemblyParser(assemblyFile, _log);
             var plugin = parser.GetPluginDefinition();

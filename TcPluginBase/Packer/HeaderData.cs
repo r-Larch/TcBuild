@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace TcPluginBase.Packer {
     // Used as parameter type for ReadHeader method
     [Serializable]
-    public class HeaderData {
+    public struct HeaderData {
         private const int AllowedPackerAttributes = 0x3F;
 
         #region Properties

@@ -6,6 +6,11 @@ namespace TcBuild {
     public class BuildLogger : MarshalByRefObject, ILogger {
         public IBuildEngine BuildEngine { get; set; }
 
+        public BuildLogger(IBuildEngine buildEngine)
+        {
+            BuildEngine = buildEngine;
+        }
+
         public virtual void SetOperationName(string weaverName)
         {
             _currentOperationName = weaverName;
@@ -36,7 +41,7 @@ namespace TcBuild {
             LogWarning(message, null, 0, 0, 0, 0);
         }
 
-        public virtual void LogWarning(string message, string file, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber)
+        public virtual void LogWarning(string message, string? file, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber)
         {
             BuildEngine.LogWarningEvent(new BuildWarningEventArgs("", "", file, lineNumber, columnNumber, endLineNumber, endColumnNumber, this.PrependMessage(message), "", SenderName));
         }
@@ -46,7 +51,7 @@ namespace TcBuild {
             LogError(message, null, 0, 0, 0, 0);
         }
 
-        public virtual void LogError(string message, string file, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber)
+        public virtual void LogError(string message, string? file, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber)
         {
             ErrorOccurred = true;
             BuildEngine.LogErrorEvent(new BuildErrorEventArgs("", "", file, lineNumber, columnNumber, endLineNumber, endColumnNumber, this.PrependMessage(message), "", SenderName));
@@ -73,7 +78,7 @@ namespace TcBuild {
         public bool ErrorOccurred;
 
         private const string SenderName = nameof(TcBuild);
-        private string _currentOperationName;
+        private string? _currentOperationName;
     }
 
 

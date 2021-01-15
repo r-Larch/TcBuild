@@ -26,7 +26,7 @@ namespace TcBuild {
         }
 
 
-        internal PluginDefinition GetPluginDefinition()
+        internal PluginDefinition? GetPluginDefinition()
         {
             var definitions = GetPluginDefinitions().ToList();
 
@@ -68,6 +68,7 @@ namespace TcBuild {
 
                     if (definition == null) {
                         _log.LogWarning($"Found invalid [{TcInfos.TcPluginDefinitionAttribute}] on '{_assembly.Name}'. Parameters: ({string.Join(", ", value.FixedArguments.Select(_ => $"{_.Type} '{_.Value}'"))})");
+                        continue;
                     }
 
                     yield return definition;
@@ -178,7 +179,7 @@ namespace TcBuild {
 
         public void Dispose()
         {
-            _peReader?.Dispose();
+            _peReader.Dispose();
         }
     }
 }

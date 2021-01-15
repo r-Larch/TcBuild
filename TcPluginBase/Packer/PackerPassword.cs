@@ -8,7 +8,7 @@ namespace TcPluginBase.Packer {
         {
             switch (tcCryptResult) {
                 case (int) PackerResult.OK:
-                    return CryptResult.OK;
+                    return CryptResult.Ok;
                 case (int) PackerResult.ErrorCreate:
                     return CryptResult.Failed;
                 case (int) PackerResult.NoFiles:

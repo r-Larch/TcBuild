@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace TcBuild {
     public class TcBuildTask : Microsoft.Build.Utilities.Task, ICancelableTask, ITask {
+#nullable disable
         private readonly CancellationTokenSource _token;
         private ILogger _log;
 
@@ -28,6 +29,8 @@ namespace TcBuild {
         [Output]
         public string GeneratedFiles { get; set; }
 
+#nullable enable
+
         public TcBuildTask()
         {
             _token = new CancellationTokenSource();
@@ -35,7 +38,7 @@ namespace TcBuild {
 
         public override bool Execute()
         {
-            _log = new BuildLogger {BuildEngine = BuildEngine};
+            _log = new BuildLogger(BuildEngine);
 
             if (!File.Exists(AssemblyFile)) {
                 _log.LogWarning("AssemblyFile '" + AssemblyFile + "' does not exists. If you have not done a build you can ignore this error.");

@@ -7,7 +7,7 @@ namespace TcPluginBase.Packer {
     public abstract class PackerPlugin : TcPlugin, IPackerPlugin {
         public PackerCapabilities Capabilities { get; set; }
         public PackBackgroundFlags BackgroundFlags { get; set; }
-        public PackerPassword PasswordManager { get; set; }
+        public PackerPassword? PasswordManager { get; set; }
 
 
         protected PackerPlugin(IConfiguration pluginSettings) : base(pluginSettings)
@@ -19,7 +19,7 @@ namespace TcPluginBase.Packer {
 
         #region IPackerPlugin Members
 
-        public virtual object OpenArchive(ref OpenArchiveData archiveData)
+        public virtual object? OpenArchive(ref OpenArchiveData archiveData)
         {
             throw new MethodNotSupportedException(nameof(OpenArchive));
         }
@@ -56,7 +56,7 @@ namespace TcPluginBase.Packer {
         {
         }
 
-        public virtual object StartMemPack(MemPackOptions options, string fileName)
+        public virtual object? StartMemPack(MemPackOptions options, string fileName)
         {
             return null;
         }

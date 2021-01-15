@@ -43,6 +43,10 @@ namespace TcPluginBase.Tools {
             var settings = GetSettings(pluginClass.Assembly);
 
             var ctor = pluginClass.GetConstructor(new[] {typeof(IConfiguration)});
+            if (ctor == null) {
+                throw new PluginException($"Failed to Load Plugin '{pluginClass.FullName}'! Constructor missing! Please implement public constructor which accepts the 'IConfiguration' as single parameter.");
+            }
+
             var tcPlugin = (TPlugin) ctor.Invoke(new object[] {settings});
             return tcPlugin;
         }
@@ -62,7 +66,7 @@ namespace TcPluginBase.Tools {
         }
 
 
-        public static void ProcessException(TcPlugin plugin, string callSignature, Exception ex)
+        public static void ProcessException(TcPlugin? plugin, string callSignature, Exception ex)
         {
 #if TRACE
             var pluginTitle = plugin == null ? "NULL" : plugin.TraceTitle;
