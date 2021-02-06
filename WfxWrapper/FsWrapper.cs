@@ -522,10 +522,11 @@ namespace WfxWrapper {
 
                 var resStr = result.Type.ToString();
                 if (result.Type == ExecResult.ExecEnum.SymLink && result.SymlinkTarget.HasValue) {
-                    resStr += " (" + result.SymlinkTarget + ")";
+                    resStr += " (" + result.SymlinkTarget.Path + ")";
                 }
 
                 TraceCall(TraceLevel.Warning, resStr);
+                return result;
             }
             catch (Exception ex) {
                 ProcessException(ex);

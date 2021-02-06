@@ -62,14 +62,18 @@ namespace TcBuild {
 
                 token.ThrowIfCancellationRequested();
 
+                // ico resource
+                FileInfo resFile = new FileInfo(Path.Combine(workDir.FullName, $"{AssemblyFile.Name}.res"));
+                _tools.TryCreateResFile(AssemblyFile, resFile);
+
                 // create: x86
-                _tools.Assemble(wrapperSource, outFile, false, IsRelease);
+                _tools.Assemble(wrapperSource, outFile, resFile, false, IsRelease);
                 _log.LogInfo($"{outFile.FullName}");
 
                 token.ThrowIfCancellationRequested();
 
                 // create: x64
-                _tools.Assemble(wrapperSource, outFile64, true, IsRelease);
+                _tools.Assemble(wrapperSource, outFile64, resFile, true, IsRelease);
                 _log.LogInfo($"{outFile64.FullName}");
 
                 token.ThrowIfCancellationRequested();
@@ -96,7 +100,8 @@ namespace TcBuild {
                             //.Where(_ => _.Name != "Microsoft.Build.Framework.dll")
                             //.Where(_ => _.Name != "Microsoft.Build.Utilities.Core.dll")
                             //.Where(_ => _.Name != "System.Collections.Immutable.dll")
-                        )
+                        ),
+                        GetSatelliteAssemblyFiles()
                     );
                     if (!success) {
                         _log.LogWarning("ZIP Archiver is not found - Installation Archive is not created.");
@@ -114,6 +119,22 @@ namespace TcBuild {
             }
         }
 
+        private IEnumerable<FileInfo> GetSatelliteAssemblyFiles()
+        {
+            IEnumerable<FileInfo> allAssemblyFiles = new[] { AssemblyFile }.Concat(ReferenceFiles).Where(f => f.Extension.Equals(".dll", StringComparison.InvariantCultureIgnoreCase));
+            foreach (FileInfo assemblyFile in allAssemblyFiles)
+            {
+                foreach (FileInfo satelliteAssemblyFile in GetSatelliteAssemblyFiles(assemblyFile))
+                {
+                    yield return satelliteAssemblyFile;
+                }
+            }
+        }
+
+        private IEnumerable<FileInfo> GetSatelliteAssemblyFiles(FileInfo assemblyFile)
+        {
+            return assemblyFile.Directory.EnumerateFiles($"{Path.GetFileNameWithoutExtension(assemblyFile.Name)}.resources{assemblyFile.Extension}", SearchOption.AllDirectories);
+        }
 
         private void CreatePluginstFile(FileInfo iniFile, FileInfo outFile, PluginType pluginType)
         {

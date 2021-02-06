@@ -30,6 +30,8 @@ namespace TcBuild {
         [Required]
         public string CacheDir { get; set; }
 
+        internal string LibDirectory { get; set; }
+
         //[Output]
         //public string TargetExt { get; private set; }
 
@@ -47,6 +49,7 @@ namespace TcBuild {
             var tools = new Tools(
                 ilasmPath: Path.Combine(MSBuildFrameworkToolsPath, "ilasm.exe"),
                 ildasmPath: new DirectoryInfo(FrameworkSDKRoot).GetFiles("ildasm.exe", SearchOption.AllDirectories).OrderByDescending(_ => _.DirectoryName).FirstOrDefault()?.FullName,
+                rcPath: Path.Combine(LibDirectory ?? new FileInfo(TcPluginBase).Directory.Parent.FullName, "RC.Exe"),
                 _log
             );
 

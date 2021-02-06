@@ -49,6 +49,7 @@ namespace TcBuild.Test {
                     MSBuildFrameworkToolsPath = @"C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\",
                     FrameworkSDKRoot = @"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\",
                     CacheDir = cacheDir.FullName,
+                    LibDirectory = @"..\..\..\..\TcBuild\lib\",
                     //--
                     BuildEngine = new FakeBuildEngine(_output)
                 };

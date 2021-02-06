@@ -32,6 +32,15 @@
       <Pack>true</Pack>
       <PackagePath>build</PackagePath>
     </Content>
+    <!-- lib target -->
+    <Content Include=".\lib\rcdll.dll">
+      <Pack>true</Pack>
+      <PackagePath>lib</PackagePath>
+    </Content>
+    <Content Include=".\lib\RC.Exe">
+      <Pack>true</Pack>
+      <PackagePath>lib</PackagePath>
+    </Content>    
   </ItemGroup>
 
   <PropertyGroup>
