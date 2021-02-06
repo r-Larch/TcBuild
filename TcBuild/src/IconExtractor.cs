@@ -14,6 +14,9 @@ namespace TcBuild
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, uint dwFlags);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool FreeLibrary(IntPtr hModule);
+
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern IntPtr FindResource(IntPtr hModule, IntPtr lpName, IntPtr lpType);
 
@@ -38,6 +41,8 @@ namespace TcBuild
         public static bool ExtractIconFromExecutable(FileInfo sourceFile, FileInfo targetFile)
         {
             IntPtr hModule = LoadLibraryEx(sourceFile.FullName, IntPtr.Zero, LOAD_LIBRARY_AS_DATAFILE);
+            if (hModule == IntPtr.Zero)
+                throw new FileNotFoundException($"Library {sourceFile.Name} not found.", sourceFile.FullName);
 
             ENUMRESNAMEPROC callback = (h, t, name, l) =>
             {
@@ -84,7 +89,9 @@ namespace TcBuild
                 }
                 return true;
             };
-            return EnumResourceNames(hModule, RT_GROUP_ICON, callback, IntPtr.Zero);
+            bool ok = EnumResourceNames(hModule, RT_GROUP_ICON, callback, IntPtr.Zero);
+            FreeLibrary(hModule);
+            return ok;
         }
         private static byte[] GetDataFromResource(IntPtr hModule, IntPtr type, IntPtr name)
         {
