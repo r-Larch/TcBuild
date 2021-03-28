@@ -7,6 +7,7 @@ namespace TcBuildGenerator {
         private static readonly Dictionary<string, PluginType> Plugins = new() {
             {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem},
             {"TcPluginBase.Packer.IPackerPlugin", PluginType.Packer},
+            {"TcPluginBase.QuickSearch.IQuickSearchPlugin", PluginType.QuickSearch},
         };
 
         public static bool IsPluginClass(INamedTypeSymbol clazz, out PluginType pluginType, out INamedTypeSymbol pluginInterface)

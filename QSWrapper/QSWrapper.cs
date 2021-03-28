@@ -8,8 +8,8 @@ using TcPluginBase.Tools;
 
 namespace QSWrapper {
     public class QuickSearchWrapper {
-        private static string _callSignature;
-        private static QuickSearchPlugin _plugin;
+        private static string? _callSignature;
+        private static QuickSearchPlugin? _plugin;
         private static QuickSearchPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<QuickSearchPlugin>(typeof(PluginClassPlaceholder));
 
 
@@ -25,8 +25,8 @@ namespace QSWrapper {
         [return: MarshalAs(UnmanagedType.Bool)]
         public static bool MatchFile(IntPtr wcFilter, IntPtr wcFileName)
         {
-            var filter = Marshal.PtrToStringUni(wcFilter);
-            var fileName = Marshal.PtrToStringUni(wcFileName);
+            var filter = Marshal.PtrToStringUni(wcFilter)!;
+            var fileName = Marshal.PtrToStringUni(wcFileName)!;
 
             var result = false;
             _callSignature = $"MatchFileW(\"{fileName}\",\"{filter}\")";
