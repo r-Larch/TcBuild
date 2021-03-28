@@ -106,6 +106,7 @@ namespace TcBuildGenerator {
         {
             return plugin.Type switch {
                 PluginType.FileSystem => GetManifestResource("TcBuildGenerator.Wrapper.FsWrapper.cs"),
+                PluginType.Packer => GetManifestResource("TcBuildGenerator.Wrapper.WcxWrapper.cs"),
                 _ => throw new ArgumentOutOfRangeException(nameof(plugin.Type), $"PluginType: '{plugin.Type}' not implemented!")
             };
         }

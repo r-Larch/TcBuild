@@ -108,23 +108,27 @@ namespace TcPluginBase {
 
         #endregion DateTime Conversion Methods
 
-        #region Unmanaged String Methods
+        #region Unmanaged Marshal Methods
 
-        internal static string? ReadStringAnsi(IntPtr addr)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static byte[] ReadByteArray(IntPtr ptr, int size)
         {
-            return (addr == IntPtr.Zero)
-                ? string.Empty
-                : Marshal.PtrToStringAnsi(addr);
+            var buffer = new byte[size];
+            Marshal.Copy(ptr, buffer, 0, size);
+            return buffer;
         }
 
-        internal static List<string> ReadStringListAnsi(IntPtr addr)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static List<string> ReadStringListAnsi(IntPtr addr)
         {
             var result = new List<string>();
             if (addr != IntPtr.Zero) {
                 while (true) {
-                    var s = ReadStringAnsi(addr);
-                    if (string.IsNullOrEmpty(s))
+                    var s = Marshal.PtrToStringAnsi(addr) ?? string.Empty;
+                    if (string.IsNullOrEmpty(s)) {
                         break;
+                    }
+
                     result.Add(s);
                     addr = new IntPtr(addr.ToInt64() + s.Length + 1);
                 }
@@ -133,19 +137,13 @@ namespace TcPluginBase {
             return result;
         }
 
-        internal static string? ReadStringUni(IntPtr addr)
-        {
-            return (addr == IntPtr.Zero)
-                ? string.Empty
-                : Marshal.PtrToStringUni(addr);
-        }
-
-        internal static List<string> ReadStringListUni(IntPtr addr)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static List<string> ReadStringListUni(IntPtr addr)
         {
             var result = new List<string>();
             if (addr != IntPtr.Zero) {
                 while (true) {
-                    var s = ReadStringUni(addr);
+                    var s = Marshal.PtrToStringUni(addr) ?? string.Empty;
                     if (string.IsNullOrEmpty(s))
                         break;
                     result.Add(s);

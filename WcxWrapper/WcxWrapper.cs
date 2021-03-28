@@ -10,8 +10,8 @@ using TcPluginBase.Tools;
 
 namespace WcxWrapper {
     public class PackerWrapper {
-        private static string _callSignature;
-        private static PackerPlugin _plugin;
+        private static string? _callSignature;
+        private static PackerPlugin? _plugin;
         private static PackerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<PackerPlugin>(typeof(PluginClassPlaceholder));
 
 
@@ -117,13 +117,24 @@ namespace WcxWrapper {
         #region ProcessFile
 
         [UnmanagedCallersOnly(EntryPoint = "ProcessFile")]
-        public static int ProcessFile(IntPtr arcData, int operation, [MarshalAs(UnmanagedType.LPStr)] string destPath, [MarshalAs(UnmanagedType.LPStr)] string destName)
+        public static int ProcessFile(IntPtr arcData, int operation, IntPtr destPathPtr, IntPtr destNamePtr)
         {
-            return ProcessFileW(arcData, operation, destPath, destName);
+            var destPath = Marshal.PtrToStringAnsi(destPathPtr)!;
+            var destName = Marshal.PtrToStringAnsi(destNamePtr)!;
+
+            return ProcessFileInternal(arcData, operation, destPath, destName);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ProcessFileW")]
-        public static int ProcessFileW(IntPtr arcData, int operation, [MarshalAs(UnmanagedType.LPWStr)] string destPath, [MarshalAs(UnmanagedType.LPWStr)] string destName)
+        public static int ProcessFileW(IntPtr arcData, int operation, IntPtr destPathPtr, IntPtr destNamePtr)
+        {
+            var destPath = Marshal.PtrToStringUni(destPathPtr)!;
+            var destName = Marshal.PtrToStringUni(destNamePtr)!;
+
+            return ProcessFileInternal(arcData, operation, destPath, destName);
+        }
+
+        private static int ProcessFileInternal(IntPtr arcData, int operation, string destPath, string destName)
         {
             var result = PackerResult.NotSupported;
             var oper = (ProcessFileOperation) operation;
@@ -183,8 +194,10 @@ namespace WcxWrapper {
 
         // SetChangeVolProc & SetChangeVolProcW functionality is implemented here, not included to Packer Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "SetChangeVolProc")]
-        public static void SetChangeVolProc(IntPtr arcData, ChangeVolCallback changeVolProc)
+        public static void SetChangeVolProc(IntPtr arcData, IntPtr changeVolProcPtr)
         {
+            var changeVolProc = Marshal.GetDelegateForFunctionPointer<ChangeVolCallback>(changeVolProcPtr);
+
             _callSignature = $"SetChangeVolProc ({arcData.ToString()})";
             try {
                 TcCallback.SetPackerPluginCallbacks(changeVolProc, null, null, null, null, null);
@@ -197,8 +210,10 @@ namespace WcxWrapper {
         }
 
         [UnmanagedCallersOnly(EntryPoint = "SetChangeVolProcW")]
-        public static void SetChangeVolProcW(IntPtr arcData, ChangeVolCallbackW changeVolProcW)
+        public static void SetChangeVolProcW(IntPtr arcData, IntPtr changeVolProcWPtr)
         {
+            var changeVolProcW = Marshal.GetDelegateForFunctionPointer<ChangeVolCallbackW>(changeVolProcWPtr);
+
             _callSignature = $"SetChangeVolProcW ({arcData.ToString()})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, changeVolProcW, null, null, null, null);
@@ -216,8 +231,10 @@ namespace WcxWrapper {
 
         // SetProcessDataProc & SetProcessDataProcW functionality is implemented here, not included to Packer Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "SetProcessDataProc")]
-        public static void SetProcessDataProc(IntPtr arcData, ProcessDataCallback processDataProc)
+        public static void SetProcessDataProc(IntPtr arcData, IntPtr processDataProcPtr)
         {
+            var processDataProc = Marshal.GetDelegateForFunctionPointer<ProcessDataCallback>(processDataProcPtr);
+
             _callSignature = $"SetProcessDataProc ({arcData.ToString()})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, null, processDataProc, null, null, null);
@@ -230,8 +247,10 @@ namespace WcxWrapper {
         }
 
         [UnmanagedCallersOnly(EntryPoint = "SetProcessDataProcW")]
-        public static void SetProcessDataProcW(IntPtr arcData, ProcessDataCallbackW processDataProcW)
+        public static void SetProcessDataProcW(IntPtr arcData, IntPtr processDataProcWPtr)
         {
+            var processDataProcW = Marshal.GetDelegateForFunctionPointer<ProcessDataCallbackW>(processDataProcWPtr);
+
             _callSignature = $"SetProcessDataProcW ({arcData.ToString()})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, null, null, processDataProcW, null, null);
@@ -253,22 +272,30 @@ namespace WcxWrapper {
 
         [UnmanagedCallersOnly(EntryPoint = "PackFiles")]
         public static int PackFiles(
-            [MarshalAs(UnmanagedType.LPStr)] string packedFile,
-            [MarshalAs(UnmanagedType.LPStr)] string subPath,
-            [MarshalAs(UnmanagedType.LPStr)] string srcPath,
+            IntPtr packedFilePtr,
+            IntPtr subPathPtr,
+            IntPtr srcPathPtr,
             IntPtr addListPtr, int flags)
         {
+            var packedFile = Marshal.PtrToStringAnsi(packedFilePtr)!;
+            var subPath = Marshal.PtrToStringAnsi(subPathPtr)!;
+            var srcPath = Marshal.PtrToStringAnsi(srcPathPtr)!;
+
             List<string> addList = TcUtils.ReadStringListAnsi(addListPtr);
             return PackFilesInternal(packedFile, subPath, srcPath, addList, (PackFilesFlags) flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "PackFilesW")]
         public static int PackFilesW(
-            [MarshalAs(UnmanagedType.LPWStr)] string packedFile,
-            [MarshalAs(UnmanagedType.LPWStr)] string subPath,
-            [MarshalAs(UnmanagedType.LPWStr)] string srcPath,
+            IntPtr packedFilePtr,
+            IntPtr subPathPtr,
+            IntPtr srcPathPtr,
             IntPtr addListPtr, int flags)
         {
+            var packedFile = Marshal.PtrToStringUni(packedFilePtr)!;
+            var subPath = Marshal.PtrToStringUni(subPathPtr)!;
+            var srcPath = Marshal.PtrToStringUni(srcPathPtr)!;
+
             List<string> addList = TcUtils.ReadStringListUni(addListPtr);
             return PackFilesInternal(packedFile, subPath, srcPath, addList, (PackFilesFlags) flags);
         }
@@ -294,15 +321,19 @@ namespace WcxWrapper {
         #region DeleteFiles
 
         [UnmanagedCallersOnly(EntryPoint = "DeleteFiles")]
-        public static int DeleteFiles([MarshalAs(UnmanagedType.LPStr)] string packedFile, IntPtr deleteListPtr)
+        public static int DeleteFiles(IntPtr packedFilePtr, IntPtr deleteListPtr)
         {
+            var packedFile = Marshal.PtrToStringAnsi(packedFilePtr)!;
+
             var deleteList = TcUtils.ReadStringListAnsi(deleteListPtr);
             return DeleteFilesInternal(packedFile, deleteList);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "DeleteFilesW")]
-        public static int DeleteFilesW([MarshalAs(UnmanagedType.LPWStr)] string packedFile, IntPtr deleteListPtr)
+        public static int DeleteFilesW(IntPtr packedFilePtr, IntPtr deleteListPtr)
         {
+            var packedFile = Marshal.PtrToStringUni(packedFilePtr)!;
+
             var deleteList = TcUtils.ReadStringListUni(deleteListPtr);
             return DeleteFilesInternal(packedFile, deleteList);
         }
@@ -361,13 +392,20 @@ namespace WcxWrapper {
         #region StartMemPack
 
         [UnmanagedCallersOnly(EntryPoint = "StartMemPack")]
-        public static IntPtr StartMemPack(int options, [MarshalAs(UnmanagedType.LPStr)] string fileName)
+        public static IntPtr StartMemPack(int options, IntPtr fileNamePtr)
         {
-            return StartMemPackW(options, fileName);
+            var fileName = Marshal.PtrToStringAnsi(fileNamePtr)!;
+            return StartMemPackInternal(options, fileName);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "StartMemPackW")]
-        public static IntPtr StartMemPackW(int options, [MarshalAs(UnmanagedType.LPWStr)] string fileName)
+        public static IntPtr StartMemPackW(int options, IntPtr fileNamePtr)
+        {
+            var fileName = Marshal.PtrToStringUni(fileNamePtr)!;
+            return StartMemPackInternal(options, fileName);
+        }
+
+        private static IntPtr StartMemPackInternal(int options, string fileName)
         {
             var result = IntPtr.Zero;
             var mpOptions = (MemPackOptions) options;
@@ -393,16 +431,15 @@ namespace WcxWrapper {
 
         [UnmanagedCallersOnly(EntryPoint = "PackToMem")]
         public static int PackToMem(IntPtr hMemPack,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)]
-            byte[] bufIn,
-            int inLen, ref int taken,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)]
-            byte[] bufOut,
-            int outLen, ref int written, int seekBy)
+            IntPtr bufInPtr, int inLen, ref int taken,
+            IntPtr bufOutPtr, int outLen, ref int written, int seekBy)
         {
+            var bufIn = TcUtils.ReadByteArray(bufInPtr, inLen);
+            var bufOut = TcUtils.ReadByteArray(bufOutPtr, outLen);
+
             var result = PackerResult.NotSupported;
             _callSignature = $"PackToMem ({hMemPack.ToString()} - {inLen}, {outLen}, {seekBy})";
-            string traceRes = null;
+            string? traceRes = null;
             try {
                 var o = TcHandles.GetObject(hMemPack);
                 if (o != null) {
@@ -457,14 +494,21 @@ namespace WcxWrapper {
 
         [UnmanagedCallersOnly(EntryPoint = "CanYouHandleThisFile")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool CanYouHandleThisFile([MarshalAs(UnmanagedType.LPStr)] string fileName)
+        public static bool CanYouHandleThisFile(IntPtr fileNamePtr)
         {
-            return CanYouHandleThisFileW(fileName);
+            var fileName = Marshal.PtrToStringAnsi(fileNamePtr)!;
+            return CanYouHandleThisFileInternal(fileName);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "CanYouHandleThisFileW")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static bool CanYouHandleThisFileW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
+        public static bool CanYouHandleThisFileW(IntPtr fileNamePtr)
+        {
+            var fileName = Marshal.PtrToStringUni(fileNamePtr)!;
+            return CanYouHandleThisFileInternal(fileName);
+        }
+
+        private static bool CanYouHandleThisFileInternal(string fileName)
         {
             var result = false;
             _callSignature = $"CanYouHandleThisFile ({fileName})";
@@ -486,8 +530,10 @@ namespace WcxWrapper {
 
         // PackSetDefaultParams functionality is implemented here, not included to Packer Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "PackSetDefaultParams")]
-        public static void SetDefaultParams(ref PluginDefaultParams defParams)
+        public static void SetDefaultParams(IntPtr defParamsPtr)
         {
+            var defParams = Marshal.PtrToStructure<PluginDefaultParams>(defParamsPtr);
+
             _callSignature = "SetDefaultParams";
             try {
                 Plugin.DefaultParams = defParams;
@@ -505,8 +551,10 @@ namespace WcxWrapper {
 
         // PkSetCryptCallback & PkSetCryptCallbackW functionality is implemented here, not included to Packer Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "PkSetCryptCallback")]
-        public static void SetCryptCallback(PkCryptCallback cryptProc, int cryptNumber, int flags)
+        public static void SetCryptCallback(IntPtr cryptProcPtr, int cryptNumber, int flags)
         {
+            var cryptProc = Marshal.GetDelegateForFunctionPointer<PkCryptCallback>(cryptProcPtr);
+
             _callSignature = $"PkSetCryptCallback ({cryptNumber}, {flags})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, null, null, null, cryptProc, null);
@@ -522,8 +570,10 @@ namespace WcxWrapper {
         }
 
         [UnmanagedCallersOnly(EntryPoint = "PkSetCryptCallbackW")]
-        public static void SetCryptCallbackW(PkCryptCallbackW cryptProcW, int cryptNumber, int flags)
+        public static void SetCryptCallbackW(IntPtr cryptProcWPtr, int cryptNumber, int flags)
         {
+            var cryptProcW = Marshal.GetDelegateForFunctionPointer<PkCryptCallbackW>(cryptProcWPtr);
+
             _callSignature = $"PkSetCryptCallbackW ({cryptNumber}, {flags})";
             try {
                 TcCallback.SetPackerPluginCallbacks(null, null, null, null, null, cryptProcW);
@@ -573,7 +623,7 @@ namespace WcxWrapper {
             TcPluginLoader.ProcessException(_plugin, _callSignature, ex);
         }
 
-        private static void TraceCall(TraceLevel level, string result)
+        private static void TraceCall(TraceLevel level, string? result)
         {
             TcTrace.TraceCall(_plugin, level, _callSignature, result);
             _callSignature = null;

@@ -4,8 +4,9 @@ using Microsoft.CodeAnalysis;
 
 namespace TcBuildGenerator {
     public class TcHelper {
-        private static readonly Dictionary<string, PluginType> Plugins = new Dictionary<string, PluginType> {
-            {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem}
+        private static readonly Dictionary<string, PluginType> Plugins = new() {
+            {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem},
+            {"TcPluginBase.Packer.IPackerPlugin", PluginType.Packer},
         };
 
         public static bool IsPluginClass(INamedTypeSymbol clazz, out PluginType pluginType, out INamedTypeSymbol pluginInterface)

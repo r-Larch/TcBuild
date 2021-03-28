@@ -214,7 +214,7 @@ namespace TcPluginBase.Tools {
         private static PkCryptCallback? _pkCryptCallback;
         private static PkCryptCallbackW? _pkCryptCallbackW;
 
-        public static void SetPackerPluginCallbacks(ChangeVolCallback changeVol, ChangeVolCallbackW changeVolW, ProcessDataCallback processData, ProcessDataCallbackW processDataW, PkCryptCallback crypt, PkCryptCallbackW cryptW)
+        public static void SetPackerPluginCallbacks(ChangeVolCallback? changeVol, ChangeVolCallbackW? changeVolW, ProcessDataCallback? processData, ProcessDataCallbackW? processDataW, PkCryptCallback? crypt, PkCryptCallbackW? cryptW)
         {
             _changeVolCallback ??= changeVol;
             _changeVolCallbackW ??= changeVolW;
