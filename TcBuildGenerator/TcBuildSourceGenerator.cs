@@ -23,7 +23,7 @@ namespace TcBuildGenerator {
             var plugin = plugins.SingleOrDefault();
 
             if (plugin == null) {
-                //context.ReportDiagnostic(Diagnostic.Create(new DiagnosticDescriptor(), ));
+                context.ReportDiagnostic(Diagnostic.Create(Messages.NoPluginError, Location.None));
                 return;
             }
 
