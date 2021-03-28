@@ -91,17 +91,17 @@ namespace TcPluginBase.FileSystem {
 
         public static RemotePath operator +(RemotePath parentPath, RemotePath subPath)
         {
-            return new RemotePath(parentPath.PathWithoutTrailingSlash + subPath.Path);
+            return new(parentPath.PathWithoutTrailingSlash + subPath.Path);
         }
 
         public static RemotePath operator +(RemotePath path, string segment)
         {
-            return new RemotePath(path.Path + segment);
+            return new(path.Path + segment);
         }
 
         public static RemotePath operator +(string parentPath, RemotePath subPath)
         {
-            return new RemotePath(parentPath + subPath.Path);
+            return new(parentPath + subPath.Path);
         }
 
 
@@ -112,7 +112,7 @@ namespace TcPluginBase.FileSystem {
 
         public static implicit operator RemotePath(string? path)
         {
-            return new RemotePath(path);
+            return new(path);
         }
 
         public override string ToString()

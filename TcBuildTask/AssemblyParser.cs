@@ -103,10 +103,10 @@ namespace TcBuild {
 
 
         private readonly struct KnownType {
-            public static readonly KnownType Unknown = new KnownType("Unknown");
-            public static readonly KnownType String = new KnownType("String");
-            public static readonly KnownType SystemTypeArray = new KnownType("SystemTypeArray");
-            public static readonly KnownType SystemType = new KnownType("SystemType");
+            public static readonly KnownType Unknown = new("Unknown");
+            public static readonly KnownType String = new("String");
+            public static readonly KnownType SystemTypeArray = new("SystemTypeArray");
+            public static readonly KnownType SystemType = new("SystemType");
 
             private readonly string _value;
             public KnownType(string value) => _value = value;
@@ -162,7 +162,7 @@ namespace TcBuild {
 
             public KnownType GetTypeFromSerializedName(string name)
             {
-                return new KnownType(name);
+                return new(name);
             }
 
             public PrimitiveTypeCode GetUnderlyingEnumType(KnownType type)

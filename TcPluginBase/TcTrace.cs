@@ -16,7 +16,7 @@ namespace TcPluginBase {
             //});
         }
 
-        private static readonly TraceSwitch TcPluginTraceSwitch = new TraceSwitch("DotNetPlugins", "All .NET plugins", "Warning");
+        private static readonly TraceSwitch TcPluginTraceSwitch = new("DotNetPlugins", "All .NET plugins", "Warning");
 
         public static void TraceOut(TraceLevel level, string text, string? category)
         {

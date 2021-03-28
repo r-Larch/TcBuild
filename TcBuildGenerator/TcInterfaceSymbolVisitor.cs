@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 namespace TcBuildGenerator {
     public class TcInterfaceSymbolVisitor : SymbolVisitor {
         private readonly Action<Diagnostic> _errorSink;
-        public List<PluginDefinition> Definitions = new List<PluginDefinition>();
+        public List<PluginDefinition> Definitions = new();
 
         public TcInterfaceSymbolVisitor(Action<Diagnostic> errorSink)
         {

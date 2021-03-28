@@ -20,7 +20,7 @@ namespace TcPluginBase {
         public const int WM_KEYDOWN = 0x100;
         public const int GWL_STYLE = -16;
         public const int WS_CHILD = 0x40000000;
-        public static readonly IntPtr INVALID_HANDLE = new IntPtr(-1);
+        public static readonly IntPtr INVALID_HANDLE = new(-1);
 
         [DllImport("user32.dll")]
         public static extern Int32 PostMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);

@@ -20,7 +20,7 @@ namespace TcPluginBase.Lister {
 
         #region Keyboard Handler
 
-        private static readonly List<Key> SentToParentKeys = new List<Key>() {
+        private static readonly List<Key> SentToParentKeys = new() {
             Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, // Options.Mode
             Key.N, Key.P,
             Key.A, Key.S, Key.V, Key.W, // Options.Text
@@ -28,7 +28,7 @@ namespace TcPluginBase.Lister {
             Key.F2, Key.F5, Key.F7
         };
 
-        private static readonly List<Key> SentToParentCtrlKeys = new List<Key>() {
+        private static readonly List<Key> SentToParentCtrlKeys = new() {
             Key.P //, Key.A, Key.C,
         };
 

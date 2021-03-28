@@ -5,7 +5,7 @@ namespace TcBuildGenerator {
     public static class TcInfos {
         public const string TcPluginDefinitionAttribute = "TcPluginDefinitionAttribute";
 
-        public static readonly Dictionary<PluginType, string> PluginExtensions = new Dictionary<PluginType, string> {
+        public static readonly Dictionary<PluginType, string> PluginExtensions = new() {
             {PluginType.Content, "wdx"},
             {PluginType.FileSystem, "wfx"},
             {PluginType.Lister, "wlx"},

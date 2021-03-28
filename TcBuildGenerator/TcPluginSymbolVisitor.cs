@@ -7,8 +7,8 @@ using Microsoft.CodeAnalysis;
 namespace TcBuildGenerator {
     public class TcPluginSymbolVisitor : SymbolVisitor {
         private readonly Action<Diagnostic> _errorSink;
-        public List<PluginData> Plugins = new List<PluginData>();
-        public Dictionary<PluginType, PluginDefinition> Definitions = new Dictionary<PluginType, PluginDefinition>();
+        public List<PluginData> Plugins = new();
+        public Dictionary<PluginType, PluginDefinition> Definitions = new();
 
         public TcPluginSymbolVisitor(Action<Diagnostic> errorSink)
         {

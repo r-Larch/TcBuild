@@ -23,9 +23,9 @@ namespace TcPluginBase {
     // Some TC plugin methods return handles as pointers to internal plugin structures.
     // This class contains methods for TC plugin Handle management.
     public static class TcHandles {
-        private static readonly Dictionary<IntPtr, RefCountObject> HandleDictionary = new Dictionary<IntPtr, RefCountObject>();
+        private static readonly Dictionary<IntPtr, RefCountObject> HandleDictionary = new();
         private static int _lastHandle;
-        private static readonly object HandleSyncObj = new object();
+        private static readonly object HandleSyncObj = new();
 
         public static IntPtr AddHandle(object obj)
         {

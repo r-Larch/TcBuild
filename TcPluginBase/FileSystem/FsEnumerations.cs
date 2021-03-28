@@ -43,13 +43,13 @@ namespace TcPluginBase.FileSystem {
     /// <summary> Used as result type for ExecuteOpen, ExecuteProperties, and ExecuteCommand methods </summary>
     public struct ExecResult {
         /// <summary> Command was executed successfully, no further action is needed. </summary>
-        public static ExecResult Ok => new ExecResult(ExecEnum.Ok);
+        public static ExecResult Ok => new(ExecEnum.Ok);
 
         /// <summary> Execution failed. </summary>
-        public static ExecResult Error => new ExecResult(ExecEnum.Error);
+        public static ExecResult Error => new(ExecEnum.Error);
 
         /// <summary> Total Commander should download the file and execute it locally. </summary>
-        public static ExecResult Yourself => new ExecResult(ExecEnum.Yourself);
+        public static ExecResult Yourself => new(ExecEnum.Yourself);
 
         /// <summary>
         /// It was a (symbolic) link or .lnk file pointing to another file or directory.
@@ -58,7 +58,7 @@ namespace TcPluginBase.FileSystem {
         /// The maximum allowed length of such a path is MAX_PATH-1 = 259 characters!
         /// </summary>
         /// <param name="symlinkTarget">The file or directory where the symlink points to.</param>
-        public static ExecResult SymLink(string symlinkTarget) => new ExecResult(ExecEnum.SymLink, symlinkTarget);
+        public static ExecResult SymLink(string symlinkTarget) => new(ExecEnum.SymLink, symlinkTarget);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public ExecEnum Type;
@@ -95,7 +95,7 @@ namespace TcPluginBase.FileSystem {
     /// <summary> Used as result type for ExtractCustomIcon method </summary>
     public struct ExtractIconResult {
         /// <summary> No icon is returned. Total Commander should show the default icon for this file type. </summary>
-        public static ExtractIconResult UseDefault => new ExtractIconResult {Value = ExtractIconEnum.UseDefault};
+        public static ExtractIconResult UseDefault => new() {Value = ExtractIconEnum.UseDefault};
 
         /// <summary>
         /// This return value is only valid if <see cref="ExtractIconFlags.Background"/> was NOT set. It tells the calling app to show a default icon, and request the true icon in a background thread. See remarks.
@@ -107,21 +107,21 @@ namespace TcPluginBase.FileSystem {
         /// the drive icons are returned immediately (because they are stored in the plugin itself), but the EXE icons are loaded with a delay.
         /// If the user turns off background loading of icons, the function will be called in the foreground with the <see cref="ExtractIconFlags.Background"/> flag.
         /// </remarks>
-        public static ExtractIconResult Delayed => new ExtractIconResult {Value = ExtractIconEnum.Delayed};
+        public static ExtractIconResult Delayed => new() {Value = ExtractIconEnum.Delayed};
 
         /// <summary>
         /// The icon must NOT be freed by Total Commander, e.g. because it was loaded with LoadIcon, or the DLL handles destruction of the icon.
         /// </summary>
         /// <param name="icon"></param>
         /// <param name="iconName">Name of the icon. Total Commander can use this to cache the icon</param>
-        public static ExtractIconResult Extracted(Icon icon, string? iconName = null) => new ExtractIconResult {Value = ExtractIconEnum.Extracted, Icon = icon, IconName = iconName};
+        public static ExtractIconResult Extracted(Icon icon, string? iconName = null) => new() {Value = ExtractIconEnum.Extracted, Icon = icon, IconName = iconName};
 
         /// <summary>
         /// The icon MUST be destroyed by Total Commander, e.g. because it was created with CreateIcon(), or extracted with ExtractIconEx().
         /// </summary>
         /// <param name="icon"></param>
         /// <param name="iconName">Name of the icon. Total Commander can use this to cache the icon</param>
-        public static ExtractIconResult ExtractedDestroy(Icon icon, string? iconName = null) => new ExtractIconResult {Value = ExtractIconEnum.ExtractedDestroy, Icon = icon, IconName = iconName};
+        public static ExtractIconResult ExtractedDestroy(Icon icon, string? iconName = null) => new() {Value = ExtractIconEnum.ExtractedDestroy, Icon = icon, IconName = iconName};
 
         /// <summary>
         /// This attempts to load the Icon from the specified filePath.
@@ -185,24 +185,24 @@ namespace TcPluginBase.FileSystem {
         }
 
         /// <summary> The file was copied OK, but name or extension has changed. </summary>
-        public static GetFileResult OkNameChanged(string newFileName) => new GetFileResult(FileSystemExitCode.OK, newFileName);
+        public static GetFileResult OkNameChanged(string newFileName) => new(FileSystemExitCode.OK, newFileName);
 
         /// <summary> The file was copied OK. </summary>
-        public static GetFileResult Ok => new GetFileResult(FileSystemExitCode.OK);
+        public static GetFileResult Ok => new(FileSystemExitCode.OK);
         /// <summary> The target file already exists, and resume is not supported. </summary>
-        public static GetFileResult FileExists => new GetFileResult(FileSystemExitCode.FileExists);
+        public static GetFileResult FileExists => new(FileSystemExitCode.FileExists);
         /// <summary> The source file couldn't be found or opened. </summary>
-        public static GetFileResult FileNotFound => new GetFileResult(FileSystemExitCode.FileNotFound);
+        public static GetFileResult FileNotFound => new(FileSystemExitCode.FileNotFound);
         /// <summary> There was an error reading from the source file. </summary>
-        public static GetFileResult ReadError => new GetFileResult(FileSystemExitCode.ReadError);
+        public static GetFileResult ReadError => new(FileSystemExitCode.ReadError);
         /// <summary> There was an error writing to the target file, e.g. disk full. </summary>
-        public static GetFileResult WriteError => new GetFileResult(FileSystemExitCode.WriteError);
+        public static GetFileResult WriteError => new(FileSystemExitCode.WriteError);
         /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
-        public static GetFileResult UserAbort => new GetFileResult(FileSystemExitCode.UserAbort);
+        public static GetFileResult UserAbort => new(FileSystemExitCode.UserAbort);
         /// <summary> The operation is not supported (e.g. resume). </summary>
-        public static GetFileResult NotSupported => new GetFileResult(FileSystemExitCode.NotSupported);
+        public static GetFileResult NotSupported => new(FileSystemExitCode.NotSupported);
         /// <summary> The target file already exists, and resume is supported. </summary>
-        public static GetFileResult ExistsResumeAllowed => new GetFileResult(FileSystemExitCode.ExistsResumeAllowed);
+        public static GetFileResult ExistsResumeAllowed => new(FileSystemExitCode.ExistsResumeAllowed);
     }
 
     public readonly struct PutFileResult {
@@ -218,24 +218,24 @@ namespace TcPluginBase.FileSystem {
         }
 
         /// <summary> The file was copied OK, but name or extension has changed. </summary>
-        public static PutFileResult OkNameChanged(string newFileName) => new PutFileResult(FileSystemExitCode.OK, newFileName);
+        public static PutFileResult OkNameChanged(string newFileName) => new(FileSystemExitCode.OK, newFileName);
 
         /// <summary> The file was copied OK. </summary>
-        public static PutFileResult Ok => new PutFileResult(FileSystemExitCode.OK);
+        public static PutFileResult Ok => new(FileSystemExitCode.OK);
         /// <summary> The target file already exists, and resume is not supported. </summary>
-        public static PutFileResult FileExists => new PutFileResult(FileSystemExitCode.FileExists);
+        public static PutFileResult FileExists => new(FileSystemExitCode.FileExists);
         /// <summary> The source file couldn't be found or opened. </summary>
-        public static PutFileResult FileNotFound => new PutFileResult(FileSystemExitCode.FileNotFound);
+        public static PutFileResult FileNotFound => new(FileSystemExitCode.FileNotFound);
         /// <summary> There was an error reading from the source file. </summary>
-        public static PutFileResult ReadError => new PutFileResult(FileSystemExitCode.ReadError);
+        public static PutFileResult ReadError => new(FileSystemExitCode.ReadError);
         /// <summary> There was an error writing to the target file, e.g. disk full. </summary>
-        public static PutFileResult WriteError => new PutFileResult(FileSystemExitCode.WriteError);
+        public static PutFileResult WriteError => new(FileSystemExitCode.WriteError);
         /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
-        public static PutFileResult UserAbort => new PutFileResult(FileSystemExitCode.UserAbort);
+        public static PutFileResult UserAbort => new(FileSystemExitCode.UserAbort);
         /// <summary> The operation is not supported (e.g. resume). </summary>
-        public static PutFileResult NotSupported => new PutFileResult(FileSystemExitCode.NotSupported);
+        public static PutFileResult NotSupported => new(FileSystemExitCode.NotSupported);
         /// <summary> The target file already exists, and resume is supported. </summary>
-        public static PutFileResult ExistsResumeAllowed => new PutFileResult(FileSystemExitCode.ExistsResumeAllowed);
+        public static PutFileResult ExistsResumeAllowed => new(FileSystemExitCode.ExistsResumeAllowed);
     }
 
     public readonly struct RenMovFileResult {
@@ -245,19 +245,19 @@ namespace TcPluginBase.FileSystem {
         public RenMovFileResult(FileSystemExitCode code) => Code = code;
 
         /// <summary> The file was copied/moved OK. </summary>
-        public static RenMovFileResult Ok => new RenMovFileResult(FileSystemExitCode.OK);
+        public static RenMovFileResult Ok => new(FileSystemExitCode.OK);
         /// <summary> The target file already exists, and resume is not supported. </summary>
-        public static RenMovFileResult FileExists => new RenMovFileResult(FileSystemExitCode.FileExists);
+        public static RenMovFileResult FileExists => new(FileSystemExitCode.FileExists);
         /// <summary> The source file couldn't be found or opened. </summary>
-        public static RenMovFileResult FileNotFound => new RenMovFileResult(FileSystemExitCode.FileNotFound);
+        public static RenMovFileResult FileNotFound => new(FileSystemExitCode.FileNotFound);
         /// <summary> There was an error reading from the source file. </summary>
-        public static RenMovFileResult ReadError => new RenMovFileResult(FileSystemExitCode.ReadError);
+        public static RenMovFileResult ReadError => new(FileSystemExitCode.ReadError);
         /// <summary> There was an error writing to the target file, e.g. disk full. </summary>
-        public static RenMovFileResult WriteError => new RenMovFileResult(FileSystemExitCode.WriteError);
+        public static RenMovFileResult WriteError => new(FileSystemExitCode.WriteError);
         /// <summary> Copying was aborted by the user (through ProgressProc). </summary>
-        public static RenMovFileResult UserAbort => new RenMovFileResult(FileSystemExitCode.UserAbort);
+        public static RenMovFileResult UserAbort => new(FileSystemExitCode.UserAbort);
         /// <summary> The operation is not supported (e.g. resume). </summary>
-        public static RenMovFileResult NotSupported => new RenMovFileResult(FileSystemExitCode.NotSupported);
+        public static RenMovFileResult NotSupported => new(FileSystemExitCode.NotSupported);
     }
 
     /// <summary> Used as result type for <see cref="FsPlugin.GetFile"/>, <see cref="FsPlugin.PutFile"/> and <see cref="FsPlugin.RenMovFile"/> methods </summary>
@@ -302,13 +302,13 @@ namespace TcPluginBase.FileSystem {
     /// <summary> Used as result type for <see cref="FsPlugin.GetPreviewBitmap"/> method </summary>
     public struct PreviewBitmapResult {
         /// <summary> There is no preview bitmap. </summary>
-        public static PreviewBitmapResult None => new PreviewBitmapResult {Value = PreviewBitmapEnum.None};
+        public static PreviewBitmapResult None => new() {Value = PreviewBitmapEnum.None};
 
         /// <summary> The image was extracted and is returned </summary>
         /// <param name="bitmap"></param>
         /// <param name="bitmapName">Name of the bitmap. Total Commander can use this to cache the bitmap</param>
         /// <param name="cache">false to NOT cache the image</param>
-        public static PreviewBitmapResult Extracted(Bitmap bitmap, string? bitmapName = null, bool cache = true) => new PreviewBitmapResult {
+        public static PreviewBitmapResult Extracted(Bitmap bitmap, string? bitmapName = null, bool cache = true) => new() {
             Value = PreviewBitmapEnum.Extracted,
             Bitmap = bitmap ?? throw new ArgumentNullException(nameof(bitmap)),
             BitmapName = bitmapName,
@@ -320,7 +320,7 @@ namespace TcPluginBase.FileSystem {
         /// <param name="cache">false to NOT cache the image</param>
         public static PreviewBitmapResult ExtractYourself(string bitmapPath, bool cache = true)
         {
-            return new PreviewBitmapResult {Value = PreviewBitmapEnum.ExtractYourself, BitmapName = bitmapPath, Cache = cache};
+            return new() {Value = PreviewBitmapEnum.ExtractYourself, BitmapName = bitmapPath, Cache = cache};
         }
 
         /// <summary>
@@ -331,7 +331,7 @@ namespace TcPluginBase.FileSystem {
         /// </summary>
         /// <param name="temporaryImageFile"></param>
         /// <param name="cache">false to NOT cache the image</param>
-        public static PreviewBitmapResult ExtractYourselfAndDelete(string temporaryImageFile, bool cache = true) => new PreviewBitmapResult {Value = PreviewBitmapEnum.ExtractYourselfAndDelete, BitmapName = temporaryImageFile, Cache = cache};
+        public static PreviewBitmapResult ExtractYourselfAndDelete(string temporaryImageFile, bool cache = true) => new() {Value = PreviewBitmapEnum.ExtractYourselfAndDelete, BitmapName = temporaryImageFile, Cache = cache};
 
 
         [EditorBrowsable(EditorBrowsableState.Never)]
