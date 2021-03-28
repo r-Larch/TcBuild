@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DNNE" Version="1.0.17" PrivateAssets="None" ExcludeAssets="Build" />
+    <PackageReference Include="DNNE" Version="1.0.19" PrivateAssets="None" ExcludeAssets="Build" />
     <PackageReference Include="System.Reflection.MetadataLoadContext" Version="5.0.0" PrivateAssets="All" GeneratePathProperty="true" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.0-beta-20204-02" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" PrivateAssets="All" />
