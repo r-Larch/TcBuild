@@ -1,24 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 // Integration with WinForms
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 // WPF
 using System.Windows.Input;
-using WPFUserControl = System.Windows.Controls.UserControl;
 
 
 namespace TcPluginBase.Lister {
-    public class WpfListerHandlerBuilder : IListerHandlerBuilder {
-        private readonly ListerPlugin _plugin;
+    public class WpfLister : ILister {
+        public UIElement Control { get; } // or better WPFUserControl
         private ElementHost? _elementHost;
 
-        public WpfListerHandlerBuilder(ListerPlugin plugin)
+        public ParentWindow Parent { get; }
+
+        private IntPtr? _handle;
+        public IntPtr Handle => _handle ??= GetHandle();
+
+        public WpfLister(ParentWindow parent, UIElement control)
         {
-            _plugin = plugin;
+            Control = control;
+            Parent = parent;
         }
 
-        #region Keyboard Handler
+
+        private IntPtr GetHandle()
+        {
+            _elementHost = new ElementHost {
+                Dock = DockStyle.Fill,
+                Child = Control
+            };
+            Control.KeyDown += wpfControl_KeyDown;
+            _elementHost.Focus();
+            Control.Focus();
+            return _elementHost.Handle;
+        }
+
 
         private static readonly List<Key> SentToParentKeys = new() {
             Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, // Options.Mode
@@ -36,42 +54,20 @@ namespace TcPluginBase.Lister {
         private void wpfControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Escape) {
-                _plugin.CloseParentWindow();
+                Parent.CloseParentWindow();
                 e.Handled = true;
             }
             else if (SentToParentCtrlKeys.Contains(e.Key)
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Control) != 0
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Alt) == 0) {
-                int code = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key) | (int) Keys.Control;
-                _plugin.SendKeyToParentWindow(code);
+                var code = System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key) | (int) Keys.Control;
+                Parent.SendKeyToParentWindow(code);
             }
             else if (SentToParentKeys.Contains(e.Key)
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Control) == 0
                      && (e.KeyboardDevice.Modifiers & System.Windows.Input.ModifierKeys.Alt) == 0) {
-                _plugin.SendKeyToParentWindow(System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key));
+                Parent.SendKeyToParentWindow(System.Windows.Input.KeyInterop.VirtualKeyFromKey(e.Key));
             }
-        }
-
-        #endregion Keyboard Handler
-
-        public IntPtr GetHandle(object listerControl, IntPtr parentHandle)
-        {
-            if (listerControl != null) {
-                if (listerControl is WPFUserControl wpfControl) {
-                    _elementHost = new ElementHost {
-                        Dock = DockStyle.Fill,
-                        Child = wpfControl
-                    };
-                    wpfControl.KeyDown += wpfControl_KeyDown;
-                    _elementHost.Focus();
-                    wpfControl.Focus();
-                    return _elementHost.Handle;
-                }
-
-                throw new Exception("Unexpected WPF control type: " + listerControl.GetType());
-            }
-
-            return IntPtr.Zero;
         }
     }
 }

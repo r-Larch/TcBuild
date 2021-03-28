@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 
 
@@ -6,35 +7,35 @@ namespace TcPluginBase.Lister {
         #region Mandatory Methods
 
         [TcMethod("ListLoad", "ListLoadW", Mandatory = true)]
-        object Load(string fileToLoad, ShowFlags showFlags);
+        ILister? Load(ParentWindow parent, string fileToLoad, ShowFlags showFlags);
 
         #endregion Mandatory Methods
 
         #region Optional Methods
 
         [TcMethod("ListLoadNext", "ListLoadNextW")]
-        ListerResult LoadNext(object control, string fileToLoad, ShowFlags showFlags);
+        ListerResult LoadNext(ILister lister, string fileToLoad, ShowFlags showFlags);
 
         [TcMethod("ListCloseWindow")]
-        void CloseWindow(object control);
+        void CloseWindow(ILister lister);
 
         [TcMethod("ListSearchText", "ListSearchTextW")]
-        ListerResult SearchText(object control, string searchString, SearchParameter searchParameter);
+        ListerResult SearchText(ILister lister, string searchString, SearchParameter searchParameter);
+
+        [TcMethod("ListSearchDialog")]
+        ListerResult SearchDialog(ILister lister, bool findNext);
 
         [TcMethod("ListSendCommand")]
-        ListerResult SendCommand(object control, ListerCommand command, ShowFlags parameter);
+        ListerResult SendCommand(ILister lister, ListerCommand command, ShowFlags parameter);
 
         [TcMethod("ListPrint", "ListPrintW")]
-        ListerResult Print(object control, string fileToPrint, string defPrinter, PrintFlags printFlags, PrintMargins margins);
+        ListerResult Print(ILister lister, string fileToPrint, string defPrinter, PrintFlags printFlags, PrintMargins margins);
 
         [TcMethod("ListNotificationReceived")]
-        int NotificationReceived(object control, int message, int wParam, int lParam);
+        int NotificationReceived(ILister lister, int message, int wParam, int lParam);
 
         [TcMethod("ListGetPreviewBitmap", "ListGetPreviewBitmapW")]
         Bitmap? GetPreviewBitmap(string fileToLoad, int width, int height, byte[] contentBuf);
-
-        [TcMethod("ListSearchDialog")]
-        ListerResult SearchDialog(object control, bool findNext);
 
         #endregion Optional Methods
     }

@@ -9,30 +9,9 @@ using TcPluginBase.Tools;
 
 namespace WlxWrapper {
     public class ListerWrapper {
-        private static string _callSignature;
-        private static ListerPlugin _plugin;
+        private static string? _callSignature;
+        private static ListerPlugin? _plugin;
         private static ListerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ListerPlugin>(typeof(PluginClassPlaceholder));
-
-
-        private static IListerHandlerBuilder ListerHandlerBuilder => GetListerHandlerBuilder(Plugin);
-
-        private static IListerHandlerBuilder GetListerHandlerBuilder(ListerPlugin listerPlugin)
-        {
-            try {
-                var guiType = listerPlugin.GuiType;
-                if (guiType == GuiType.WinForms) {
-                    return new FormsListerHandlerBuilder(listerPlugin);
-                }
-                else {
-                    return new WpfListerHandlerBuilder(listerPlugin);
-                }
-            }
-            catch {
-                // ignored
-            }
-
-            return null;
-        }
 
 
         private ListerWrapper()
@@ -40,67 +19,72 @@ namespace WlxWrapper {
         }
 
 
-        #region Lister Plugin Exported Functions
-
-        #region Mandatory Methods
-
         #region ListLoad
 
         [UnmanagedCallersOnly(EntryPoint = "ListLoad")]
-        public static IntPtr Load(IntPtr parentWin, [MarshalAs(UnmanagedType.LPStr)] string fileToLoad, int flags)
+        public static IntPtr Load(IntPtr parentWin, IntPtr fileToLoadPtr, int flags)
         {
-            return LoadW(parentWin, fileToLoad, flags);
+            var fileToLoad = Marshal.PtrToStringAnsi(fileToLoadPtr)!;
+            return LoadInternal(parentWin, fileToLoad, flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ListLoadW")]
-        public static IntPtr LoadW(IntPtr parentWin, [MarshalAs(UnmanagedType.LPWStr)] string fileToLoad, int flags)
+        public static IntPtr LoadW(IntPtr parentWin, IntPtr fileToLoadPtr, int flags)
         {
-            var listerHandle = IntPtr.Zero;
+            var fileToLoad = Marshal.PtrToStringUni(fileToLoadPtr)!;
+            return LoadInternal(parentWin, fileToLoad, flags);
+        }
+
+        private static IntPtr LoadInternal(IntPtr parentWin, string fileToLoad, int flags)
+        {
+            var handle = IntPtr.Zero;
             var showFlags = (ShowFlags) flags;
             _callSignature = $"Load ({fileToLoad}, {showFlags.ToString()})";
             try {
-                var listerControl = Plugin.Load(fileToLoad, showFlags);
-                listerHandle = ListerHandlerBuilder.GetHandle(listerControl, parentWin);
-                if (listerHandle != IntPtr.Zero) {
-                    Plugin.ListerHandle = listerHandle;
-                    Plugin.ParentHandle = parentWin;
-                    long windowState = NativeMethods.GetWindowLong(parentWin, NativeMethods.GWL_STYLE);
-                    Plugin.IsQuickView = (windowState & NativeMethods.WS_CHILD) != 0;
-                    TcHandles.AddHandle(listerHandle, listerControl);
-                    NativeMethods.SetParent(listerHandle, parentWin);
+                var parent = new ParentWindow(parentWin) {WriteTrace = Plugin.WriteTrace};
+                var lister = Plugin.Load(parent, fileToLoad, showFlags);
+                if (lister != null) {
+                    handle = lister.Handle;
+                    if (handle != IntPtr.Zero) {
+                        parent.SetLister(handle);
+                        TcHandles.AddHandle(handle, lister);
+                    }
                 }
 
-                TraceCall(TraceLevel.Warning, listerHandle.ToString());
+                TraceCall(TraceLevel.Warning, handle.ToString());
             }
             catch (Exception ex) {
                 ProcessException(ex);
             }
 
-            return listerHandle;
+            return handle;
         }
 
         #endregion ListLoad
 
-        #endregion Mandatory Methods
-
-        #region Optional Methods
-
         #region ListLoadNext
 
         [UnmanagedCallersOnly(EntryPoint = "ListLoadNext")]
-        public static int LoadNext(IntPtr parentWin, IntPtr listWin, [MarshalAs(UnmanagedType.LPStr)] string fileToLoad, int flags)
+        public static int LoadNext(IntPtr parentWin, IntPtr listWin, IntPtr fileToLoadPtr, int flags)
         {
-            return LoadNextW(parentWin, listWin, fileToLoad, flags);
+            var fileToLoad = Marshal.PtrToStringAnsi(fileToLoadPtr)!;
+            return LoadNextInternal(parentWin, listWin, fileToLoad, flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ListLoadNextW")]
-        public static int LoadNextW(IntPtr parentWin, IntPtr listWin, [MarshalAs(UnmanagedType.LPWStr)] string fileToLoad, int flags)
+        public static int LoadNextW(IntPtr parentWin, IntPtr listWin, IntPtr fileToLoadPtr, int flags)
+        {
+            var fileToLoad = Marshal.PtrToStringUni(fileToLoadPtr)!;
+            return LoadNextInternal(parentWin, listWin, fileToLoad, flags);
+        }
+
+        private static int LoadNextInternal(IntPtr parentWin, IntPtr listWin, string fileToLoad, int flags)
         {
             var result = ListerResult.Error;
             var showFlags = (ShowFlags) flags;
             _callSignature = $"LoadNext ({listWin.ToString()}, {fileToLoad}, {showFlags.ToString()})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 result = Plugin.LoadNext(listerControl, fileToLoad, showFlags);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Warning, result.ToString());
@@ -121,7 +105,7 @@ namespace WlxWrapper {
         {
             _callSignature = $"CloseWindow ({listWin.ToString()})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 Plugin.CloseWindow(listerControl);
                 var count = TcHandles.RemoveHandle(listWin);
                 NativeMethods.DestroyWindow(listWin);
@@ -142,8 +126,8 @@ namespace WlxWrapper {
         {
             _callSignature = "GetDetectString";
             try {
-                TcUtils.WriteStringAnsi(Plugin.DetectString, detectString, maxLen);
-                TraceCall(TraceLevel.Warning, Plugin.DetectString);
+                TcUtils.WriteStringAnsi(Plugin.CanHandle?.Value, detectString, maxLen);
+                TraceCall(TraceLevel.Warning, Plugin.CanHandle?.Value);
             }
             catch (Exception ex) {
                 ProcessException(ex);
@@ -155,19 +139,26 @@ namespace WlxWrapper {
         #region ListSearchText
 
         [UnmanagedCallersOnly(EntryPoint = "ListSearchText")]
-        public static int SearchText(IntPtr listWin, [MarshalAs(UnmanagedType.LPStr)] string searchString, int searchParameter)
+        public static int SearchText(IntPtr listWin, IntPtr searchStringPtr, int searchParameter)
         {
-            return SearchTextW(listWin, searchString, searchParameter);
+            var searchString = Marshal.PtrToStringAnsi(searchStringPtr)!;
+            return SearchTextInternal(listWin, searchString, searchParameter);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ListSearchTextW")]
-        public static int SearchTextW(IntPtr listWin, [MarshalAs(UnmanagedType.LPWStr)] string searchString, int searchParameter)
+        public static int SearchTextW(IntPtr listWin, IntPtr searchStringPtr, int searchParameter)
+        {
+            var searchString = Marshal.PtrToStringUni(searchStringPtr)!;
+            return SearchTextInternal(listWin, searchString, searchParameter);
+        }
+
+        private static int SearchTextInternal(IntPtr listWin, string searchString, int searchParameter)
         {
             var result = ListerResult.Error;
             var sp = (SearchParameter) searchParameter;
             _callSignature = $"SearchText ({listWin.ToString()}, {searchString}, {sp.ToString()})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 result = Plugin.SearchText(listerControl, searchString, sp);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Warning, result.ToString());
@@ -191,7 +182,7 @@ namespace WlxWrapper {
             var par = (ShowFlags) parameter;
             _callSignature = $"SendCommand ({listWin.ToString()}, {cmd.ToString()}, {par.ToString()})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 result = Plugin.SendCommand(listerControl, cmd, par);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Info, result.ToString());
@@ -208,19 +199,28 @@ namespace WlxWrapper {
         #region ListPrint
 
         [UnmanagedCallersOnly(EntryPoint = "ListPrint")]
-        public static int Print(IntPtr listWin, [MarshalAs(UnmanagedType.LPStr)] string fileToPrint, [MarshalAs(UnmanagedType.LPStr)] string defPrinter, int flags, PrintMargins margins)
+        public static int Print(IntPtr listWin, IntPtr fileToPrintPtr, IntPtr defPrinterPtr, int flags, PrintMargins margins)
         {
-            return PrintW(listWin, fileToPrint, defPrinter, flags, margins);
+            var fileToPrint = Marshal.PtrToStringAnsi(fileToPrintPtr)!;
+            var defPrinter = Marshal.PtrToStringAnsi(defPrinterPtr)!;
+            return PrintInternal(listWin, fileToPrint, defPrinter, flags, margins);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ListPrintW")]
-        public static int PrintW(IntPtr listWin, [MarshalAs(UnmanagedType.LPWStr)] string fileToPrint, [MarshalAs(UnmanagedType.LPWStr)] string defPrinter, int flags, PrintMargins margins)
+        public static int PrintW(IntPtr listWin, IntPtr fileToPrintPtr, IntPtr defPrinterPtr, int flags, PrintMargins margins)
+        {
+            var fileToPrint = Marshal.PtrToStringUni(fileToPrintPtr)!;
+            var defPrinter = Marshal.PtrToStringUni(defPrinterPtr)!;
+            return PrintInternal(listWin, fileToPrint, defPrinter, flags, margins);
+        }
+
+        private static int PrintInternal(IntPtr listWin, string fileToPrint, string defPrinter, int flags, PrintMargins margins)
         {
             var result = ListerResult.Error;
             var printFlags = (PrintFlags) flags;
             _callSignature = $"Print ({listWin.ToString()}, {fileToPrint}, {defPrinter}, {printFlags.ToString()})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 result = Plugin.Print(listerControl, fileToPrint, defPrinter, printFlags, margins);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Warning, result.ToString());
@@ -242,7 +242,7 @@ namespace WlxWrapper {
             var result = 0;
             _callSignature = $"NotificationReceived ({listWin.ToString()}, {message}, {wParam}, {lParam})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 result = Plugin.NotificationReceived(listerControl, message, wParam, lParam);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Info, result.ToString(CultureInfo.InvariantCulture));
@@ -260,8 +260,10 @@ namespace WlxWrapper {
 
         // ListSetDefaultParams functionality is implemented here, not included to Lister Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "ListSetDefaultParams")]
-        public static void SetDefaultParams(ref PluginDefaultParams defParams)
+        public static void SetDefaultParams(IntPtr defParamsPtr)
         {
+            var defParams = Marshal.PtrToStructure<PluginDefaultParams>(defParamsPtr);
+
             _callSignature = "SetDefaultParams";
             try {
                 Plugin.DefaultParams = defParams;
@@ -277,16 +279,18 @@ namespace WlxWrapper {
         #region ListGetPreviewBitmap
 
         [UnmanagedCallersOnly(EntryPoint = "ListGetPreviewBitmap")]
-        public static IntPtr GetPreviewBitmap([MarshalAs(UnmanagedType.LPStr)] string fileToLoad, int width, int height, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
-            byte[] contentBuf, int contentBufLen)
+        public static IntPtr GetPreviewBitmap(IntPtr fileToLoadPtr, int width, int height, IntPtr contentBufPtr, int contentBufLen)
         {
+            var fileToLoad = Marshal.PtrToStringAnsi(fileToLoadPtr)!;
+            var contentBuf = TcUtils.ReadByteArray(contentBufPtr, contentBufLen);
             return GetPreviewBitmapInternal(fileToLoad, width, height, contentBuf);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ListGetPreviewBitmapW")]
-        public static IntPtr GetPreviewBitmapW([MarshalAs(UnmanagedType.LPWStr)] string fileToLoad, int width, int height, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
-            byte[] contentBuf, int contentBufLen)
+        public static IntPtr GetPreviewBitmapW(IntPtr fileToLoadPtr, int width, int height, IntPtr contentBufPtr, int contentBufLen)
         {
+            var fileToLoad = Marshal.PtrToStringUni(fileToLoadPtr)!;
+            var contentBuf = TcUtils.ReadByteArray(contentBufPtr, contentBufLen);
             return GetPreviewBitmapInternal(fileToLoad, width, height, contentBuf);
         }
 
@@ -296,7 +300,13 @@ namespace WlxWrapper {
             _callSignature = $"GetPreviewBitmap '{fileToLoad}' ({width} x {height})";
             try {
                 var bitmap = Plugin.GetPreviewBitmap(fileToLoad, width, height, contentBuf);
-                result = bitmap.GetHbitmap(Plugin.BitmapBackgroundColor);
+                if (bitmap != null) {
+                    result = bitmap.GetHbitmap(Plugin.BitmapBackgroundColor);
+                }
+                else {
+                    result = IntPtr.Zero;
+                }
+
                 TraceCall(TraceLevel.Info, result.Equals(IntPtr.Zero) ? "OK" : "None");
             }
             catch (Exception ex) {
@@ -319,7 +329,7 @@ namespace WlxWrapper {
             var result = ListerResult.Error;
             _callSignature = $"SearchDialog ({listWin.ToString()}, {findNext})";
             try {
-                var listerControl = TcHandles.GetObject(listWin);
+                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
                 result = Plugin.SearchDialog(listerControl, findNext != 0);
                 TraceCall(TraceLevel.Info, result.ToString());
             }
@@ -332,23 +342,16 @@ namespace WlxWrapper {
 
         #endregion ListSearchDialog
 
-        #endregion Optional Methods
-
-        #endregion Lister Plugin Exported Functions
-
-        #region Tracing & Exceptions
 
         public static void ProcessException(Exception ex)
         {
             TcPluginLoader.ProcessException(_plugin, _callSignature, ex);
         }
 
-        public static void TraceCall(TraceLevel level, string result)
+        public static void TraceCall(TraceLevel level, string? result)
         {
             TcTrace.TraceCall(_plugin, level, _callSignature, result);
             _callSignature = null;
         }
-
-        #endregion Tracing & Exceptions
     }
 }

@@ -6,6 +6,7 @@ namespace TcBuildGenerator {
     public class TcHelper {
         private static readonly Dictionary<string, PluginType> Plugins = new() {
             {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem},
+            {"TcPluginBase.Lister.IListerPlugin", PluginType.Lister},
             {"TcPluginBase.Packer.IPackerPlugin", PluginType.Packer},
             {"TcPluginBase.QuickSearch.IQuickSearchPlugin", PluginType.QuickSearch},
         };

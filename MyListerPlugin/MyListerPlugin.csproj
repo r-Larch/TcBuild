@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <UseWpf>true</UseWpf>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DNNE" Version="1.0.19" />
+    <ProjectReference Include="..\TcBuildTask\TcBuildTask.csproj" />
+    <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" />
+    <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Import Project="..\TcBuildTask\build\TcBuild.targets" />
+
+</Project>

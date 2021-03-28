@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="..\WfxWrapper\FsWrapper.cs" Link="Wrapper\FsWrapper.cs" />
+    <EmbeddedResource Include="..\WlxWrapper\WlxWrapper.cs" Link="Wrapper\WlxWrapper.cs" />
     <EmbeddedResource Include="..\WcxWrapper\WcxWrapper.cs" Link="Wrapper\WcxWrapper.cs" />
     <EmbeddedResource Include="..\QSWrapper\QSWrapper.cs" Link="Wrapper\QSWrapper.cs" />
   </ItemGroup>
