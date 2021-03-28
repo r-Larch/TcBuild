@@ -114,7 +114,16 @@ namespace TcBuild {
             if (string.IsNullOrEmpty(desc)) {
                 // TC needs a description to show the install dialog!
                 _log.LogWarning("[plugininstall] description is empty! Using default description. (to change description add <Description>..</Description> tag to .csproj)");
-                desc = $"{Path.GetFileNameWithoutExtension(wrapperFile.Name)} is a File System Plugin for Total Commander";
+                desc = $"{Path.GetFileNameWithoutExtension(wrapperFile.Name)} is a {pluginType} Plugin for Total Commander";
+            }
+
+            // desc has a max length of 255!
+            if (desc.Length > 255) {
+                _log.LogWarning(
+                    "[plugininstall] plugin description may not exceed 255 characters. It got trimmed to fit! " +
+                    "To remove this warning adjust the text inside of <Description>..</Description> tag in .csproj)"
+                );
+                desc = desc.Substring(0, 255 - 3) + "...";
             }
 
             // https://www.ghisler.ch/wiki/index.php/Plugins_Automated_Installation
@@ -122,7 +131,7 @@ namespace TcBuild {
                 $"[plugininstall]",
                 $"type={TcInfos.PluginExtensions[pluginType]}",
                 $"file={wrapperFile.Name}",
-                $"description={desc}", // TODO desc max length 255
+                $"description={desc}",
                 $"defaultdir={Path.GetFileNameWithoutExtension(wrapperFile.Name)}",
                 $"version={version.FileVersion}"
             };
