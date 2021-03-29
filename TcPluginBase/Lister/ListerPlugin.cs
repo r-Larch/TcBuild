@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 
 namespace TcPluginBase.Lister {
-    public abstract class ListerPlugin : TcPlugin, IListerPlugin {
+    public abstract class ListerPlugin<TLister> : TcPlugin, IListerPlugin<TLister> where TLister : ILister {
         public Color BitmapBackgroundColor { get; set; }
 
         /// <summary>
@@ -36,45 +36,41 @@ namespace TcPluginBase.Lister {
         /// Example: A plugin with line numbers may only show the file as such when the user explicitly chooses 'Image/Multimedia' from the menu.
         /// Lister plugins which only create thumbnail images do not need to implement this function.
         /// </remarks>
-        /// <returns>
-        /// <see cref="FormsLister"/>
-        /// <see cref="WpfLister"/>
-        /// </returns>
-        public abstract ILister? Load(ParentWindow parent, string fileToLoad, ShowFlags showFlags);
+        public abstract TLister? Load(ParentWindow parent, string fileToLoad, ShowFlags showFlags);
 
 
         #region Optional Methods
 
-        public virtual ListerResult LoadNext(ILister lister, string fileToLoad, ShowFlags showFlags)
+        public virtual ListerResult LoadNext(TLister lister, string fileToLoad, ShowFlags showFlags)
         {
             return ListerResult.Error;
         }
 
-        public virtual void CloseWindow(ILister lister)
+        public virtual void CloseWindow(TLister lister)
         {
         }
 
-        public virtual ListerResult SearchText(ILister lister, string searchString, SearchParameter searchParameter)
-        {
-            return ListerResult.Error;
-        }
-
-        public virtual ListerResult SearchDialog(ILister lister, bool findNext)
+        public virtual ListerResult SearchText(TLister lister, string searchString, SearchParameter searchParameter)
         {
             return ListerResult.Error;
         }
 
-        public virtual ListerResult SendCommand(ILister lister, ListerCommand command, ShowFlags parameter)
+        public virtual ListerResult SearchDialog(TLister lister, bool findNext)
         {
             return ListerResult.Error;
         }
 
-        public virtual ListerResult Print(ILister lister, string fileToPrint, string defPrinter, PrintFlags printFlags, PrintMargins margins)
+        public virtual ListerResult SendCommand(TLister lister, ListerCommand command, ShowFlags parameter)
         {
             return ListerResult.Error;
         }
 
-        public virtual int NotificationReceived(ILister lister, int message, int wParam, int lParam)
+        public virtual ListerResult Print(TLister lister, string fileToPrint, string defPrinter, PrintFlags printFlags, PrintMargins margins)
+        {
+            return ListerResult.Error;
+        }
+
+        public virtual int NotificationReceived(TLister lister, int message, int wParam, int lParam)
         {
             return 0;
         }

@@ -9,8 +9,8 @@ using System.Windows.Input;
 
 
 namespace TcPluginBase.Lister {
-    public class WpfLister : ILister {
-        public UIElement Control { get; } // or better WPFUserControl
+    public class WpfLister<TControl> : ILister where TControl : System.Windows.Controls.UserControl {
+        public TControl Control { get; }
         private ElementHost? _elementHost;
 
         public ParentWindow Parent { get; }
@@ -18,7 +18,7 @@ namespace TcPluginBase.Lister {
         private IntPtr? _handle;
         public IntPtr Handle => _handle ??= GetHandle();
 
-        public WpfLister(ParentWindow parent, UIElement control)
+        public WpfLister(ParentWindow parent, TControl control)
         {
             Control = control;
             Parent = parent;

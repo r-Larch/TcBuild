@@ -68,15 +68,19 @@ namespace TcBuildGenerator {
                 symbol.IsOverride &&
                 symbol.IsDefinition
             ) {
-                var methodData = new MethodData {
-                    MethodName = symbol.Name,
-                    Signature = $"{symbol.ReturnType} {symbol.Name}({string.Join(", ", symbol.Parameters)})",
-                    ContainingType = symbol.ContainingType.ToString(),
-                };
-
                 var plugin = Plugins.Last();
-                if (plugin.Definition.Methods.ContainsKey(methodData.Signature)) {
-                    plugin.ImplementedMethods.Add(methodData);
+
+                if (TcHelper.TryGetPluginMethod(plugin, symbol, out var interfaceMember)) {
+                    var methodData = new MethodData {
+                        MethodName = symbol.Name,
+                        Signature = interfaceMember.ToString(),
+                        ContainingType = symbol.ContainingType.ToString(),
+                    };
+
+
+                    if (plugin.Definition.Methods.ContainsKey(methodData.Signature)) {
+                        plugin.ImplementedMethods.Add(methodData);
+                    }
                 }
             }
         }

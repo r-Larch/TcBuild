@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 
 namespace TcBuildGenerator.Tests {
-    public class Tests {
+    public class FsPluginTests {
         [Test]
         public void Test_TcPluginSymbolVisitor()
         {
@@ -49,7 +49,7 @@ namespace TcBuildGenerator.Tests {
 
             Assert.AreEqual(1, plugin.ImplementedMethods.Count);
             Assert.AreEqual("GetFiles", plugin.ImplementedMethods[0].MethodName);
-            Assert.AreEqual("System.Collections.Generic.IEnumerable<TcPluginBase.FileSystem.FindData> GetFiles(TcPluginBase.FileSystem.RemotePath)", plugin.ImplementedMethods[0].Signature);
+            Assert.AreEqual("TcPluginBase.FileSystem.IFsPlugin.GetFiles(TcPluginBase.FileSystem.RemotePath)", plugin.ImplementedMethods[0].Signature);
             Assert.AreEqual("MyNamespace.MyFsPlugin", plugin.ImplementedMethods[0].ContainingType);
 
             Assert.AreEqual(PluginType.FileSystem, plugin.Definition.Type);
@@ -59,6 +59,12 @@ namespace TcBuildGenerator.Tests {
             var getFilesMethod = plugin.Definition.Methods[plugin.ImplementedMethods[0].Signature];
 
             Assert.AreEqual("FsFindFirst,FsFindFirstW,FsFindNext,FsFindNext,FsFindClose", string.Join(",", getFilesMethod.WrapperData.MethodNames));
+
+
+            var source = TcBuildSourceGenerator.GenerateWrapperSource(plugin);
+            var final = TcBuildSourceGenerator.ModifySource(plugin, source);
+
+            Console.WriteLine(final);
         }
 
 

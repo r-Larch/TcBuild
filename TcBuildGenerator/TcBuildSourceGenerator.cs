@@ -2,8 +2,11 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
+
+[assembly: InternalsVisibleTo("TcBuildGenerator.Tests")]
 
 namespace TcBuildGenerator {
     [Generator]
@@ -53,7 +56,7 @@ namespace TcBuildGenerator {
         }
 
 
-        private static string ModifySource(PluginData plugin, string fileSource)
+        internal static string ModifySource(PluginData plugin, string fileSource)
         {
             // 1. take all Mandatory and BaseImplemented methods
             var methods = plugin.Definition.Methods.Values
@@ -98,11 +101,15 @@ namespace TcBuildGenerator {
 
             fileSource = fileSource.Replace("PluginClassPlaceholder", $"global::{plugin.ClassFullName}");
 
+            foreach (var (key, value) in plugin.Definition.GenericTypeArguments) {
+                fileSource = fileSource.Replace(key, $"global::{value}");
+            }
+
             return fileSource;
         }
 
 
-        private static string GenerateWrapperSource(PluginData plugin)
+        internal static string GenerateWrapperSource(PluginData plugin)
         {
             return plugin.Type switch {
                 PluginType.FileSystem => GetManifestResource("TcBuildGenerator.Wrapper.FsWrapper.cs"),

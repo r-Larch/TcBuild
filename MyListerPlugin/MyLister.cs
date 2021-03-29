@@ -4,7 +4,7 @@ using TcPluginBase.Lister;
 
 
 namespace MyListerPlugin {
-    public class MyLister : ListerPlugin {
+    public class MyLister : WpfListerPlugin<ListerControl> {
         public MyLister(IConfiguration pluginSettings) : base(pluginSettings)
         {
         }
@@ -13,18 +13,22 @@ namespace MyListerPlugin {
             x.Multimedia && x.HasExt("svg")
         );
 
-        public override ILister? Load(ParentWindow parent, string fileToLoad, ShowFlags showFlags)
+        public override WpfLister<ListerControl>? Load(ParentWindow parent, string fileToLoad, ShowFlags showFlags)
         {
-            var control = new ListerControl();
+            var control = new ListerControl {
+                TextControl = {
+                    Text = fileToLoad
+                }
+            };
 
-            control.Text.Text = fileToLoad;
-
-            return new WpfLister(parent, control: control);
+            return new(parent, control);
         }
 
-        //public override void CloseWindow(ILister lister)
-        //{
-        //    base.CloseWindow(lister);
-        //}
+        public override ListerResult LoadNext(WpfLister<ListerControl> lister, string fileToLoad, ShowFlags showFlags)
+        {
+            lister.Control.TextControl.Text = fileToLoad;
+
+            return ListerResult.Ok;
+        }
     }
 }

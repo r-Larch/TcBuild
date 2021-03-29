@@ -10,8 +10,8 @@ using TcPluginBase.Tools;
 namespace WlxWrapper {
     public class ListerWrapper {
         private static string? _callSignature;
-        private static ListerPlugin? _plugin;
-        private static ListerPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ListerPlugin>(typeof(PluginClassPlaceholder));
+        private static ListerPlugin<TLister>? _plugin;
+        private static ListerPlugin<TLister> Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ListerPlugin<TLister>>(typeof(PluginClassPlaceholder));
 
 
         private ListerWrapper()
@@ -84,7 +84,7 @@ namespace WlxWrapper {
             var showFlags = (ShowFlags) flags;
             _callSignature = $"LoadNext ({listWin.ToString()}, {fileToLoad}, {showFlags.ToString()})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 result = Plugin.LoadNext(listerControl, fileToLoad, showFlags);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Warning, result.ToString());
@@ -105,7 +105,7 @@ namespace WlxWrapper {
         {
             _callSignature = $"CloseWindow ({listWin.ToString()})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 Plugin.CloseWindow(listerControl);
                 var count = TcHandles.RemoveHandle(listWin);
                 NativeMethods.DestroyWindow(listWin);
@@ -158,7 +158,7 @@ namespace WlxWrapper {
             var sp = (SearchParameter) searchParameter;
             _callSignature = $"SearchText ({listWin.ToString()}, {searchString}, {sp.ToString()})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 result = Plugin.SearchText(listerControl, searchString, sp);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Warning, result.ToString());
@@ -182,7 +182,7 @@ namespace WlxWrapper {
             var par = (ShowFlags) parameter;
             _callSignature = $"SendCommand ({listWin.ToString()}, {cmd.ToString()}, {par.ToString()})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 result = Plugin.SendCommand(listerControl, cmd, par);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Info, result.ToString());
@@ -220,7 +220,7 @@ namespace WlxWrapper {
             var printFlags = (PrintFlags) flags;
             _callSignature = $"Print ({listWin.ToString()}, {fileToPrint}, {defPrinter}, {printFlags.ToString()})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 result = Plugin.Print(listerControl, fileToPrint, defPrinter, printFlags, margins);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Warning, result.ToString());
@@ -242,7 +242,7 @@ namespace WlxWrapper {
             var result = 0;
             _callSignature = $"NotificationReceived ({listWin.ToString()}, {message}, {wParam}, {lParam})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 result = Plugin.NotificationReceived(listerControl, message, wParam, lParam);
                 TcHandles.UpdateHandle(listWin, listerControl);
                 TraceCall(TraceLevel.Info, result.ToString(CultureInfo.InvariantCulture));
@@ -329,7 +329,7 @@ namespace WlxWrapper {
             var result = ListerResult.Error;
             _callSignature = $"SearchDialog ({listWin.ToString()}, {findNext})";
             try {
-                var listerControl = (ILister) TcHandles.GetObject(listWin)!;
+                var listerControl = (TLister) TcHandles.GetObject(listWin)!;
                 result = Plugin.SearchDialog(listerControl, findNext != 0);
                 TraceCall(TraceLevel.Info, result.ToString());
             }

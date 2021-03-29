@@ -4,12 +4,12 @@ using System.Windows.Forms;
 
 
 namespace TcPluginBase.Lister {
-    public class FormsLister : ILister {
-        public Control Control { get; }
+    public class FormsLister<TControl> : ILister where TControl : System.Windows.Forms.UserControl {
+        public TControl Control { get; }
         public ParentWindow Parent { get; }
         public IntPtr Handle => Control.Handle;
 
-        public FormsLister(ParentWindow parent, Control control)
+        public FormsLister(ParentWindow parent, TControl control)
         {
             Control = control;
             Parent = parent;

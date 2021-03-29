@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="Aqua">
-            <TextBlock Name="Text">
+            <TextBlock Name="TextControl">
                 Hoi
             </TextBlock>
     </Grid>

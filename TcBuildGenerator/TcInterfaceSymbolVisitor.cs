@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
@@ -21,17 +22,25 @@ namespace TcBuildGenerator {
             }
         }
 
-        public override void VisitNamedType(INamedTypeSymbol clazz)
+        public override void VisitNamedType(INamedTypeSymbol iface)
         {
-            if (TcHelper.IsPluginInterface(clazz, out var pluginType)) {
+            if (TcHelper.IsPluginInterface(iface, out var pluginType)) {
+                var genericTypeArguments = new List<(string key, string value)>();
+                for (var i = 0; i < iface.OriginalDefinition.TypeArguments.Length; i++) {
+                    var key = iface.OriginalDefinition.TypeArguments[i].ToString();
+                    var value = iface.TypeArguments[i].ToString();
+                    genericTypeArguments.Add((key, value));
+                }
+
                 var definition = new PluginDefinition {
                     Type = pluginType,
-                    Name = clazz.Name,
+                    Name = iface.Name,
+                    GenericTypeArguments = genericTypeArguments.ToImmutableArray(),
                     Methods = new Dictionary<string, PluginDefinitionMethodData>()
                 };
                 Definitions.Add(definition);
 
-                foreach (var child in clazz.GetMembers()) {
+                foreach (var child in iface.GetMembers()) {
                     child.Accept(this);
                 }
             }
@@ -39,10 +48,10 @@ namespace TcBuildGenerator {
 
         public override void VisitMethod(IMethodSymbol symbol)
         {
-            if (symbol.IsDefinition && TryGetWrapperData(symbol, out var wrapperData)) {
+            if (TryGetWrapperData(symbol, out var wrapperData)) {
                 var methodData = new PluginDefinitionMethodData {
                     MethodName = symbol.Name,
-                    Signature = $"{symbol.ReturnType} {symbol.Name}({string.Join(", ", symbol.Parameters)})",
+                    Signature = symbol.ToString(),
                     ContainingType = symbol.ContainingType.ToString(),
                     WrapperData = wrapperData,
                 };
@@ -66,7 +75,7 @@ namespace TcBuildGenerator {
 
                 static WrapperData GetAttributeData(AttributeData attribute)
                 {
-                    var wrapperMethods = attribute.ConstructorArguments.Where(_ => _.Type?.ToString() == "string").Select(_ => _.Value).OfType<string>().ToArray();
+                    var wrapperMethods = attribute.ConstructorArguments.Where(_ => _.Type?.ToString() == "string").Select(_ => _.Value).OfType<string>().ToImmutableArray();
 
                     return new WrapperData {
                         MethodNames = wrapperMethods,
@@ -82,6 +91,7 @@ namespace TcBuildGenerator {
         public PluginType Type { get; set; }
         public string Name { get; set; }
         public Dictionary<string, PluginDefinitionMethodData> Methods { get; set; }
+        public ImmutableArray<(string key, string value)> GenericTypeArguments { get; set; }
     }
 
     public struct PluginDefinitionMethodData {
@@ -92,7 +102,7 @@ namespace TcBuildGenerator {
     }
 
     public struct WrapperData {
-        public string[] MethodNames { get; set; }
+        public ImmutableArray<string> MethodNames { get; set; }
         public bool Mandatory { get; set; }
         public bool BaseImplemented { get; set; }
     }
