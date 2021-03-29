@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Threading;
 
 
 namespace TcBuild {
@@ -13,13 +14,13 @@ namespace TcBuild {
         public ZipFile(FileInfo zipFile, DirectoryInfo baseDirectory)
         {
             _baseDirectory = baseDirectory.FullName.TrimEnd('\\') + '\\';
-            _zip = new ZipArchive(zipFile.OpenWrite(), ZipArchiveMode.Create);
+            _zip = new ZipArchive(OpenWrite(zipFile), ZipArchiveMode.Create);
         }
 
         public ZipFile Add(FileInfo file)
         {
             if (file.Exists) {
-                using var fileContents = file.OpenRead();
+                using var fileContents = OpenRead(file);
                 var fileName = file.FullName.Replace(_baseDirectory, "");
                 Add(fileName, fileContents);
             }
@@ -51,6 +52,44 @@ namespace TcBuild {
             fileContents.CopyTo(entry);
 
             return this;
+        }
+
+        private static Stream OpenWrite(FileInfo zipFile)
+        {
+            var count = 0;
+            while (true) {
+                try {
+                    return zipFile.OpenWrite();
+                }
+                catch (IOException) {
+                    if (count++ < 10) {
+                        Thread.Sleep(10 * count * count);
+                        continue;
+                    }
+                    else {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        private static Stream OpenRead(FileInfo zipFile)
+        {
+            var count = 0;
+            while (true) {
+                try {
+                    return zipFile.OpenRead();
+                }
+                catch (IOException) {
+                    if (count++ < 10) {
+                        Thread.Sleep(10 * count * count);
+                        continue;
+                    }
+                    else {
+                        throw;
+                    }
+                }
+            }
         }
 
         public void Dispose()

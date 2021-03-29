@@ -61,7 +61,8 @@ namespace TcBuild {
             var outputFiles = OutputDirectory.GetFiles("*", SearchOption.AllDirectories).ToList();
             var references = outputFiles
                 .Where(_ => !_.Name.StartsWith($"{Path.GetFileNameWithoutExtension(AssemblyFile.Name)}NE."))
-                .Where(_ => _.Name != "dnne.h");
+                .Where(_ => _.Name != "dnne.h")
+                .Where(_ => _.Name != zipFile.Name);
 
 
             token.ThrowIfCancellationRequested();
