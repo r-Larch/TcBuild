@@ -4,12 +4,6 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>FsAzureStorage</RootNamespace>
     <Nullable>enable</Nullable>
-
-    <EnableDynamicLoading>true</EnableDynamicLoading>
-    <!--<DnneBuildExports>false</DnneBuildExports>-->
-
-    <!--<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)\GeneratedFiles</CompilerGeneratedFilesOutputPath>-->
   </PropertyGroup>
 
   <ItemGroup>
