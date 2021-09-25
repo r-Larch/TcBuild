@@ -13,6 +13,9 @@ namespace TcPluginBase.FileSystem {
         [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNext", "FsFindClose")]
         IEnumerable<FindData> GetFiles(RemotePath path);
 
+        [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNext", "FsFindClose")]
+        IAsyncEnumerable<FindData> GetFilesAsync(RemotePath path);
+
         [TcMethod("FsGetFile", "FsGetFileW")]
         Task<GetFileResult> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token);
 

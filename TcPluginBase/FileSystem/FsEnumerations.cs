@@ -41,7 +41,7 @@ namespace TcPluginBase.FileSystem {
 
 
     /// <summary> Used as result type for ExecuteOpen, ExecuteProperties, and ExecuteCommand methods </summary>
-    public struct ExecResult {
+    public readonly struct ExecResult {
         /// <summary> Command was executed successfully, no further action is needed. </summary>
         public static ExecResult Ok => new(ExecEnum.Ok);
 
@@ -61,9 +61,9 @@ namespace TcPluginBase.FileSystem {
         public static ExecResult SymLink(string symlinkTarget) => new(ExecEnum.SymLink, symlinkTarget);
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public ExecEnum Type;
+        public readonly ExecEnum Type;
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string? SymlinkTarget;
+        public readonly string? SymlinkTarget;
 
         private ExecResult(ExecEnum type, string? symlinkTarget = default)
         {
@@ -78,6 +78,14 @@ namespace TcPluginBase.FileSystem {
             Yourself = -1,
             SymLink = -2,
         }
+
+
+        public static bool operator ==(ExecResult a, ExecResult b) => a.Equals(b);
+        public static bool operator !=(ExecResult a, ExecResult b) => !(a == b);
+
+        public bool Equals(ExecResult other) => Type == other.Type && SymlinkTarget == other.SymlinkTarget;
+        public override bool Equals(object? obj) => obj is ExecResult other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine((int) Type, SymlinkTarget);
     }
 
 
@@ -93,9 +101,9 @@ namespace TcPluginBase.FileSystem {
 
 
     /// <summary> Used as result type for ExtractCustomIcon method </summary>
-    public struct ExtractIconResult {
+    public readonly struct ExtractIconResult {
         /// <summary> No icon is returned. Total Commander should show the default icon for this file type. </summary>
-        public static ExtractIconResult UseDefault => new() {Value = ExtractIconEnum.UseDefault};
+        public static ExtractIconResult UseDefault => new(ExtractIconEnum.UseDefault);
 
         /// <summary>
         /// This return value is only valid if <see cref="ExtractIconFlags.Background"/> was NOT set. It tells the calling app to show a default icon, and request the true icon in a background thread. See remarks.
@@ -107,21 +115,21 @@ namespace TcPluginBase.FileSystem {
         /// the drive icons are returned immediately (because they are stored in the plugin itself), but the EXE icons are loaded with a delay.
         /// If the user turns off background loading of icons, the function will be called in the foreground with the <see cref="ExtractIconFlags.Background"/> flag.
         /// </remarks>
-        public static ExtractIconResult Delayed => new() {Value = ExtractIconEnum.Delayed};
+        public static ExtractIconResult Delayed => new(ExtractIconEnum.Delayed);
 
         /// <summary>
         /// The icon must NOT be freed by Total Commander, e.g. because it was loaded with LoadIcon, or the DLL handles destruction of the icon.
         /// </summary>
         /// <param name="icon"></param>
         /// <param name="iconName">Name of the icon. Total Commander can use this to cache the icon</param>
-        public static ExtractIconResult Extracted(Icon icon, string? iconName = null) => new() {Value = ExtractIconEnum.Extracted, Icon = icon, IconName = iconName};
+        public static ExtractIconResult Extracted(Icon icon, string? iconName = null) => new(ExtractIconEnum.Extracted, icon, iconName);
 
         /// <summary>
         /// The icon MUST be destroyed by Total Commander, e.g. because it was created with CreateIcon(), or extracted with ExtractIconEx().
         /// </summary>
         /// <param name="icon"></param>
         /// <param name="iconName">Name of the icon. Total Commander can use this to cache the icon</param>
-        public static ExtractIconResult ExtractedDestroy(Icon icon, string? iconName = null) => new() {Value = ExtractIconEnum.ExtractedDestroy, Icon = icon, IconName = iconName};
+        public static ExtractIconResult ExtractedDestroy(Icon icon, string? iconName = null) => new(ExtractIconEnum.ExtractedDestroy, icon, iconName);
 
         /// <summary>
         /// This attempts to load the Icon from the specified filePath.
@@ -152,11 +160,18 @@ namespace TcPluginBase.FileSystem {
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public ExtractIconEnum Value { get; set; }
+        public readonly ExtractIconEnum Value { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Icon? Icon { get; set; }
+        public readonly Icon? Icon { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string? IconName { get; set; }
+        public readonly string? IconName { get; }
+
+        private ExtractIconResult(ExtractIconEnum value, Icon? icon = null, string? iconName = null)
+        {
+            Value = value;
+            Icon = icon;
+            IconName = iconName;
+        }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public enum ExtractIconEnum {
@@ -170,6 +185,14 @@ namespace TcPluginBase.FileSystem {
         {
             return $"{nameof(Value)}: {Value}, {nameof(Icon)}: {Icon?.Handle.ToString() ?? "null"}, {nameof(IconName)}: {IconName ?? "null"}";
         }
+
+
+        public static bool operator ==(ExtractIconResult a, ExtractIconResult b) => a.Equals(b);
+        public static bool operator !=(ExtractIconResult a, ExtractIconResult b) => !(a == b);
+
+        public bool Equals(ExtractIconResult other) => Value == other.Value && Icon == other.Icon && IconName == other.IconName;
+        public override bool Equals(object? obj) => obj is ExtractIconResult other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine((int) Value, Icon?.Handle, IconName);
     }
 
     public readonly struct GetFileResult {
@@ -203,6 +226,14 @@ namespace TcPluginBase.FileSystem {
         public static GetFileResult NotSupported => new(FileSystemExitCode.NotSupported);
         /// <summary> The target file already exists, and resume is supported. </summary>
         public static GetFileResult ExistsResumeAllowed => new(FileSystemExitCode.ExistsResumeAllowed);
+
+
+        public static bool operator ==(GetFileResult a, GetFileResult b) => a.Equals(b);
+        public static bool operator !=(GetFileResult a, GetFileResult b) => !(a == b);
+
+        public bool Equals(GetFileResult other) => Code == other.Code && FileName == other.FileName;
+        public override bool Equals(object? obj) => obj is GetFileResult other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine((int) Code, FileName);
     }
 
     public readonly struct PutFileResult {
@@ -236,11 +267,19 @@ namespace TcPluginBase.FileSystem {
         public static PutFileResult NotSupported => new(FileSystemExitCode.NotSupported);
         /// <summary> The target file already exists, and resume is supported. </summary>
         public static PutFileResult ExistsResumeAllowed => new(FileSystemExitCode.ExistsResumeAllowed);
+
+        public static bool operator ==(PutFileResult a, PutFileResult b) => a.Equals(b);
+        public static bool operator !=(PutFileResult a, PutFileResult b) => !(a == b);
+
+        public bool Equals(PutFileResult other) => Code == other.Code && FileName == other.FileName;
+        public override bool Equals(object? obj) => obj is PutFileResult other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine((int) Code, FileName);
     }
 
     public readonly struct RenMovFileResult {
         [EditorBrowsable(EditorBrowsableState.Never)]
         public FileSystemExitCode Code { get; }
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         public RenMovFileResult(FileSystemExitCode code) => Code = code;
 
@@ -258,6 +297,13 @@ namespace TcPluginBase.FileSystem {
         public static RenMovFileResult UserAbort => new(FileSystemExitCode.UserAbort);
         /// <summary> The operation is not supported (e.g. resume). </summary>
         public static RenMovFileResult NotSupported => new(FileSystemExitCode.NotSupported);
+
+        public static bool operator ==(RenMovFileResult a, RenMovFileResult b) => a.Equals(b);
+        public static bool operator !=(RenMovFileResult a, RenMovFileResult b) => !(a == b);
+
+        public bool Equals(RenMovFileResult other) => Code == other.Code;
+        public override bool Equals(object? obj) => obj is RenMovFileResult other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine((int) Code);
     }
 
     /// <summary> Used as result type for <see cref="FsPlugin.GetFile"/>, <see cref="FsPlugin.PutFile"/> and <see cref="FsPlugin.RenMovFile"/> methods </summary>
@@ -300,27 +346,27 @@ namespace TcPluginBase.FileSystem {
 
 
     /// <summary> Used as result type for <see cref="FsPlugin.GetPreviewBitmap"/> method </summary>
-    public struct PreviewBitmapResult {
+    public readonly struct PreviewBitmapResult {
         /// <summary> There is no preview bitmap. </summary>
-        public static PreviewBitmapResult None => new() {Value = PreviewBitmapEnum.None};
+        public static PreviewBitmapResult None => new(PreviewBitmapEnum.None, null, null, false);
 
         /// <summary> The image was extracted and is returned </summary>
         /// <param name="bitmap"></param>
         /// <param name="bitmapName">Name of the bitmap. Total Commander can use this to cache the bitmap</param>
         /// <param name="cache">false to NOT cache the image</param>
-        public static PreviewBitmapResult Extracted(Bitmap bitmap, string? bitmapName = null, bool cache = true) => new() {
-            Value = PreviewBitmapEnum.Extracted,
-            Bitmap = bitmap ?? throw new ArgumentNullException(nameof(bitmap)),
-            BitmapName = bitmapName,
-            Cache = cache
-        };
+        public static PreviewBitmapResult Extracted(Bitmap bitmap, string? bitmapName = null, bool cache = true) => new(
+            value: PreviewBitmapEnum.Extracted,
+            bitmap: bitmap ?? throw new ArgumentNullException(nameof(bitmap)),
+            bitmapName: bitmapName,
+            cache: cache
+        );
 
         /// <summary> Tells the caller to extract the image by itself from bitmapPath. </summary>
         /// <param name="bitmapPath">The local path to the bitmap</param>
         /// <param name="cache">false to NOT cache the image</param>
         public static PreviewBitmapResult ExtractYourself(string bitmapPath, bool cache = true)
         {
-            return new() {Value = PreviewBitmapEnum.ExtractYourself, BitmapName = bitmapPath, Cache = cache};
+            return new(PreviewBitmapEnum.ExtractYourself, bitmap: null, bitmapPath, cache);
         }
 
         /// <summary>
@@ -331,17 +377,17 @@ namespace TcPluginBase.FileSystem {
         /// </summary>
         /// <param name="temporaryImageFile"></param>
         /// <param name="cache">false to NOT cache the image</param>
-        public static PreviewBitmapResult ExtractYourselfAndDelete(string temporaryImageFile, bool cache = true) => new() {Value = PreviewBitmapEnum.ExtractYourselfAndDelete, BitmapName = temporaryImageFile, Cache = cache};
+        public static PreviewBitmapResult ExtractYourselfAndDelete(string temporaryImageFile, bool cache = true) => new(PreviewBitmapEnum.ExtractYourselfAndDelete, bitmap: null, temporaryImageFile, cache);
 
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public string? BitmapName { get; private set; }
+        public readonly string? BitmapName { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public PreviewBitmapEnum Value { get; private set; }
+        public readonly PreviewBitmapEnum Value { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public Bitmap? Bitmap { get; private set; }
+        public readonly Bitmap? Bitmap { get; }
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public bool Cache { get; private set; }
+        public readonly bool Cache { get; }
 
 
         [Flags, EditorBrowsable(EditorBrowsableState.Never)]
@@ -352,6 +398,21 @@ namespace TcPluginBase.FileSystem {
             ExtractYourselfAndDelete, // Tells the caller to extract the image by itself, and then delete the temporary image file.
             Cache = 256 // This value must be ADDED to one of the above values if the caller should cache the image.
         }
+
+        private PreviewBitmapResult(PreviewBitmapEnum value, Bitmap? bitmap, string? bitmapName, bool cache)
+        {
+            Value = value;
+            Bitmap = bitmap;
+            BitmapName = bitmapName;
+            Cache = cache;
+        }
+
+        public static bool operator ==(PreviewBitmapResult a, PreviewBitmapResult b) => a.Equals(b);
+        public static bool operator !=(PreviewBitmapResult a, PreviewBitmapResult b) => !(a == b);
+
+        public bool Equals(PreviewBitmapResult other) => Value == other.Value && BitmapName == other.BitmapName && Bitmap == other.Bitmap && Cache == other.Cache;
+        public override bool Equals(object? obj) => obj is PreviewBitmapResult other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine((int) Value, BitmapName, Bitmap, Cache);
     }
 
     /// <summary> Used as parameter type for <see cref="FsPlugin.RequestProc"/> callback method </summary>

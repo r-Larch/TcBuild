@@ -38,29 +38,55 @@ namespace TcPluginBase.FileSystem {
 
         #region Mandatory Methods
 
-        // TODO use IAsyncEnumerable when C# 8
         // TODO return new []{ new FindData("..", FileAttributes.Directory) } when path == empty directory
         public virtual IEnumerable<FindData> GetFiles(RemotePath path)
         {
-            return new FindData[0];
+            return null!;
+        }
+
+        public virtual IAsyncEnumerable<FindData> GetFilesAsync(RemotePath path)
+        {
+            return null!;
         }
 
 
         /// <exception cref="NoMoreFilesException"></exception>
         public virtual object? FindFirst(RemotePath path, out FindData? findData)
         {
-            var enumerable = GetFiles(path);
-            if (enumerable != null!) {
-                var enumerator = enumerable.GetEnumerator();
+            var syncFiles = GetFiles(path);
+            if (syncFiles != null!) {
+                var enumerator = syncFiles.GetEnumerator();
                 if (enumerator.MoveNext()) {
                     findData = enumerator.Current;
                     return enumerator;
                 }
-            }
 
-            // empty list
-            findData = null;
-            return null;
+                // empty list
+                findData = null;
+                return null;
+            }
+            else {
+                using var exec = new ThreadKeeper();
+                var (result, enumerator) = exec.ExecAsync(Run);
+
+                async Task<(FindData? result, object? enumerator)> Run(CancellationToken token)
+                {
+                    var enumerable = GetFilesAsync(path);
+                    if (enumerable != null!) {
+                        var enumerator = enumerable.GetAsyncEnumerator(token);
+                        if (await enumerator.MoveNextAsync()) {
+                            var result = enumerator.Current;
+                            return (result, enumerator);
+                        }
+                    }
+
+                    // empty list
+                    return (null, null);
+                }
+
+                findData = result;
+                return enumerator;
+            }
         }
 
         public virtual bool FindNext(ref object o, [NotNullWhen(true)] out FindData? findData)
@@ -73,6 +99,21 @@ namespace TcPluginBase.FileSystem {
                         return true;
                     }
                 }
+            }
+            else if (o is IAsyncEnumerator<FindData?> fsAsyncEnum) {
+                using var exec = new ThreadKeeper();
+                var result = exec.ExecAsync(async token => {
+                    if (await fsAsyncEnum.MoveNextAsync()) {
+                        var current = fsAsyncEnum.Current;
+                        if (current != null) {
+                            return current;
+                        }
+                    }
+
+                    return null;
+                });
+                findData = result;
+                return findData != null;
             }
 
             // end of sequence

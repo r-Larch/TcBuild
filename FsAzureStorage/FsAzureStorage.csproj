@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <RootNamespace>MyPlugin</RootNamespace>
+    <RootNamespace>FsAzureStorage</RootNamespace>
     <Nullable>enable</Nullable>
 
     <EnableDynamicLoading>true</EnableDynamicLoading>
@@ -13,14 +13,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DNNE" Version="1.0.19" />
+    <PackageReference Include="Azure.Identity" Version="1.4.1" />
+    <PackageReference Include="Azure.ResourceManager.Storage" Version="1.0.0-beta.2" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
+    <PackageReference Include="MimeMapping" Version="1.0.1.37" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="DNNE" Version="1.0.19" />
+    <ProjectReference Include="..\TcBuildTask\TcBuildTask.csproj" />
     <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" />
-    <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj"
-                      OutputItemType="Analyzer"
+    <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj" 
+                      OutputItemType="Analyzer" 
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
+
+  <Import Project="..\TcBuildTask\build\TcBuild.targets" />
 
 </Project>
