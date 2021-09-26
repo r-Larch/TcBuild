@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Interop;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FsAzureStorage.Windows;
@@ -33,23 +32,23 @@ namespace FsAzureStorage {
             switch (path.Level) {
                 case 0:
                     return GetAccounts();
-                case 1 when path.AccountName == "settings":
-                    return GetSettings();
+                //case 1 when path.AccountName == "settings":
+                //    return GetSettings();
                 case 1:
                     return GetContainers(path.AccountName);
                 default:
                     return GetBlobSegments(path);
             }
 
-            async IAsyncEnumerable<FindData> GetSettings()
-            {
-                await Task.CompletedTask;
-                yield return new FindData("Connect to Azure");
-            }
+            //async IAsyncEnumerable<FindData> GetSettings()
+            //{
+            //    await Task.CompletedTask;
+            //    yield return new FindData("Connect to Azure");
+            //}
 
             async IAsyncEnumerable<FindData> GetAccounts()
             {
-                yield return new FindData("settings", FileAttributes.Directory);
+                // yield return new FindData("settings", FileAttributes.Directory);
 
                 await foreach (var account in _blobStorage.GetAccounts()) {
                     yield return new FindData(account.Name, FileAttributes.Directory);

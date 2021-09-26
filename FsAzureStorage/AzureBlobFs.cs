@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -186,7 +187,7 @@ namespace FsAzureStorage {
 
             if (path.Level == 1) {
                 return path.Path switch {
-                    "/settings" => ExtractIconResult.Extracted(Icons.settings_icon),
+                    // "/settings" => ExtractIconResult.Extracted(Icons.settings_icon),
                     _ => ExtractIconResult.Extracted(Icons.storage_account)
                 };
             }
@@ -208,6 +209,10 @@ namespace FsAzureStorage {
         public override ExecResult ExecuteCommand(TcWindow mainWin, RemotePath remoteName, string command)
         {
             switch (command) {
+                case "debug":
+                    Debugger.Launch();
+                    return ExecResult.Ok;
+
                 case "refresh":
                     mainWin.Refresh();
                     return ExecResult.Ok;
@@ -359,16 +364,16 @@ namespace FsAzureStorage {
         {
             CloudPath path = remoteName;
 
-            switch (path.Level) {
-                case 2 when path.AccountName == "settings":
+            //switch (path.Level) {
+            //    case 2 when path.AccountName == "settings":
 
-                    //var window = new SettingsWindow("Azure Storage Account", Configuration.GetSection(nameof(SettingsWindow)), Password, Prompt);
-                    //new WindowInteropHelper(window).Owner = NativeApis.GetActiveWindow();
-                    //window.ShowDialog();
+            //        //var window = new SettingsWindow("Azure Storage Account", Configuration.GetSection(nameof(SettingsWindow)), Password, Prompt);
+            //        //new WindowInteropHelper(window).Owner = NativeApis.GetActiveWindow();
+            //        //window.ShowDialog();
 
-                    //ProcessSettings(path);
-                    return ExecResult.Ok;
-            }
+            //        //ProcessSettings(path);
+            //        return ExecResult.Ok;
+            //}
 
             return ExecResult.Yourself;
         }
