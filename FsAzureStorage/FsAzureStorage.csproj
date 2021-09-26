@@ -1,9 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>FsAzureStorage</RootNamespace>
+    <Description>Total Commander FileSystem Plugin to manage Azure Blob Storage.</Description>
     <Nullable>enable</Nullable>
+    
+    <UseWPF>true</UseWPF>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>

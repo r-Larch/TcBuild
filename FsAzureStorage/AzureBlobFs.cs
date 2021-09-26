@@ -345,9 +345,14 @@ namespace FsAzureStorage {
         }
 
 
-        public override ExecResult ExecuteProperties(TcWindow mainWin, RemotePath remoteName)
+        public override async Task<ExecResult> ExecutePropertiesAsync(TcWindow mainWin, RemotePath remoteName, CancellationToken token)
         {
-            return ExecResult.Yourself;
+            return remoteName switch {
+                {Level: 1} => ExecResult.Yourself,
+                {Level: 2} => ExecResult.Yourself,
+                {Level: > 2} => await _fs.OpenBlobPropertiesWindow(mainWin, remoteName, token),
+                _ => ExecResult.Yourself,
+            };
         }
 
         public override ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName)

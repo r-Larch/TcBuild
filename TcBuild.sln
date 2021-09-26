@@ -50,6 +50,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyListerPlugin", "MyListerP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{8F116D2F-64D0-4552-AD08-12BB2728A47E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FsAzureStorage.Test", "Plugins\FsAzureStorage.Test\FsAzureStorage.Test.csproj", "{F2CE07FC-C1B3-4566-A52B-15974EED91C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -256,6 +258,18 @@ Global
 		{8F116D2F-64D0-4552-AD08-12BB2728A47E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8F116D2F-64D0-4552-AD08-12BB2728A47E}.Release|x86.ActiveCfg = Release|Any CPU
 		{8F116D2F-64D0-4552-AD08-12BB2728A47E}.Release|x86.Build.0 = Release|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Debug|x86.Build.0 = Debug|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -274,6 +288,7 @@ Global
 		{D2BD89C2-53F4-4506-8413-C5EA05255D6A} = {6CC36ED6-55ED-4F54-9D77-D9A7AFD90FDF}
 		{9A0D8DC2-06B0-48DC-9E64-5BE591F5585F} = {9209666C-8C8A-46E7-9750-9FE1C9FC7321}
 		{8F116D2F-64D0-4552-AD08-12BB2728A47E} = {9209666C-8C8A-46E7-9750-9FE1C9FC7321}
+		{F2CE07FC-C1B3-4566-A52B-15974EED91C5} = {9209666C-8C8A-46E7-9750-9FE1C9FC7321}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EF0D11D-68CE-4427-A295-CFD001EF25CF}

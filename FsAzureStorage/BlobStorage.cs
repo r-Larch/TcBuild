@@ -12,7 +12,7 @@ using Azure.Storage.Blobs;
 
 
 namespace FsAzureStorage {
-    internal class BlobStorage {
+    public class BlobStorage {
         private readonly List<BlobStorageAccount> _accounts = new();
 
         public async IAsyncEnumerable<BlobStorageAccount> GetAccounts([EnumeratorCancellation] CancellationToken token = default)
@@ -90,7 +90,7 @@ namespace FsAzureStorage {
     }
 
 
-    internal record BlobStorageAccount(string Name, string Subscription, BlobServiceClient Client);
+    public record BlobStorageAccount(string Name, string Subscription, BlobServiceClient Client);
 
 
     internal static class Extensions {

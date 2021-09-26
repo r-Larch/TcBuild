@@ -4,18 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using FsAzureStorage.Windows;
 using MimeMapping;
+using TcPluginBase;
 using TcPluginBase.FileSystem;
 
 
 // ReSharper disable LocalizableElement
 
 namespace FsAzureStorage {
-    internal delegate void FileProgress(string source, string destination, int percentDone);
+    public delegate void FileProgress(string source, string destination, int percentDone);
 
-    internal class BlobFileSystem {
+    public class BlobFileSystem {
         internal readonly PathCache _pathCache;
         private readonly BlobStorage _blobStorage;
 
@@ -317,6 +320,18 @@ namespace FsAzureStorage {
 
             // can not create accounts and container
             return false;
+        }
+
+        public async Task<ExecResult> OpenBlobPropertiesWindow(TcWindow owner, CloudPath remoteName, CancellationToken token)
+        {
+            var blob = await _blobStorage.GetBlockBlobReference(remoteName.AccountName, remoteName.ContainerName, remoteName.BlobName, token);
+            if (blob == null) {
+                return ExecResult.Error;
+            }
+
+            owner.ShowDialog(() => new PropertiesWindow(blob));
+
+            return ExecResult.Ok;
         }
     }
 }
