@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -84,25 +84,26 @@ namespace FsAzureStorage {
             return false;
         }
 
-        public override bool DeleteFile(RemotePath fileName)
+
+        public override async Task<bool> DeleteFileAsync(RemotePath fileName, CancellationToken token)
         {
-            return _fs.DeleteFile(fileName).Result;
+            return await _fs.DeleteFile(fileName, token);
         }
 
 
-        public override RenMovFileResult RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
+        public override async Task<RenMovFileResult> RenMovFileAsync(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
-            ProgressProc(oldName, newName, 0);
+            setProgress(0);
             try {
                 if (move) {
-                    return _fs.Move(oldName, newName, overwrite: overwrite, default).Result;
+                    return await _fs.Move(oldName, newName, overwrite: overwrite, default);
                 }
                 else {
-                    return _fs.Copy(oldName, newName, overwrite: overwrite, default).Result;
+                    return await _fs.Copy(oldName, newName, overwrite: overwrite, default);
                 }
             }
             finally {
-                ProgressProc(oldName, newName, 100);
+                setProgress(100);
             }
         }
 

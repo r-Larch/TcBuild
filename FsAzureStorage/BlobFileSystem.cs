@@ -261,16 +261,16 @@ namespace FsAzureStorage {
             return _pathCache.Remove(directory); // allow removing virtual dirs
         }
 
-        public async Task<bool> DeleteFile(CloudPath fileName)
+        public async Task<bool> DeleteFile(CloudPath fileName, CancellationToken token)
         {
-            var blob = await _blobStorage.GetBlockBlobReference(fileName.AccountName, fileName.ContainerName, fileName.BlobName);
+            var blob = await _blobStorage.GetBlockBlobReference(fileName.AccountName, fileName.ContainerName, fileName.BlobName, token);
             if (blob is null) {
                 return false;
             }
 
             var success = RemoveVirtualDir(fileName);
 
-            if (await blob.DeleteIfExistsAsync()) {
+            if (await blob.DeleteIfExistsAsync(cancellationToken: token)) {
                 // cache the directory to allow adding some files
                 _pathCache.Add(fileName.Directory);
                 return true;

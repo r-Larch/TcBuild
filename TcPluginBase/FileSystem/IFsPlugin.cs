@@ -16,12 +16,6 @@ namespace TcPluginBase.FileSystem {
         [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNext", "FsFindClose")]
         IAsyncEnumerable<FindData> GetFilesAsync(RemotePath path);
 
-        [TcMethod("FsGetFile", "FsGetFileW")]
-        Task<GetFileResult> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token);
-
-        [TcMethod("FsPutFile", "FsPutFileW")]
-        Task<PutFileResult> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token);
-
         #endregion
 
         #region Mandatory Methods
@@ -76,6 +70,9 @@ namespace TcPluginBase.FileSystem {
         [TcMethod("FsGetFile", "FsGetFileW")]
         GetFileResult GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo);
 
+        [TcMethod("FsGetFile", "FsGetFileW")]
+        Task<GetFileResult> GetFileAsync(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token);
+
         /// <summary>
         /// FsPutFile is called to transfer a file from the normal file system (drive letters or UNC) to the plugin's file system.
         /// </summary>
@@ -96,6 +93,9 @@ namespace TcPluginBase.FileSystem {
         [TcMethod("FsPutFile", "FsPutFileW")]
         PutFileResult PutFile(string localName, RemotePath remoteName, CopyFlags copyFlags);
 
+        [TcMethod("FsPutFile", "FsPutFileW")]
+        Task<PutFileResult> PutFileAsync(string localName, RemotePath remoteName, CopyFlags copyFlags, Action<int> setProgress, CancellationToken token);
+
         /// <summary>
         /// FsRenMovFile is called to transfer (copy or move) a file within the plugin's file system.
         /// </summary>
@@ -114,29 +114,73 @@ namespace TcPluginBase.FileSystem {
         [TcMethod("FsRenMovFile", "FsRenMovFileW")]
         RenMovFileResult RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo);
 
+        /// <summary>
+        /// FsRenMovFile is called to transfer (copy or move) a file within the plugin's file system.
+        /// </summary>
+        /// <remarks>
+        /// Total Commander usually calls this function twice:
+        /// <list type="bullet">
+        ///   <item> once with OverWrite==false. If the remote file exists, return FS_FILE_EXISTS. If it doesn't exist, try to copy the file, and return an appropriate error code. </item>
+        ///   <item> a second time with OverWrite==true, if the user chose to overwrite the file. While copying the file, but at least at the beginning and the end, call ProgressProc to show the copy progress and allow the user to abort the operation. </item>
+        /// </list>
+        /// </remarks>
+        /// <param name="oldName">Name of the remote source file, with full path. The name always starts with a backslash, then the names returned by FsFindFirst/FsFindNext separated by backslashes.</param>
+        /// <param name="newName">Name of the remote destination file, with full path. The name always starts with a backslash, then the names returned by FsFindFirst/FsFindNext separated by backslashes.</param>
+        /// <param name="move">If true, the file needs to be moved to the new location and name. Many file systems allow to rename/move a file without actually moving any of its data, only the pointer to it.</param>
+        /// <param name="overwrite">Tells the function whether it should overwrite the target file or not. See notes below on how this parameter is used.</param>
+        /// <param name="remoteInfo">An instance of class RemoteInfo which contains the parameters of the file being renamed/moved (not of the target file!). In TC 5.51, the fields are set as follows for directories: SizeLow=0, SizeHigh=0xFFFFFFFF.</param>
+        /// <param name="setProgress">Set the progress state in percent 0-100</param>
+        /// <param name="token"></param>
+        [TcMethod("FsRenMovFile", "FsRenMovFileW")]
+        Task<RenMovFileResult> RenMovFileAsync(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token);
+
         [TcMethod("FsDeleteFile", "FsDeleteFileW")]
         bool DeleteFile(RemotePath fileName);
+
+        [TcMethod("FsDeleteFile", "FsDeleteFileW")]
+        Task<bool> DeleteFileAsync(RemotePath fileName, CancellationToken token);
 
         [TcMethod("FsRemoveDir", "FsRemoveDirW")]
         bool RemoveDir(RemotePath dirName);
 
+        [TcMethod("FsRemoveDir", "FsRemoveDirW")]
+        Task<bool> RemoveDirAsync(RemotePath dirName, CancellationToken token);
+
         [TcMethod("FsMkDir", "FsMkDirW")]
         bool MkDir(RemotePath dir);
+
+        [TcMethod("FsMkDir", "FsMkDirW")]
+        Task<bool> MkDirAsync(RemotePath dir, CancellationToken token);
 
         [TcMethod("FsExecuteFile", "FsExecuteFileW")]
         ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName);
 
         [TcMethod("FsExecuteFile", "FsExecuteFileW")]
+        Task<ExecResult> ExecuteOpenAsync(TcWindow mainWin, RemotePath remoteName, CancellationToken token);
+
+        [TcMethod("FsExecuteFile", "FsExecuteFileW")]
         ExecResult ExecuteProperties(TcWindow mainWin, RemotePath remoteName);
+
+        [TcMethod("FsExecuteFile", "FsExecuteFileW")]
+        Task<ExecResult> ExecutePropertiesAsync(TcWindow mainWin, RemotePath remoteName, CancellationToken token);
 
         [TcMethod("FsExecuteFile", "FsExecuteFileW")]
         ExecResult ExecuteCommand(TcWindow mainWin, RemotePath remoteName, string command);
 
+        [TcMethod("FsExecuteFile", "FsExecuteFileW")]
+        Task<ExecResult> ExecuteCommandAsync(TcWindow mainWin, RemotePath remoteName, string command, CancellationToken token);
+
         [TcMethod("FsSetAttr", "FsSetAttrW")]
         bool SetAttr(RemotePath remoteName, FileAttributes attr);
 
+        [TcMethod("FsSetAttr", "FsSetAttrW")]
+        Task<bool> SetAttrAsync(RemotePath remoteName, FileAttributes attr, CancellationToken token);
+
         [TcMethod("FsSetTime", "FsSetTimeW")]
         bool SetTime(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime);
+
+        [TcMethod("FsSetTime", "FsSetTimeW")]
+        Task<bool> SetTimeAsync(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime, CancellationToken token);
 
         /// <summary>
         /// FsDisconnect is called when the user presses the Disconnect button in the FTP connections toolbar. This toolbar is only shown if MSGTYPE_CONNECT is passed to LogProc().
@@ -162,8 +206,14 @@ namespace TcPluginBase.FileSystem {
         [TcMethod("FsExtractCustomIcon", "FsExtractCustomIconW")]
         ExtractIconResult ExtractCustomIcon(RemotePath remoteName, ExtractIconFlags extractFlags);
 
+        [TcMethod("FsExtractCustomIcon", "FsExtractCustomIconW")]
+        Task<ExtractIconResult> ExtractCustomIconAsync(RemotePath remoteName, ExtractIconFlags extractFlags, CancellationToken token);
+
         [TcMethod("FsGetPreviewBitmap", "FsGetPreviewBitmapW")]
         PreviewBitmapResult GetPreviewBitmap(RemotePath remoteName, int width, int height);
+
+        [TcMethod("FsGetPreviewBitmap", "FsGetPreviewBitmapW")]
+        Task<PreviewBitmapResult> GetPreviewBitmapAsync(RemotePath remoteName, int width, int height, CancellationToken token);
 
         /// <summary>
         /// FsLinksToLocalFiles must not be implemented unless your plugin is a temporary file panel plugin! Temporary file panels just hold links to files on the local file system.

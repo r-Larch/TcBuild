@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -134,21 +134,19 @@ namespace TcPluginBase.FileSystem {
         public virtual GetFileResult GetFile(RemotePath remoteName, string localName, CopyFlags copyFlags, RemoteInfo remoteInfo)
         {
             try {
-                // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
-                using (var exec = new ThreadKeeper()) {
-                    void Progress(int percentDone)
-                    {
-                        exec.RunInMainThread(() => {
-                            if (ProgressProc(remoteName, localName, percentDone)) {
-                                exec.Cancel();
-                            }
-                        });
-                    }
+                using var exec = new ThreadKeeper();
 
-                    var ret = exec.ExecAsync(asyncFunc: (token) => GetFileAsync(remoteName, localName, copyFlags, remoteInfo, Progress, token));
-
-                    return ret;
+                void Progress(int percentDone)
+                {
+                    exec.RunInMainThread(() => {
+                        if (ProgressProc(remoteName, localName, percentDone)) {
+                            exec.Cancel();
+                        }
+                    });
                 }
+
+                var ret = exec.ExecAsync(asyncFunc: (token) => GetFileAsync(remoteName, localName, copyFlags, remoteInfo, Progress, token));
+                return ret;
             }
             catch (TaskCanceledException) {
                 return GetFileResult.UserAbort;
@@ -169,21 +167,19 @@ namespace TcPluginBase.FileSystem {
         public virtual PutFileResult PutFile(string localName, RemotePath remoteName, CopyFlags copyFlags)
         {
             try {
-                // My ThreadKeeper class is needed here because calls to ProgressProc must be made from this thread and not from some random async one.
-                using (var exec = new ThreadKeeper()) {
-                    void Progress(int percentDone)
-                    {
-                        exec.RunInMainThread(() => {
-                            if (ProgressProc(localName, remoteName, percentDone)) {
-                                exec.Cancel();
-                            }
-                        });
-                    }
+                using var exec = new ThreadKeeper();
 
-                    var ret = exec.ExecAsync(asyncFunc: (token) => PutFileAsync(localName, remoteName, copyFlags, Progress, token));
-
-                    return ret;
+                void Progress(int percentDone)
+                {
+                    exec.RunInMainThread(() => {
+                        if (ProgressProc(localName, remoteName, percentDone)) {
+                            exec.Cancel();
+                        }
+                    });
                 }
+
+                var ret = exec.ExecAsync(asyncFunc: (token) => PutFileAsync(localName, remoteName, copyFlags, Progress, token));
+                return ret;
             }
             catch (TaskCanceledException) {
                 return PutFileResult.UserAbort;
@@ -228,22 +224,69 @@ namespace TcPluginBase.FileSystem {
 
         public virtual RenMovFileResult RenMovFile(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo)
         {
-            return RenMovFileResult.NotSupported;
+            try {
+                using var exec = new ThreadKeeper();
+
+                void Progress(int percent)
+                {
+                    exec.RunInMainThread(() => {
+                        ProgressProc(oldName, newName, percent);
+                    });
+                }
+
+                return exec.ExecAsync(token => RenMovFileAsync(oldName, newName, move, overwrite, remoteInfo, Progress, token));
+            }
+            catch (TaskCanceledException) {
+                return RenMovFileResult.UserAbort;
+            }
+            catch (OperationCanceledException) {
+                return RenMovFileResult.UserAbort;
+            }
+            catch (AggregateException e) {
+                if (HasCanceledException(e)) {
+                    return RenMovFileResult.UserAbort;
+                }
+
+                throw;
+            }
+        }
+
+        public virtual Task<RenMovFileResult> RenMovFileAsync(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
+        {
+            return Task.FromResult(RenMovFileResult.NotSupported);
         }
 
         public virtual bool DeleteFile(RemotePath fileName)
         {
-            return false;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => DeleteFileAsync(fileName, token));
+        }
+
+        public virtual Task<bool> DeleteFileAsync(RemotePath fileName, CancellationToken token)
+        {
+            return Task.FromResult(false);
         }
 
         public virtual bool RemoveDir(RemotePath dirName)
         {
-            return false;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => RemoveDirAsync(dirName, token));
+        }
+
+        public virtual Task<bool> RemoveDirAsync(RemotePath dirName, CancellationToken token)
+        {
+            return Task.FromResult(false);
         }
 
         public virtual bool MkDir(RemotePath dir)
         {
-            return false;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => MkDirAsync(dir, token));
+        }
+
+        public virtual Task<bool> MkDirAsync(RemotePath dir, CancellationToken token)
+        {
+            return Task.FromResult(false);
         }
 
         public ExecResult ExecuteFile(TcWindow mainWin, RemotePath remoteName, string verb)
@@ -257,34 +300,64 @@ namespace TcPluginBase.FileSystem {
                 "open" => ExecuteOpen(mainWin, remoteName),
                 "properties" => ExecuteProperties(mainWin, remoteName),
                 "chmod" => ExecuteCommand(mainWin, remoteName, verb.Trim()),
-                "quote" => ExecuteCommand(mainWin, remoteName, verb.Substring(6).Trim()),
+                "quote" => ExecuteCommand(mainWin, remoteName, verb[6..].Trim()),
                 _ => ExecResult.Yourself
             };
         }
 
         public virtual ExecResult ExecuteOpen(TcWindow mainWin, RemotePath remoteName)
         {
-            return ExecResult.Yourself;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => ExecuteOpenAsync(mainWin, remoteName, token));
+        }
+
+        public virtual Task<ExecResult> ExecuteOpenAsync(TcWindow mainWin, RemotePath remoteName, CancellationToken token)
+        {
+            return Task.FromResult(ExecResult.Yourself);
         }
 
         public virtual ExecResult ExecuteProperties(TcWindow mainWin, RemotePath remoteName)
         {
-            return ExecResult.Yourself;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => ExecutePropertiesAsync(mainWin, remoteName, token));
+        }
+
+        public virtual Task<ExecResult> ExecutePropertiesAsync(TcWindow mainWin, RemotePath remoteName, CancellationToken token)
+        {
+            return Task.FromResult(ExecResult.Yourself);
         }
 
         public virtual ExecResult ExecuteCommand(TcWindow mainWin, RemotePath remoteName, string command)
         {
-            return ExecResult.Yourself;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => ExecuteCommandAsync(mainWin, remoteName, command, token));
+        }
+
+        public virtual Task<ExecResult> ExecuteCommandAsync(TcWindow mainWin, RemotePath remoteName, string command, CancellationToken token)
+        {
+            return Task.FromResult(ExecResult.Yourself);
         }
 
         public virtual bool SetAttr(RemotePath remoteName, FileAttributes attr)
         {
-            return false;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => SetAttrAsync(remoteName, attr, token));
+        }
+
+        public virtual Task<bool> SetAttrAsync(RemotePath remoteName, FileAttributes attr, CancellationToken token)
+        {
+            return Task.FromResult(false);
         }
 
         public virtual bool SetTime(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime)
         {
-            return false;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => SetTimeAsync(remoteName, creationTime, lastAccessTime, lastWriteTime, token));
+        }
+
+        public virtual Task<bool> SetTimeAsync(RemotePath remoteName, DateTime? creationTime, DateTime? lastAccessTime, DateTime? lastWriteTime, CancellationToken token)
+        {
+            return Task.FromResult(false);
         }
 
         public virtual bool Disconnect(RemotePath disconnectRoot)
@@ -314,7 +387,13 @@ namespace TcPluginBase.FileSystem {
         /// <returns><see cref="ExtractIconResult"/> with the extracted Icon, caching infos or the path to a local file where TC can extract the Icon on its own.</returns>
         public virtual ExtractIconResult ExtractCustomIcon(RemotePath remoteName, ExtractIconFlags extractFlags)
         {
-            return ExtractIconResult.UseDefault;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => ExtractCustomIconAsync(remoteName, extractFlags, token));
+        }
+
+        public virtual Task<ExtractIconResult> ExtractCustomIconAsync(RemotePath remoteName, ExtractIconFlags extractFlags, CancellationToken token)
+        {
+            return Task.FromResult(ExtractIconResult.UseDefault);
         }
 
         /// <summary>
@@ -328,7 +407,23 @@ namespace TcPluginBase.FileSystem {
         /// <returns><see cref="PreviewBitmapResult"/> with the extracted Bitmap, caching infos or the path to a local file where TC can extract the bitmap on its own.</returns>
         public virtual PreviewBitmapResult GetPreviewBitmap(RemotePath remoteName, int width, int height)
         {
-            return PreviewBitmapResult.None;
+            using var exec = new ThreadKeeper();
+            return exec.ExecAsync(token => GetPreviewBitmapAsync(remoteName, width, height, token));
+        }
+
+        /// <summary>
+        /// GetPreviewBitmap is called when a file/directory is displayed in thumbnail view.
+        /// It can be used to return a custom bitmap for that file/directory.
+        /// This function is new in version 1.4. It requires Total Commander >=7.0, but is ignored by older versions.
+        /// </summary>
+        /// <param name="remoteName">This is the full path to the file or directory whose bitmap is to be retrieved.</param>
+        /// <param name="width">The maximum dimensions of the preview bitmap. If your image is smaller, or has a different side ratio, then you need to return an image which is smaller than these dimensions! See notes below!</param>
+        /// <param name="height">The maximum dimensions of the preview bitmap. If your image is smaller, or has a different side ratio, then you need to return an image which is smaller than these dimensions! See notes below!</param>
+        /// <param name="token"></param>
+        /// <returns><see cref="PreviewBitmapResult"/> with the extracted Bitmap, caching infos or the path to a local file where TC can extract the bitmap on its own.</returns>
+        public virtual Task<PreviewBitmapResult> GetPreviewBitmapAsync(RemotePath remoteName, int width, int height, CancellationToken token)
+        {
+            return Task.FromResult(PreviewBitmapResult.None);
         }
 
         public virtual string? GetLocalName(RemotePath remoteName, int maxLen)
