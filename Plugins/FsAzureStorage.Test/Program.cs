@@ -1,4 +1,7 @@
-﻿using FsAzureStorage.Windows;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using FsAzureStorage.Windows;
 using TcPluginBase;
 
 

@@ -94,17 +94,37 @@ namespace FsAzureStorage {
 
         public override async Task<RenMovFileResult> RenMovFileAsync(RemotePath oldName, RemotePath newName, bool move, bool overwrite, RemoteInfo remoteInfo, Action<int> setProgress, CancellationToken token)
         {
-            setProgress(0);
-            try {
-                if (move) {
-                    return await _fs.Move(oldName, newName, overwrite: overwrite, default);
-                }
-                else {
-                    return await _fs.Copy(oldName, newName, overwrite: overwrite, default);
-                }
+            if (move) {
+                var prevPercent = -1;
+                return await _fs.Move(
+                    sourceFileName: oldName,
+                    destFileName: newName,
+                    overwrite: overwrite,
+                    fileProgress: (source, destination, percent) => {
+                        if (percent != prevPercent) {
+                            prevPercent = percent;
+
+                            setProgress(percent);
+                        }
+                    },
+                    token: token
+                );
             }
-            finally {
-                setProgress(100);
+            else {
+                var prevPercent = -1;
+                return await _fs.Copy(
+                    sourceFileName: oldName,
+                    destFileName: newName,
+                    overwrite: overwrite,
+                    fileProgress: (source, destination, percent) => {
+                        if (percent != prevPercent) {
+                            prevPercent = percent;
+
+                            setProgress(percent);
+                        }
+                    },
+                    token: token
+                );
             }
         }
 

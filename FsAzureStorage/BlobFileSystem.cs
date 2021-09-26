@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FsAzureStorage.Windows;
@@ -147,6 +149,11 @@ namespace FsAzureStorage {
             try {
                 _ = await blob.DownloadToAsync(dstFileName.FullName, mode, new Progress<long>(Progress), cancellationToken: token);
 
+                if (properties.Value.Metadata.Count > 0) {
+                    var json = JsonSerializer.Serialize(properties.Value.Metadata, new JsonSerializerOptions {WriteIndented = true});
+                    await File.WriteAllTextAsync($"{dstFileName.FullName}.metadata", json, token);
+                }
+
                 if (deleteAfter) {
                     await blob.DeleteAsync(cancellationToken: token);
                 }
@@ -193,6 +200,18 @@ namespace FsAzureStorage {
                     ContentType = MimeUtility.GetMimeMapping(srcFileName.Name),
                 };
                 var metadata = new Dictionary<string, string>();
+
+                var metaFile = $"{srcFileName.FullName}.metadata";
+                if (File.Exists(metaFile)) {
+                    try {
+                        var json = await File.ReadAllTextAsync(metaFile, token);
+                        metadata = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+                    }
+                    catch {
+                        // Ignore
+                    }
+                }
+
                 _ = await blob.UploadAsync(srcFileName.FullName, httpHeaders, metadata, progressHandler: new Progress<long>(Progress), cancellationToken: token);
 
                 Progress(fileSize);
@@ -205,7 +224,7 @@ namespace FsAzureStorage {
         }
 
 
-        public async Task<RenMovFileResult> Move(CloudPath sourceFileName, CloudPath destFileName, bool overwrite, CancellationToken token)
+        public async Task<RenMovFileResult> Move(CloudPath sourceFileName, CloudPath destFileName, bool overwrite, FileProgress fileProgress, CancellationToken token)
         {
             var source = await _blobStorage.GetBlockBlobReference(sourceFileName.AccountName, sourceFileName.ContainerName, sourceFileName.BlobName, token);
             var target = await _blobStorage.GetBlockBlobReference(destFileName.AccountName, destFileName.ContainerName, destFileName.BlobName, token);
@@ -218,21 +237,43 @@ namespace FsAzureStorage {
                 return RenMovFileResult.FileExists;
             }
 
-            var res = await CopyAndOverwrite(source, target, token);
-            if (res != RenMovFileResult.Ok) {
-                return res;
+            if (!await source.ExistsAsync(token)) {
+                return RenMovFileResult.FileNotFound;
             }
 
-            if (!await target.ExistsAsync(token)) {
-                throw new Exception("Move failed because the target file wasn't created.");
+            var fileSize = (await source.GetPropertiesAsync(cancellationToken: token)).Value.ContentLength;
+
+            Progress(0);
+
+            void Progress(long bytesTransferred)
+            {
+                var percent = fileSize == 0
+                    ? 0
+                    : decimal.ToInt32((bytesTransferred * 100) / (decimal) fileSize);
+
+                fileProgress(sourceFileName, destFileName, percent);
             }
 
-            await source.DeleteIfExistsAsync(cancellationToken: token);
-            return RenMovFileResult.Ok;
+            try {
+                await source.CopyAndOverwrite(target, new Progress<long>(Progress), cancellationToken: token);
+
+                if (!await target.ExistsAsync(token)) {
+                    throw new Exception("Move failed because the target file wasn't created.");
+                }
+
+                await source.DeleteIfExistsAsync(cancellationToken: token);
+
+                Progress(fileSize);
+
+                return RenMovFileResult.Ok;
+            }
+            catch (TaskCanceledException) {
+                return RenMovFileResult.UserAbort;
+            }
         }
 
 
-        public async Task<RenMovFileResult> Copy(CloudPath sourceFileName, CloudPath destFileName, bool overwrite, CancellationToken token)
+        public async Task<RenMovFileResult> Copy(CloudPath sourceFileName, CloudPath destFileName, bool overwrite, FileProgress fileProgress, CancellationToken token)
         {
             var source = await _blobStorage.GetBlockBlobReference(sourceFileName.AccountName, sourceFileName.ContainerName, sourceFileName.BlobName, token);
             var target = await _blobStorage.GetBlockBlobReference(destFileName.AccountName, destFileName.ContainerName, destFileName.BlobName, token);
@@ -245,16 +286,35 @@ namespace FsAzureStorage {
                 return RenMovFileResult.FileExists;
             }
 
-            var res = await CopyAndOverwrite(source, target, token);
-            if (res != RenMovFileResult.Ok) {
-                return res;
+            if (!await source.ExistsAsync(token)) {
+                return RenMovFileResult.FileNotFound;
             }
 
-            if (!await target.ExistsAsync(token)) {
-                throw new Exception("Move failed because the target file wasn't created.");
+            var fileSize = (await source.GetPropertiesAsync(cancellationToken: token)).Value.ContentLength;
+
+            void Progress(long bytesTransferred)
+            {
+                var percent = fileSize == 0
+                    ? 0
+                    : decimal.ToInt32((bytesTransferred * 100) / (decimal) fileSize);
+
+                fileProgress(sourceFileName, destFileName, percent);
             }
 
-            return RenMovFileResult.Ok;
+            try {
+                await source.CopyAndOverwrite(target, new Progress<long>(Progress), cancellationToken: token);
+
+                if (!await target.ExistsAsync(token)) {
+                    throw new Exception("Move failed because the target file wasn't created.");
+                }
+
+                Progress(fileSize);
+
+                return RenMovFileResult.Ok;
+            }
+            catch (TaskCanceledException) {
+                return RenMovFileResult.UserAbort;
+            }
         }
 
 
@@ -297,19 +357,6 @@ namespace FsAzureStorage {
         //}
 
 
-        private static async Task<RenMovFileResult> CopyAndOverwrite(BlobClient src, BlobClient dst, CancellationToken token)
-        {
-            if (!await src.ExistsAsync(token)) {
-                return RenMovFileResult.FileNotFound;
-            }
-
-            var operation = await dst.StartCopyFromUriAsync(src.Uri, cancellationToken: token);
-            await operation.WaitForCompletionAsync(token);
-
-            return RenMovFileResult.Ok;
-        }
-
-
         public bool CacheDirectory(CloudPath dir)
         {
             if (dir.IsBlobPath) {
@@ -320,6 +367,7 @@ namespace FsAzureStorage {
             // can not create accounts and container
             return false;
         }
+
 
         public async Task<ExecResult> OpenBlobPropertiesWindow(TcWindow owner, CloudPath remoteName, CancellationToken token)
         {
