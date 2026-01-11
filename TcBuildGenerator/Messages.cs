@@ -3,13 +3,13 @@
 
 namespace TcBuildGenerator {
     public static class Messages {
-        public static string[] PluginBaseClasses = {
+        public static string[] PluginBaseClasses = [
             "TcPluginBase.FileSystem.FsPlugin",
             "TcPluginBase.Content.ContentPlugin",
             "TcPluginBase.Lister.ListerPlugin",
             "TcPluginBase.Packer.PackerPlugin",
-            "TcPluginBase.QuickSearch.QuickSearchPlugin",
-        };
+            "TcPluginBase.QuickSearch.QuickSearchPlugin"
+        ];
 
         public static DiagnosticDescriptor NoPluginError => new(
             id: "TcBuild0001",

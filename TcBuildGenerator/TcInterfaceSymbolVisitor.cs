@@ -6,14 +6,9 @@ using Microsoft.CodeAnalysis;
 
 
 namespace TcBuildGenerator {
-    public class TcInterfaceSymbolVisitor : SymbolVisitor {
-        private readonly Action<Diagnostic> _errorSink;
-        public List<PluginDefinition> Definitions = new();
-
-        public TcInterfaceSymbolVisitor(Action<Diagnostic> errorSink)
-        {
-            _errorSink = errorSink;
-        }
+    public class TcInterfaceSymbolVisitor(Action<Diagnostic> errorSink) : SymbolVisitor {
+        private readonly Action<Diagnostic> _errorSink = errorSink;
+        public List<PluginDefinition> Definitions = [];
 
         public override void VisitNamespace(INamespaceSymbol symbol)
         {
@@ -32,12 +27,12 @@ namespace TcBuildGenerator {
                     genericTypeArguments.Add((key, value));
                 }
 
-                var definition = new PluginDefinition {
-                    Type = pluginType,
-                    Name = iface.Name,
-                    GenericTypeArguments = genericTypeArguments.ToImmutableArray(),
-                    Methods = new Dictionary<string, PluginDefinitionMethodData>()
-                };
+                var definition = new PluginDefinition(
+                    Type: pluginType,
+                    Name: iface.Name,
+                    GenericTypeArguments: genericTypeArguments.ToImmutableArray(),
+                    Methods: new()
+                );
                 Definitions.Add(definition);
 
                 foreach (var child in iface.GetMembers()) {
@@ -49,12 +44,12 @@ namespace TcBuildGenerator {
         public override void VisitMethod(IMethodSymbol symbol)
         {
             if (TryGetWrapperData(symbol, out var wrapperData)) {
-                var methodData = new PluginDefinitionMethodData {
-                    MethodName = symbol.Name,
-                    Signature = symbol.ToString(),
-                    ContainingType = symbol.ContainingType.ToString(),
-                    WrapperData = wrapperData,
-                };
+                var methodData = new PluginDefinitionMethodData(
+                    MethodName: symbol.Name,
+                    Signature: symbol.ToString(),
+                    ContainingType: symbol.ContainingType.ToString(),
+                    WrapperData: wrapperData
+                );
 
                 symbol.GetAttributes();
 
@@ -77,33 +72,33 @@ namespace TcBuildGenerator {
                 {
                     var wrapperMethods = attribute.ConstructorArguments.Where(_ => _.Type?.ToString() == "string").Select(_ => _.Value).OfType<string>().ToImmutableArray();
 
-                    return new WrapperData {
-                        MethodNames = wrapperMethods,
-                        Mandatory = (bool?) attribute.NamedArguments.FirstOrDefault(_ => _.Key == "Mandatory").Value.Value == true,
-                        BaseImplemented = (bool?) attribute.NamedArguments.FirstOrDefault(_ => _.Key == "BaseImplemented").Value.Value == true,
-                    };
+                    return new WrapperData(
+                        MethodNames: wrapperMethods,
+                        Mandatory: (bool?) attribute.NamedArguments.FirstOrDefault(_ => _.Key == "Mandatory").Value.Value == true,
+                        BaseImplemented: (bool?) attribute.NamedArguments.FirstOrDefault(_ => _.Key == "BaseImplemented").Value.Value == true
+                    );
                 }
             }
         }
     }
 
-    public struct PluginDefinition {
-        public PluginType Type { get; set; }
-        public string Name { get; set; }
-        public Dictionary<string, PluginDefinitionMethodData> Methods { get; set; }
-        public ImmutableArray<(string key, string value)> GenericTypeArguments { get; set; }
-    }
+    public record struct PluginDefinition(
+        PluginType Type,
+        string Name,
+        Dictionary<string, PluginDefinitionMethodData> Methods,
+        ImmutableArray<(string key, string value)> GenericTypeArguments
+    );
 
-    public struct PluginDefinitionMethodData {
-        public string MethodName { get; set; }
-        public string Signature { get; set; }
-        public string ContainingType { get; set; }
-        public WrapperData WrapperData { get; set; }
-    }
+    public record struct PluginDefinitionMethodData(
+        string MethodName,
+        string Signature,
+        string ContainingType,
+        WrapperData WrapperData
+    );
 
-    public struct WrapperData {
-        public ImmutableArray<string> MethodNames { get; set; }
-        public bool Mandatory { get; set; }
-        public bool BaseImplemented { get; set; }
-    }
+    public record struct WrapperData(
+        ImmutableArray<string> MethodNames,
+        bool Mandatory,
+        bool BaseImplemented
+    );
 }

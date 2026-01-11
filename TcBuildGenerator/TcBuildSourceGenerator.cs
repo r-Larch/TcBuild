@@ -79,7 +79,7 @@ namespace TcBuildGenerator {
                 .ToList();
 
             // temp fix: remove Fs Content
-            methodsToRemove.AddRange(new[] {
+            methodsToRemove.AddRange([
                 "FsContentGetDefaultSortOrder",
                 "FsContentGetDefaultView",
                 "FsContentGetDefaultViewW",
@@ -91,8 +91,8 @@ namespace TcBuildGenerator {
                 "FsContentSetValue",
                 "FsContentSetValueW",
                 "FsContentStopGetValue",
-                "FsContentStopGetValueW",
-            });
+                "FsContentStopGetValueW"
+            ]);
 
             // 5.remove excluded methods
             foreach (var method in methodsToRemove) {

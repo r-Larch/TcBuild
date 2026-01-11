@@ -13,7 +13,7 @@ namespace TcBuildGenerator.Tests {
         {
             var tree = CSharpSyntaxTree.ParseText(sourceText);
             var compilation = CSharpCompilation.Create("MyCompilation",
-                syntaxTrees: new[] {tree},
+                syntaxTrees: [tree],
                 references: Helper.GetMetadataReferences(
                     parentAssembly
                 ),
@@ -68,24 +68,26 @@ namespace TcBuildGenerator.Tests {
             }
         }
 
-        public static IEnumerable<AssemblyName> GetTransitiveAssemblies(this Assembly assembly)
-        {
-            var assemblyNames = new HashSet<AssemblyName>(AssemblyNameEqualityComparer.Instance);
-            assembly.PopulateTransitiveAssemblies(assemblyNames);
+        extension(Assembly assembly) {
+            public IEnumerable<AssemblyName> GetTransitiveAssemblies()
+            {
+                var assemblyNames = new HashSet<AssemblyName>(AssemblyNameEqualityComparer.Instance);
+                assembly.PopulateTransitiveAssemblies(assemblyNames);
 
-            return assemblyNames;
-        }
+                return assemblyNames;
+            }
 
-        private static void PopulateTransitiveAssemblies(this Assembly assembly, ISet<AssemblyName> assemblyNames)
-        {
-            foreach (var referencedAssemblyName in assembly.GetReferencedAssemblies()) {
-                // Already exists
-                if (!assemblyNames.Add(referencedAssemblyName))
-                    continue;
+            private void PopulateTransitiveAssemblies(ISet<AssemblyName> assemblyNames)
+            {
+                foreach (var referencedAssemblyName in assembly.GetReferencedAssemblies()) {
+                    // Already exists
+                    if (!assemblyNames.Add(referencedAssemblyName))
+                        continue;
 
-                var referencedAssembly = referencedAssemblyName.TryLoad();
-                if (referencedAssembly != null)
-                    referencedAssembly.PopulateTransitiveAssemblies(assemblyNames);
+                    var referencedAssembly = referencedAssemblyName.TryLoad();
+                    if (referencedAssembly != null)
+                        referencedAssembly.PopulateTransitiveAssemblies(assemblyNames);
+                }
             }
         }
 

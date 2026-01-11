@@ -5,15 +5,9 @@ using Microsoft.CodeAnalysis;
 
 
 namespace TcBuildGenerator {
-    public class TcPluginSymbolVisitor : SymbolVisitor {
-        private readonly Action<Diagnostic> _errorSink;
-        public List<PluginData> Plugins = new();
+    public class TcPluginSymbolVisitor(Action<Diagnostic> errorSink) : SymbolVisitor {
+        public List<PluginData> Plugins = [];
         public Dictionary<PluginType, PluginDefinition> Definitions = new();
-
-        public TcPluginSymbolVisitor(Action<Diagnostic> errorSink)
-        {
-            _errorSink = errorSink;
-        }
 
         public override void VisitNamespace(INamespaceSymbol symbol)
         {
@@ -27,13 +21,13 @@ namespace TcBuildGenerator {
             if (TcHelper.IsPluginClass(clazz, out var pluginType, out var pluginInterface)) {
                 var definition = GetPluginDefinition(pluginType, pluginInterface);
 
-                var plugin = new PluginData {
-                    Type = pluginType,
-                    ClassFullName = clazz.ToString(),
-                    Namespace = clazz.ContainingNamespace.Name,
-                    ImplementedMethods = new List<MethodData>(),
-                    Definition = definition,
-                };
+                var plugin = new PluginData(
+                    Type: pluginType,
+                    ClassFullName: clazz.ToString(),
+                    Namespace: clazz.ContainingNamespace.Name,
+                    ImplementedMethods: [],
+                    Definition: definition
+                );
                 Plugins.Add(plugin);
 
                 // visit all methods of all base classes excluding the abstract XxPlugin base!
@@ -52,7 +46,7 @@ namespace TcBuildGenerator {
         private PluginDefinition GetPluginDefinition(PluginType pluginType, INamedTypeSymbol pluginInterface)
         {
             if (!Definitions.TryGetValue(pluginType, out var definition)) {
-                var visitor = new TcInterfaceSymbolVisitor(_errorSink);
+                var visitor = new TcInterfaceSymbolVisitor(errorSink);
                 visitor.Visit(pluginInterface);
                 definition = visitor.Definitions.Single();
 
@@ -64,19 +58,15 @@ namespace TcBuildGenerator {
 
         public override void VisitMethod(IMethodSymbol symbol)
         {
-            if (
-                symbol.IsOverride &&
-                symbol.IsDefinition
-            ) {
+            if (symbol is { IsOverride: true, IsDefinition: true }) {
                 var plugin = Plugins.Last();
 
                 if (TcHelper.TryGetPluginMethod(plugin, symbol, out var interfaceMember)) {
-                    var methodData = new MethodData {
-                        MethodName = symbol.Name,
-                        Signature = interfaceMember.ToString(),
-                        ContainingType = symbol.ContainingType.ToString(),
-                    };
-
+                    var methodData = new MethodData(
+                        MethodName: symbol.Name,
+                        Signature: interfaceMember.ToString(),
+                        ContainingType: symbol.ContainingType.ToString()
+                    );
 
                     if (plugin.Definition.Methods.ContainsKey(methodData.Signature)) {
                         plugin.ImplementedMethods.Add(methodData);
@@ -86,21 +76,18 @@ namespace TcBuildGenerator {
         }
     }
 
-#nullable disable
 
-    public class PluginData {
-        public PluginType Type { get; set; }
-        public string Namespace { get; set; }
-        public string ClassFullName { get; set; }
-        public List<MethodData> ImplementedMethods { get; set; }
-        public PluginDefinition Definition { get; set; }
-    }
+    public record PluginData(
+        PluginType Type,
+        string Namespace,
+        string ClassFullName,
+        List<MethodData> ImplementedMethods,
+        PluginDefinition Definition
+    );
 
-    public struct MethodData {
-        public string MethodName { get; set; }
-        public string Signature { get; set; }
-        public string ContainingType { get; set; }
-    }
-
-#nullable restore
+    public record struct MethodData(
+        string MethodName,
+        string Signature,
+        string ContainingType
+    );
 }

@@ -10,7 +10,7 @@ namespace TcBuildGenerator.Tests {
         public void Test_TcPluginSymbolVisitor()
         {
             var parentAssembly = typeof(TcPluginBase.TcPlugin).Assembly;
-            var classSymbol = Helper.GetClassSymbol(parentAssembly, @"
+            var classSymbol = Helper.GetClassSymbol(parentAssembly, """
                 using System;
                 using Microsoft.Extensions.Configuration;
                 using TcPluginBase.Lister;
@@ -30,7 +30,8 @@ namespace TcBuildGenerator.Tests {
                         }
                     }
                 }
-            ");
+                """
+            );
 
             var visitor = new TcPluginSymbolVisitor(Log);
             visitor.Visit(classSymbol);

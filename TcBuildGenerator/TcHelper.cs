@@ -7,17 +7,17 @@ using Microsoft.CodeAnalysis;
 namespace TcBuildGenerator {
     public class TcHelper {
         private static readonly Dictionary<string, PluginType> Plugins = new() {
-            {"TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem},
-            {"TcPluginBase.Lister.IListerPlugin", PluginType.Lister},
-            {"TcPluginBase.Packer.IPackerPlugin", PluginType.Packer},
-            {"TcPluginBase.QuickSearch.IQuickSearchPlugin", PluginType.QuickSearch},
+            { "TcPluginBase.FileSystem.IFsPlugin", PluginType.FileSystem },
+            { "TcPluginBase.Lister.IListerPlugin", PluginType.Lister },
+            { "TcPluginBase.Packer.IPackerPlugin", PluginType.Packer },
+            { "TcPluginBase.QuickSearch.IQuickSearchPlugin", PluginType.QuickSearch },
         };
 
         public static bool IsPluginClass(in INamedTypeSymbol clazz, out PluginType pluginType, out INamedTypeSymbol pluginInterface)
         {
             if (
-                clazz.TypeKind == TypeKind.Class &&
-                !clazz.IsAbstract && clazz.ContainingAssembly.Name != "TcPluginBase"
+                clazz is { TypeKind: TypeKind.Class, IsAbstract: false } &&
+                clazz.ContainingAssembly.Name != "TcPluginBase"
             ) {
                 foreach (var iface in clazz.AllInterfaces) {
                     if (IsPluginInterface(iface, out pluginType)) {
@@ -28,7 +28,7 @@ namespace TcBuildGenerator {
             }
 
             pluginType = default;
-            pluginInterface = default!;
+            pluginInterface = null!;
             return false;
         }
 
@@ -63,7 +63,7 @@ namespace TcBuildGenerator {
             static IEnumerable<ISymbol> ExplicitOrImplicitPluginInterfaceImplementations(ISymbol symbol, PluginData plugin)
             {
                 if (symbol.Kind != SymbolKind.Method && symbol.Kind != SymbolKind.Property && symbol.Kind != SymbolKind.Event) {
-                    return Enumerable.Empty<ISymbol>();
+                    return [];
                 }
 
                 var containingType = symbol.ContainingType;
