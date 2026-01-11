@@ -1,132 +1,69 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 
 
 [assembly: InternalsVisibleTo("TcBuildGenerator.Tests")]
 
-namespace TcBuildGenerator {
-    [Generator]
-    public class TcBuildSourceGenerator : ISourceGenerator {
-        public void Initialize(GeneratorInitializationContext context)
-        {
+namespace TcBuildGenerator;
+
+[Generator(LanguageNames.CSharp)]
+public class TcBuildSourceGenerator : IIncrementalGenerator {
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        var descriptors = context.CompilationProvider
+            .Select((compilation, token) => {
+                var visitor = new TcPluginSymbolVisitor();
+                visitor.Visit(compilation.GlobalNamespace);
+                var plugins = visitor.Plugins;
+                return new PluginDescriptor([.. plugins]);
+            });
+
+        context.RegisterSourceOutput(descriptors, static (spc, source) => Execute(source, spc));
+    }
+
+
+    private static void Execute(PluginDescriptor pluginDescriptor, SourceProductionContext context)
+    {
+        var plugin = GetPlugin(pluginDescriptor, context);
+        if (plugin == null) {
+            return;
         }
 
-
-        public void Execute(GeneratorExecutionContext context)
         {
-            var visitor = new TcPluginSymbolVisitor(context.ReportDiagnostic);
-            visitor.Visit(context.Compilation.GlobalNamespace);
-            var plugins = visitor.Plugins;
-
-            // TODO handle plugin fs + content plugin
-            var plugin = plugins.SingleOrDefault();
-
-            if (plugin == null) {
-                context.ReportDiagnostic(Diagnostic.Create(Messages.NoPluginError, Location.None));
-                return;
-            }
-
-            {
-                var fileName = $"{plugin.Type}.wrapper.cs";
-                var wrapperSource = GenerateWrapperSource(plugin);
-                var fileSource = ModifySource(plugin, wrapperSource);
-                context.AddSource(fileName, fileSource);
-            }
-
-            {
-                context.AddSource($"{plugin.Type}.attributes.cs", $@"
-                    using System;
-
-                    [assembly:{TcInfos.TcPluginDefinitionAttribute}(""{plugin.Type}"", typeof(global::{plugin.ClassFullName}))]
-
-                    internal class {TcInfos.TcPluginDefinitionAttribute} : Attribute {{
-                        public {TcInfos.TcPluginDefinitionAttribute}(string pluginType, Type type) {{
-                            PluginType = pluginType;
-                            Type = type;
-                        }}
-                        public string PluginType {{ get; set; }}
-                        public Type Type {{ get; set; }}
-                    }}
-                ");
-            }
+            var (wrapperName, wrapperSource) = SourceGenerationHelper.GenerateWrapperSource(plugin);
+            context.AddSource(wrapperName, wrapperSource);
         }
 
-
-        internal static string ModifySource(PluginData plugin, string fileSource)
         {
-            // 1. take all Mandatory and BaseImplemented methods
-            var methods = plugin.Definition.Methods.Values
-                .Where(_ => _.WrapperData.Mandatory || _.WrapperData.BaseImplemented)
-                .ToList();
-
-            // 2. add all plugin implemented methods
-            foreach (var method in plugin.ImplementedMethods) {
-                var definition = plugin.Definition.Methods[method.Signature];
-                methods.Add(definition);
-            }
-
-            // 3. get methods to implement in the wrapper
-            var wrapperMethods = methods.SelectMany(_ => _.WrapperData.MethodNames).ToImmutableHashSet();
-
-            // 4. find all methods to be excluded
-            var methodsToRemove = plugin.Definition.Methods.Values
-                .SelectMany(_ => _.WrapperData.MethodNames).Distinct()
-                .Where(_ => !wrapperMethods.Contains(_))
-                .ToList();
-
-            // temp fix: remove Fs Content
-            methodsToRemove.AddRange([
-                "FsContentGetDefaultSortOrder",
-                "FsContentGetDefaultView",
-                "FsContentGetDefaultViewW",
-                "FsContentGetSupportedField",
-                "FsContentGetSupportedFieldFlags",
-                "FsContentGetValue",
-                "FsContentGetValueW",
-                "FsContentPluginUnloading",
-                "FsContentSetValue",
-                "FsContentSetValueW",
-                "FsContentStopGetValue",
-                "FsContentStopGetValueW"
-            ]);
-
-            // 5.remove excluded methods
-            foreach (var method in methodsToRemove) {
-                fileSource = fileSource.Replace($"[UnmanagedCallersOnly(EntryPoint = \"{method}\")]", "");
-            }
-
-            fileSource = fileSource.Replace("PluginClassPlaceholder", $"global::{plugin.ClassFullName}");
-
-            foreach (var (key, value) in plugin.Definition.GenericTypeArguments) {
-                fileSource = fileSource.Replace(key, $"global::{value}");
-            }
-
-            return fileSource;
-        }
-
-
-        internal static string GenerateWrapperSource(PluginData plugin)
-        {
-            return plugin.Type switch {
-                PluginType.FileSystem => GetManifestResource("TcBuildGenerator.Wrapper.FsWrapper.cs"),
-                PluginType.Lister => GetManifestResource("TcBuildGenerator.Wrapper.WlxWrapper.cs"),
-                PluginType.Packer => GetManifestResource("TcBuildGenerator.Wrapper.WcxWrapper.cs"),
-                PluginType.QuickSearch => GetManifestResource("TcBuildGenerator.Wrapper.QSWrapper.cs"),
-                _ => throw new ArgumentOutOfRangeException(nameof(plugin.Type), $"PluginType: '{plugin.Type}' not implemented!")
-            };
-        }
-
-
-        private static string GetManifestResource(string name)
-        {
-            using var stream = typeof(TcBuildSourceGenerator).Assembly.GetManifestResourceStream(name);
-            if (stream == null) throw new FileNotFoundException($"ManifestResource: '{name}'");
-            using var sr = new StreamReader(stream);
-            return sr.ReadToEnd();
+            var (fileName, fileSource) = SourceGenerationHelper.GenerateAssemblyAttribute(plugin);
+            context.AddSource(fileName, fileSource);
         }
     }
+
+
+    private static PluginData? GetPlugin(PluginDescriptor pluginDescriptor, SourceProductionContext context)
+    {
+        var plugins = pluginDescriptor.Plugins;
+
+        if (plugins is not { Length: 1 }) {
+            // TODO handle plugin fs + content plugin
+            if (plugins is { Length: > 1 }) {
+                foreach (var location in plugins.SelectMany(_ => _.Locations)) {
+                    context.ReportDiagnostic(Diagnostic.Create(Messages.TooManyPluginsError, location));
+                }
+
+                return null;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(Messages.NoPluginError, Location.None));
+            return null;
+        }
+
+        return plugins[0];
+    }
 }
+
+public record PluginDescriptor(
+    ImmutableArray<PluginData> Plugins
+);
