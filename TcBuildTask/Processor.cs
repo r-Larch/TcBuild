@@ -10,23 +10,12 @@ using Task = System.Threading.Tasks.Task;
 
 
 namespace TcBuild {
-    public class Processor {
-        private readonly ILogger _log;
-
-#nullable disable
-
-        public FileInfo AssemblyFile { get; set; }
-        public FileInfo NativeAssemblyFile { get; set; }
-        public DirectoryInfo OutputDirectory { get; set; }
-        public List<FileInfo> ReferenceFiles { get; set; }
-        public bool Is64Bit { get; set; }
-
-#nullable enable
-
-        public Processor(ILogger log)
-        {
-            _log = log;
-        }
+    public class Processor(ILogger log) {
+        public required FileInfo AssemblyFile { get; set; }
+        public required FileInfo NativeAssemblyFile { get; set; }
+        public required DirectoryInfo OutputDirectory { get; set; }
+        public required List<FileInfo> ReferenceFiles { get; set; }
+        public required bool Is64Bit { get; set; }
 
 
         public Task<string> ExecuteAsync(CancellationToken token = default)
@@ -46,8 +35,8 @@ namespace TcBuild {
 
 
             // info
-            _log.LogMessage($"{plugin.Type}: {plugin.ClassFullName}");
-            _log.LogMessage($"Output -> {zipFile.FullName}");
+            log.LogMessage($"{plugin.Type}: {plugin.ClassFullName}");
+            log.LogMessage($"Output -> {zipFile.FullName}");
 
             token.ThrowIfCancellationRequested();
 
@@ -101,7 +90,7 @@ namespace TcBuild {
 
         private PluginDefinition? GetPluginDefinition(FileInfo assemblyFile)
         {
-            using var parser = new AssemblyParser(assemblyFile, _log);
+            using var parser = new AssemblyParser(assemblyFile, log);
             var plugin = parser.GetPluginDefinition();
             return plugin;
         }
@@ -113,14 +102,14 @@ namespace TcBuild {
 
             var desc = version.Comments ?? version.FileDescription;
             if (string.IsNullOrEmpty(desc)) {
-                // TC needs a description to show the install dialog!
-                _log.LogWarning("[plugininstall] description is empty! Using default description. (to change description add <Description>..</Description> tag to .csproj)");
+                // TC needs a description to show the installation dialog!
+                log.LogWarning("[plugininstall] description is empty! Using default description. (to change description add <Description>..</Description> tag to .csproj)");
                 desc = $"{Path.GetFileNameWithoutExtension(wrapperFile.Name)} is a {pluginType} Plugin for Total Commander";
             }
 
             // desc has a max length of 255!
             if (desc.Length > 255) {
-                _log.LogWarning(
+                log.LogWarning(
                     "[plugininstall] plugin description may not exceed 255 characters. It got trimmed to fit! " +
                     "To remove this warning adjust the text inside of <Description>..</Description> tag in .csproj)"
                 );
@@ -138,7 +127,7 @@ namespace TcBuild {
             };
 
             if (pluginType == PluginType.Packer) {
-                plugininstall.Add($"defaultextension=???");
+                plugininstall.Add("defaultextension=???");
             }
 
             return string.Join(Environment.NewLine, plugininstall);
@@ -148,7 +137,7 @@ namespace TcBuild {
         private string GetOutputFileName(PluginType pluginType, bool x64)
         {
             var name = pluginType == PluginType.QuickSearch ? "tcmatch" : Path.GetFileNameWithoutExtension(AssemblyFile.Name);
-            var extension = "." + TcInfos.PluginExtensions[pluginType];
+            var extension = $".{TcInfos.PluginExtensions[pluginType]}";
 
             if (x64) {
                 if (extension == ".dll") {

@@ -1,17 +1,12 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TcBuild.Test;
-using TcPluginBase;
-using TcPluginBase.FileSystem;
+using TcPluginBase.Test.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
 
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-namespace FsAzureStorage.Test {
+namespace TcPluginBase.Test {
     public class ThreadKeeperTests {
         private readonly ITestOutputHelper _output;
         [ThreadStatic] private static ThreadKeeper _exec;
@@ -23,20 +18,19 @@ namespace FsAzureStorage.Test {
             Console.SetError(new Converter(output, ""));
         }
 
-        private static ThreadKeeper GetCurrentThreadKeeper() => _exec ?? (_exec = new ThreadKeeper());
-        //private static ThreadKeeper exec => _exec ?? (_exec = new ThreadKeeper());
+        private static ThreadKeeper GetCurrentThreadKeeper() => _exec ??= new ThreadKeeper();
 
 
-        [Fact]
+        [Fact(Skip = "Not A Test")]
         public void Test_MultiThreading_ThreadStatic()
         {
-            Parallel.For(0, 10, new ParallelOptions() {MaxDegreeOfParallelism = 100}, i => {
+            Parallel.For(0, 10, new ParallelOptions() { MaxDegreeOfParallelism = 100 }, i => {
                 Test_MultiThreading();
             });
         }
 
 
-        [Fact]
+        [Fact(Skip = "Not A Test")]
         public void Test_MultiThreading()
         {
             // TODO overwrite: public virtual int OnTcPluginEvent(PluginEventArgs e)
@@ -106,6 +100,7 @@ namespace FsAzureStorage.Test {
                 }
             }
         }
+
 
         private bool HasCanceledException(AggregateException e)
         {

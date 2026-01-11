@@ -8,33 +8,26 @@ using System.Threading.Tasks;
 
 namespace TcBuild {
     public class TcBuildTask : Microsoft.Build.Utilities.Task, ICancelableTask, ITask {
-#nullable disable
-        private readonly CancellationTokenSource _token;
-        private ILogger _log;
+        private readonly CancellationTokenSource _token = new();
+        private ILogger _log = null!;
 
         [Required]
-        public string AssemblyFile { get; set; }
+        public string AssemblyFile { get; set; } = null!;
         [Required]
-        public string NativeAssemblyFile { get; set; }
+        public string NativeAssemblyFile { get; set; } = null!;
         [Required]
-        public string OutputDirectory { get; set; }
+        public string OutputDirectory { get; set; } = null!;
         [Required]
-        public ITaskItem[] ReferenceCopyLocalFiles { get; set; }
+        public ITaskItem[] ReferenceCopyLocalFiles { get; set; } = null!;
 
         [Required]
-        public string RuntimeId { get; set; }
+        public string RuntimeId { get; set; } = null!;
         [Required]
-        public string Architecture { get; set; }
+        public string Architecture { get; set; } = null!;
 
         [Output]
-        public string GeneratedFiles { get; set; }
+        public string GeneratedFiles { get; set; } = null!;
 
-#nullable enable
-
-        public TcBuildTask()
-        {
-            _token = new CancellationTokenSource();
-        }
 
         public override bool Execute()
         {
@@ -53,7 +46,7 @@ namespace TcBuild {
                 Is64Bit = Is64Bit
             };
 
-            GeneratedFiles = Task.Run(async () => await processor.ExecuteAsync(_token.Token), _token.Token).Result;
+            GeneratedFiles = Task.Run(async () => await processor.ExecuteAsync(_token.Token), _token.Token).GetAwaiter().GetResult();
 
             return true;
         }

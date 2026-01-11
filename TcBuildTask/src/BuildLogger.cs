@@ -3,13 +3,8 @@ using Microsoft.Build.Framework;
 
 
 namespace TcBuild {
-    public class BuildLogger : MarshalByRefObject, ILogger {
-        public IBuildEngine BuildEngine { get; set; }
-
-        public BuildLogger(IBuildEngine buildEngine)
-        {
-            BuildEngine = buildEngine;
-        }
+    public class BuildLogger(IBuildEngine buildEngine) : MarshalByRefObject, ILogger {
+        public IBuildEngine BuildEngine { get; set; } = buildEngine;
 
         public virtual void SetOperationName(string weaverName)
         {

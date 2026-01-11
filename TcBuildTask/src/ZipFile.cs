@@ -7,15 +7,9 @@ using System.Threading;
 
 
 namespace TcBuild {
-    public class ZipFile : IDisposable {
-        private readonly ZipArchive _zip;
-        private readonly string _baseDirectory;
-
-        public ZipFile(FileInfo zipFile, DirectoryInfo baseDirectory)
-        {
-            _baseDirectory = baseDirectory.FullName.TrimEnd('\\') + '\\';
-            _zip = new ZipArchive(OpenWrite(zipFile), ZipArchiveMode.Create);
-        }
+    public class ZipFile(FileInfo zipFile, DirectoryInfo baseDirectory) : IDisposable {
+        private readonly ZipArchive _zip = new(OpenWrite(zipFile), ZipArchiveMode.Create);
+        private readonly string _baseDirectory = baseDirectory.FullName.TrimEnd('\\') + '\\';
 
         public ZipFile Add(FileInfo file)
         {
@@ -37,7 +31,7 @@ namespace TcBuild {
             return this;
         }
 
-        public ZipFile Add(string fileName, string fileContents, Encoding? encoding = default)
+        public ZipFile Add(string fileName, string fileContents, Encoding? encoding = null)
         {
             using var entry = _zip.CreateEntry(fileName).Open();
             using var sw = new StreamWriter(entry, encoding ?? Encoding.Default);

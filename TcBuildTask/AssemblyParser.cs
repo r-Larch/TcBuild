@@ -102,14 +102,13 @@ namespace TcBuild {
         }
 
 
-        private readonly struct KnownType {
-            public static readonly KnownType Unknown = new("Unknown");
-            public static readonly KnownType String = new("String");
-            public static readonly KnownType SystemTypeArray = new("SystemTypeArray");
-            public static readonly KnownType SystemType = new("SystemType");
+        private readonly struct KnownType(string value) {
+            public static readonly KnownType Unknown = new(nameof(Unknown));
+            public static readonly KnownType String = new(nameof(String));
+            public static readonly KnownType SystemTypeArray = new(nameof(SystemTypeArray));
+            public static readonly KnownType SystemType = new(nameof(SystemType));
 
-            private readonly string _value;
-            public KnownType(string value) => _value = value;
+            private readonly string _value = value;
             public static implicit operator string(KnownType type) => type._value;
             public override string ToString() => _value;
         }

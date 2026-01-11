@@ -96,6 +96,22 @@ namespace TcPluginBase.Test {
         }
 
         [Fact]
+        public void Segments()
+        {
+            RemotePath path = "\\segment1\\segment2";
+
+            Assert.Equal(["segment1", "segment2"], path.Segments);
+        }
+
+        [Fact]
+        public void Segments_with_backslash()
+        {
+            RemotePath path = "\\segment1\\";
+
+            Assert.Equal(["segment1"], path.Segments);
+        }
+
+        [Fact]
         public void Implicit_Add_SubPath()
         {
             RemotePath path = @"\MyAccount\MyContainer\Folder1\";

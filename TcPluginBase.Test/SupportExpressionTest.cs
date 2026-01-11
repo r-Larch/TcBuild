@@ -90,7 +90,7 @@ namespace TcPluginBase.Test {
                 }
             };
 
-            var result = SupportExpression.Create(_ => _.Size == MyFunc(obj.Prop, 1) && _.HasExt(new {Hoi = "test"}.Hoi));
+            var result = SupportExpression.Create(_ => _.Size == MyFunc(obj.Prop, 1) && _.HasExt(new { Hoi = "test" }.Hoi));
 
             Assert.Equal(
                 expected: @"SIZE = 2 & EXT = ""TEST""",
