@@ -48,7 +48,7 @@ public class TcInterfaceSymbolVisitor : SymbolVisitor {
                 WrapperData: wrapperData
             );
 
-            symbol.GetAttributes();
+            //symbol.GetAttributes();
 
             var plugin = Definitions.Last();
             plugin.Methods.Add(methodData.Signature, methodData);

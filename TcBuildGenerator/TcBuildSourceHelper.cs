@@ -1,9 +1,19 @@
 ﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 
 
 namespace TcBuildGenerator;
 
-public class SourceGenerationHelper {
+public class TcBuildSourceHelper {
+    public static PluginDescriptor FindPluginDescriptor(ISymbol symbol)
+    {
+        var visitor = new TcPluginSymbolVisitor();
+        visitor.Visit(symbol);
+        var plugins = visitor.Plugins;
+        return new PluginDescriptor([.. plugins]);
+    }
+
+
     public static (string FileName, string FileSource) GenerateAssemblyAttribute(PluginData plugin)
     {
         var fileName = $"{plugin.Type}.attributes.g.cs";
@@ -24,6 +34,7 @@ public class SourceGenerationHelper {
 
         return (fileName, fileSource);
     }
+
 
     public static (string FileName, string FileSource) GenerateWrapperSource(PluginData plugin)
     {
@@ -84,7 +95,10 @@ public class SourceGenerationHelper {
             fileSource = fileSource.Replace(key, $"global::{value}");
         }
 
-        return fileSource;
+        return $"""
+            #nullable enable
+            {fileSource}
+            """;
     }
 
 

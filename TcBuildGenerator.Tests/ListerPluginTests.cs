@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
-using Microsoft.CodeAnalysis;
 using NUnit.Framework;
+using Assert = NUnit.Framework.Legacy.ClassicAssert;
 
 
 namespace TcBuildGenerator.Tests {
@@ -11,18 +11,19 @@ namespace TcBuildGenerator.Tests {
         {
             var parentAssembly = typeof(TcPluginBase.TcPlugin).Assembly;
             var classSymbol = Helper.GetClassSymbol(parentAssembly, """
-                using System;
                 using Microsoft.Extensions.Configuration;
                 using TcPluginBase.Lister;
                 using System.Windows.Controls;
 
+                #nullable enable
+                
                 namespace MyNamespace {
                     public class MyLister : WpfListerPlugin<UserControl> {
                         public MyLister(IConfiguration pluginSettings) : base(pluginSettings)
                         {
                         }
 
-                        public override SupportExpression CanHandle { get; }
+                        public override SupportExpression CanHandle { get; } = SupportExpression.Create(_ => _.Multimedia);
 
                         public override WpfLister<UserControl>? Load(ParentWindow parent, string fileToLoad, ShowFlags showFlags)
                         {
@@ -33,11 +34,9 @@ namespace TcBuildGenerator.Tests {
                 """
             );
 
-            var visitor = new TcPluginSymbolVisitor(Log);
-            visitor.Visit(classSymbol);
-            var plugins = visitor.Plugins;
+            var plugins = TcBuildSourceHelper.FindPluginDescriptor(classSymbol).Plugins;
 
-            Assert.AreEqual(1, plugins.Count);
+            Assert.AreEqual(1, plugins.Length);
             var plugin = plugins.Single();
 
             Assert.AreEqual(PluginType.Lister, plugin.Type);
@@ -58,18 +57,9 @@ namespace TcBuildGenerator.Tests {
 
             Assert.AreEqual("ListLoad,ListLoadW", string.Join(",", getFilesMethod.WrapperData.MethodNames));
 
+            var (wrapperName, wrapperSource) = TcBuildSourceHelper.GenerateWrapperSource(plugin);
 
-            var source = TcBuildSourceGenerator.GenerateWrapperSource(plugin);
-            var final = TcBuildSourceGenerator.ModifySource(plugin, source);
-
-            Console.WriteLine(final);
-        }
-
-
-        private static void Log(Diagnostic diagnostic)
-        {
-            Console.WriteLine(diagnostic.Descriptor.Title);
-            Console.WriteLine(diagnostic.Descriptor.MessageFormat);
+            Console.WriteLine(wrapperSource);
         }
     }
 }

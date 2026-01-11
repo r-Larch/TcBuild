@@ -12,12 +12,7 @@ public class TcBuildSourceGenerator : IIncrementalGenerator {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var descriptors = context.CompilationProvider
-            .Select((compilation, token) => {
-                var visitor = new TcPluginSymbolVisitor();
-                visitor.Visit(compilation.GlobalNamespace);
-                var plugins = visitor.Plugins;
-                return new PluginDescriptor([.. plugins]);
-            });
+            .Select((compilation, token) => TcBuildSourceHelper.FindPluginDescriptor(compilation.GlobalNamespace));
 
         context.RegisterSourceOutput(descriptors, static (spc, source) => Execute(source, spc));
     }
@@ -31,12 +26,12 @@ public class TcBuildSourceGenerator : IIncrementalGenerator {
         }
 
         {
-            var (wrapperName, wrapperSource) = SourceGenerationHelper.GenerateWrapperSource(plugin);
+            var (wrapperName, wrapperSource) = TcBuildSourceHelper.GenerateWrapperSource(plugin);
             context.AddSource(wrapperName, wrapperSource);
         }
 
         {
-            var (fileName, fileSource) = SourceGenerationHelper.GenerateAssemblyAttribute(plugin);
+            var (fileName, fileSource) = TcBuildSourceHelper.GenerateAssemblyAttribute(plugin);
             context.AddSource(fileName, fileSource);
         }
     }

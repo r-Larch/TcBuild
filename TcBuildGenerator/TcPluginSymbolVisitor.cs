@@ -48,7 +48,7 @@ public class TcPluginSymbolVisitor : SymbolVisitor {
         if (!Definitions.TryGetValue(pluginType, out var definition)) {
             var visitor = new TcInterfaceSymbolVisitor();
             visitor.Visit(pluginInterface);
-            definition = visitor.Definitions.Single();
+            definition = visitor.Definitions.Single(); // TODO collect all and validate later using diagnostics
 
             Definitions.Add(pluginType, definition);
         }

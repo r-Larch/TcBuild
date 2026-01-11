@@ -10,10 +10,10 @@ namespace TcPluginBase.FileSystem {
     public interface IFsPlugin {
         #region Optional Async
 
-        [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNext", "FsFindClose")]
+        [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNextW", "FsFindClose")]
         IEnumerable<FindData> GetFiles(RemotePath path);
 
-        [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNext", "FsFindClose")]
+        [TcMethod("FsFindFirst", "FsFindFirstW", "FsFindNext", "FsFindNextW", "FsFindClose")]
         IAsyncEnumerable<FindData> GetFilesAsync(RemotePath path);
 
         #endregion
