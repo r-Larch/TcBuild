@@ -223,6 +223,7 @@ namespace TcPluginBase.Lister {
 
         /// <summary>
         /// The extension of the file to be loaded (case-insensitive).
+        /// E.g. "TXT", "JPG", "AVI"
         /// </summary>
         public bool HasExt(string ext) => false;
 

@@ -9,15 +9,10 @@ using IWin32Window = System.Windows.Forms.IWin32Window;
 namespace TcPluginBase {
     // Total Commander window, can be used as parent for any plugin child windows.
     [Serializable]
-    public class TcWindow : IWin32Window {
+    public class TcWindow(IntPtr handle) : IWin32Window {
         private const int TcMessageId = 1024 + 51;
 
-        public IntPtr Handle { get; }
-
-        public TcWindow(IntPtr handle)
-        {
-            Handle = handle;
-        }
+        public IntPtr Handle { get; } = handle;
 
         // Forces the window to redraw itself and any child controls.
         public void Refresh()
@@ -37,7 +32,7 @@ namespace TcPluginBase {
         }
 
         /// <summary>
-        /// Creates a STA Thread and runs the windows inside it.
+        /// Creates an STA Thread and runs the windows inside it.
         /// </summary>
         /// <param name="windowFactory"></param>
         public void ShowDialog(Func<Window> windowFactory)
@@ -86,12 +81,7 @@ namespace TcPluginBase {
 
         public void Invoke(Action action)
         {
-            Dispatcher.Invoke(Run);
-
-            void Run()
-            {
-                action();
-            }
+            Dispatcher.Invoke(action);
         }
 
         public WpfDispatcher()
@@ -101,8 +91,7 @@ namespace TcPluginBase {
 
         public void Dispose()
         {
-            Interlocked.Decrement(ref _count);
-            if (_count <= 0) {
+            if (Interlocked.Decrement(ref _count) == 0) {
                 lock (Lock) {
                     if (_dispatcher != null) {
                         _dispatcher.InvokeShutdown();
