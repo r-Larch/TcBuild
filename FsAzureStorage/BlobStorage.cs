@@ -15,7 +15,7 @@ using Azure.Storage.Blobs.Models;
 
 namespace FsAzureStorage {
     public class BlobStorage {
-        private readonly List<BlobStorageAccount> _accounts = new();
+        private readonly List<BlobStorageAccount> _accounts = [];
 
         public async IAsyncEnumerable<BlobStorageAccount> GetAccounts([EnumeratorCancellation] CancellationToken token = default)
         {
@@ -96,58 +96,59 @@ namespace FsAzureStorage {
 
 
     internal static class Extensions {
-        public static async Task<Response> DownloadToAsync(this BlobClient blob, string path, FileMode mode, IProgress<long> progressHandler, int sleepMs = 100, CancellationToken cancellationToken = default)
-        {
-            await using var fs = new FileStream(path, mode);
+        extension(BlobClient blob) {
+            public async Task<Response> DownloadToAsync(string path, FileMode mode, IProgress<long> progressHandler, int sleepMs = 100, CancellationToken cancellationToken = default)
+            {
+                await using var fs = new FileStream(path, mode);
 
-            var download = blob.DownloadToAsync(fs, cancellationToken: cancellationToken);
+                var download = blob.DownloadToAsync(fs, cancellationToken: cancellationToken);
 
-            await Task.Run(() => {
-                while (!download.IsCompleted) {
-                    Thread.Sleep(sleepMs);
-                    progressHandler.Report(fs.Length);
-                }
-            }, cancellationToken);
+                await Task.Run(() => {
+                    while (!download.IsCompleted) {
+                        Thread.Sleep(sleepMs);
+                        progressHandler.Report(fs.Length);
+                    }
+                }, cancellationToken);
 
-            return download.Result;
-        }
-
-
-        public static async Task<CopyFromUriOperation> CopyAndOverwrite(this BlobClient src, BlobClient dst, IProgress<long> progressHandler, CancellationToken cancellationToken = default)
-        {
-            var properties = await src.GetPropertiesAsync(cancellationToken: cancellationToken);
-
-            var sw = new Stopwatch();
-            sw.Start();
-
-            var operation = await dst.StartCopyFromUriAsync(src.Uri, metadata: properties.Value.Metadata, cancellationToken: cancellationToken);
-            //await operation.WaitForCompletionAsync(token);
-
-            // TODO improve this hack!
-
-            const double transferRate = (1024 * 1024) / 1000d; // 1MB/s
-
-            var fileSize = properties.Value.ContentLength;
-            var timeRemaining = (fileSize / transferRate) - sw.Elapsed.TotalMilliseconds;
-            var sleep = (int) Math.Max(100, timeRemaining / 20);
-
-            while (!operation.HasCompleted) {
-                await Task.Delay(sleep, cancellationToken).ConfigureAwait(false);
-                await operation.UpdateStatusAsync(cancellationToken).ConfigureAwait(false);
-
-                var bytesTransferred = transferRate * sw.Elapsed.TotalMilliseconds;
-                var report = (int) Math.Min(bytesTransferred, fileSize * 0.9d);
-
-                progressHandler.Report(report);
-
-                cancellationToken.ThrowIfCancellationRequested();
+                return download.Result;
             }
 
-            progressHandler.Report(fileSize);
+            public async Task<CopyFromUriOperation> CopyAndOverwrite(BlobClient dst, IProgress<long> progressHandler, CancellationToken cancellationToken = default)
+            {
+                var properties = await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
 
-            sw.Stop();
+                var sw = new Stopwatch();
+                sw.Start();
 
-            return operation;
+                var operation = await dst.StartCopyFromUriAsync(blob.Uri, metadata: properties.Value.Metadata, cancellationToken: cancellationToken);
+                //await operation.WaitForCompletionAsync(token);
+
+                // TODO improve this hack!
+
+                const double transferRate = (1024 * 1024) / 1000d; // 1MB/s
+
+                var fileSize = properties.Value.ContentLength;
+                var timeRemaining = (fileSize / transferRate) - sw.Elapsed.TotalMilliseconds;
+                var sleep = (int) Math.Max(100, timeRemaining / 20);
+
+                while (!operation.HasCompleted) {
+                    await Task.Delay(sleep, cancellationToken).ConfigureAwait(false);
+                    await operation.UpdateStatusAsync(cancellationToken).ConfigureAwait(false);
+
+                    var bytesTransferred = transferRate * sw.Elapsed.TotalMilliseconds;
+                    var report = (int) Math.Min(bytesTransferred, fileSize * 0.9d);
+
+                    progressHandler.Report(report);
+
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+
+                progressHandler.Report(fileSize);
+
+                sw.Stop();
+
+                return operation;
+            }
         }
     }
 }

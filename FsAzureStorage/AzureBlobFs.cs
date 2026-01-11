@@ -42,11 +42,6 @@ namespace FsAzureStorage {
                         break;
                 }
             };
-
-            // to debug!
-            //AppDomain.CurrentDomain.FirstChanceException += (sender, eventArgs) => {
-            //    Log.Error($"FirstChanceException: " + eventArgs.Exception.ToString());
-            //};
         }
 
 
@@ -240,13 +235,13 @@ namespace FsAzureStorage {
                 case "show cache": {
                     var sb = new StringBuilder();
                     sb.AppendLine("Cache:");
-                    _fs._pathCache.Paths.Aggregate(sb, (s, path) => s.AppendLine($"  {path}"));
+                    _fs.PathCache.Paths.Aggregate(sb, (s, path) => s.AppendLine($"  {path}"));
                     MessageBox.Show(sb.ToString(), "All cached paths");
                     return ExecResult.Ok;
                 }
 
                 case "clear cache":
-                    _fs._pathCache.Paths.Clear();
+                    _fs.PathCache.Paths.Clear();
                     MessageBox.Show("Cache cleared", "Cache", MessageBoxButton.OK, MessageBoxImage.Information);
                     return ExecResult.Ok;
 
@@ -373,9 +368,9 @@ namespace FsAzureStorage {
         public override async Task<ExecResult> ExecutePropertiesAsync(TcWindow mainWin, RemotePath remoteName, CancellationToken token)
         {
             return remoteName switch {
-                {Level: 1} => ExecResult.Yourself,
-                {Level: 2} => ExecResult.Yourself,
-                {Level: > 2} => await _fs.OpenBlobPropertiesWindow(mainWin, remoteName, token),
+                { Level: 1 } => ExecResult.Yourself,
+                { Level: 2 } => ExecResult.Yourself,
+                { Level: > 2 } => await _fs.OpenBlobPropertiesWindow(mainWin, remoteName, token),
                 _ => ExecResult.Yourself,
             };
         }

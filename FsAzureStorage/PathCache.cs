@@ -7,12 +7,7 @@ using TcPluginBase.FileSystem;
 
 namespace FsAzureStorage {
     internal class PathCache {
-        public List<CloudPath> Paths { get; }
-
-        public PathCache()
-        {
-            Paths = new List<CloudPath>();
-        }
+        public List<CloudPath> Paths { get; } = [];
 
         public void Add(CloudPath path)
         {

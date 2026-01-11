@@ -8,11 +8,11 @@ namespace FsAzureStorage {
         public string[] Segments { get; set; }
 
         // Path = '/some/segments/without/trailing/slash'
-        public string Path => $"/{string.Join("/", Segments)}";
+        public string Path => $"/{string.Join('/', Segments)}";
 
         public string AccountName => GetSegment(1) ?? string.Empty;
         public string ContainerName => GetSegment(2) ?? string.Empty;
-        public string Prefix => string.Join("/", Segments.Skip(2));
+        public string Prefix => string.Join('/', Segments.Skip(2));
         public string BlobName => Prefix;
 
         /// <summary>
@@ -31,11 +31,11 @@ namespace FsAzureStorage {
         public CloudPath(string? path)
         {
             if (string.IsNullOrEmpty(path)) {
-                Segments = new string[0];
+                Segments = [];
                 return;
             }
 
-            var separators = new[] {'\\', '/'};
+            var separators = new[] { '\\', '/' };
 
             path = path.Trim();
 
@@ -47,7 +47,7 @@ namespace FsAzureStorage {
 
             var substring = path[1..];
             Segments = string.IsNullOrEmpty(substring)
-                ? new string[0]
+                ? []
                 : substring.Split(separators);
         }
 
@@ -61,29 +61,11 @@ namespace FsAzureStorage {
             return index < Segments.Length ? Segments[index] : null;
         }
 
-        public static implicit operator string(CloudPath path)
-        {
-            return path.ToString();
-        }
+        public static implicit operator string(CloudPath path) => path.ToString();
+        public static implicit operator CloudPath(string? path) => new(path);
+        public static implicit operator CloudPath(RemotePath path) => new(path);
+        public static implicit operator RemotePath(CloudPath path) => new(path);
 
-        public static implicit operator CloudPath(string? path)
-        {
-            return new CloudPath(path);
-        }
-
-        public static implicit operator CloudPath(RemotePath path)
-        {
-            return new CloudPath(path);
-        }
-
-        public static implicit operator RemotePath(CloudPath path)
-        {
-            return new RemotePath(path);
-        }
-
-        public override string ToString()
-        {
-            return Path;
-        }
+        public override string ToString() => Path;
     }
 }

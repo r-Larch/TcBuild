@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
-using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using FsAzureStorage.Windows;
 using MimeMapping;
@@ -20,27 +18,17 @@ namespace FsAzureStorage {
     public delegate void FileProgress(string source, string destination, int percentDone);
 
     public class BlobFileSystem {
-        internal readonly PathCache _pathCache;
-        private readonly BlobStorage _blobStorage;
-
-        public BlobFileSystem()
-        {
-            _blobStorage = new BlobStorage();
-            _pathCache = new PathCache();
-        }
+        internal readonly PathCache PathCache = new();
+        private readonly BlobStorage _blobStorage = new();
 
         public IAsyncEnumerable<FindData> ListDirectory(CloudPath path)
         {
-            switch (path.Level) {
-                case 0:
-                    return GetAccounts();
-                //case 1 when path.AccountName == "settings":
-                //    return GetSettings();
-                case 1:
-                    return GetContainers(path.AccountName);
-                default:
-                    return GetBlobSegments(path);
-            }
+            return path.Level switch {
+                0 => GetAccounts(),
+                //1 when path.AccountName == "settings" => GetSettings(),
+                1 => GetContainers(path.AccountName),
+                _ => GetBlobSegments(path)
+            };
 
             //async IAsyncEnumerable<FindData> GetSettings()
             //{
@@ -88,9 +76,16 @@ namespace FsAzureStorage {
                 }
 
                 var list = new List<FindData>();
-                await foreach (var x in container.GetBlobsByHierarchyAsync(traits: BlobTraits.Metadata, prefix: prefix, delimiter: "/")) {
+
+                var options = new GetBlobsByHierarchyOptions {
+                    Traits = BlobTraits.Metadata,
+                    Prefix = prefix,
+                    Delimiter = "/"
+                };
+
+                await foreach (var x in container.GetBlobsByHierarchyAsync(options)) {
                     var t = x switch {
-                        {IsBlob: true, Blob: { } block} => new FindData(
+                        { IsBlob: true, Blob: { } block } => new FindData(
                             fileName: block.Name[prefix.Length..],
                             fileSize: (ulong) (block.Properties.ContentLength ?? 0),
                             attributes: FileAttributes.Normal,
@@ -98,7 +93,7 @@ namespace FsAzureStorage {
                             creationTime: block.Properties.CreatedOn?.LocalDateTime,
                             lastAccessTime: block.Properties.LastModified?.LocalDateTime
                         ),
-                        {IsPrefix: true, Prefix: { } dir} => new FindData(
+                        { IsPrefix: true, Prefix: { } dir } => new FindData(
                             fileName: dir[prefix.Length..].TrimEnd('/'),
                             fileSize: 0,
                             attributes: FileAttributes.Directory
@@ -108,7 +103,7 @@ namespace FsAzureStorage {
                     list.Add(t);
                 }
 
-                var result = _pathCache
+                var result = PathCache
                     .WithCached(path, list)
                     .DefaultIfEmpty(new FindData("..", FileAttributes.Directory));
 
@@ -150,7 +145,7 @@ namespace FsAzureStorage {
                 _ = await blob.DownloadToAsync(dstFileName.FullName, mode, new Progress<long>(Progress), cancellationToken: token);
 
                 if (properties.Value.Metadata.Count > 0) {
-                    var json = JsonSerializer.Serialize(properties.Value.Metadata, new JsonSerializerOptions {WriteIndented = true});
+                    var json = JsonSerializer.Serialize(properties.Value.Metadata, new JsonSerializerOptions { WriteIndented = true });
                     await File.WriteAllTextAsync($"{dstFileName.FullName}.metadata", json, token);
                 }
 
@@ -320,7 +315,7 @@ namespace FsAzureStorage {
 
         public bool RemoveVirtualDir(CloudPath directory)
         {
-            return _pathCache.Remove(directory); // allow removing virtual dirs
+            return PathCache.Remove(directory); // allow removing virtual dirs
         }
 
         public async Task<bool> DeleteFile(CloudPath fileName, CancellationToken token)
@@ -334,7 +329,7 @@ namespace FsAzureStorage {
 
             if (await blob.DeleteIfExistsAsync(cancellationToken: token)) {
                 // cache the directory to allow adding some files
-                _pathCache.Add(fileName.Directory);
+                PathCache.Add(fileName.Directory);
                 return true;
             }
 
@@ -360,7 +355,7 @@ namespace FsAzureStorage {
         public bool CacheDirectory(CloudPath dir)
         {
             if (dir.IsBlobPath) {
-                _pathCache.Add(dir);
+                PathCache.Add(dir);
                 return true;
             }
 
