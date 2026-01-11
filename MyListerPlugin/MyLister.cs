@@ -1,14 +1,9 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using TcPluginBase.Lister;
 
 
 namespace MyListerPlugin {
-    public class MyLister : WpfListerPlugin<ListerControl> {
-        public MyLister(IConfiguration pluginSettings) : base(pluginSettings)
-        {
-        }
-
+    public class MyLister(IConfiguration pluginSettings) : WpfListerPlugin<ListerControl>(pluginSettings) {
         public override SupportExpression CanHandle { get; } = SupportExpression.Create(x =>
             x.Multimedia && x.HasExt("svg")
         );
