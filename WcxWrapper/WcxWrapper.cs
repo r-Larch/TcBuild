@@ -431,8 +431,8 @@ namespace WcxWrapper {
 
         [UnmanagedCallersOnly(EntryPoint = "PackToMem")]
         public static int PackToMem(IntPtr hMemPack,
-            IntPtr bufInPtr, int inLen, ref int taken,
-            IntPtr bufOutPtr, int outLen, ref int written, int seekBy)
+            IntPtr bufInPtr, int inLen, int taken,
+            IntPtr bufOutPtr, int outLen, int written, int seekBy)
         {
             var bufIn = TcUtils.ReadByteArray(bufInPtr, inLen);
             var bufOut = TcUtils.ReadByteArray(bufOutPtr, outLen);

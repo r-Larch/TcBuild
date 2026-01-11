@@ -2,7 +2,7 @@
 
 
 namespace TcPluginBase.Packer {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // Enumerations below are managed wrappers for corresponding integer flags described in
     // TC "WCX Writer's Reference" (see "Packer extensions" -> "Interface description" on www.ghisler.com/plugins.htm)
 
     // Used inside the OpenArchiveData class
@@ -54,7 +54,7 @@ namespace TcPluginBase.Packer {
     public enum PackerCapabilities {
         None = 0,
         New = 1, // Can create new archives
-        Modify = 2, // Can modify exisiting archives
+        Modify = 2, // Can modify existing archives
         Multiple = 4, // Archive can contain multiple files
         Delete = 8, // Can delete files
         Options = 16, // Has options dialog

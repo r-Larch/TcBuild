@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 
 namespace TcPluginBase {
-    internal class RefCountObject {
-        public object Obj { get; private set; }
-        public int RefCount { get; private set; }
-
-        public RefCountObject(object o)
-        {
-            Obj = o;
-            RefCount = 1;
-        }
+    internal class RefCountObject(object o) {
+        public object Obj { get; private set; } = o;
+        public int RefCount { get; private set; } = 1;
 
         public void Update(object o)
         {
@@ -25,7 +20,7 @@ namespace TcPluginBase {
     public static class TcHandles {
         private static readonly Dictionary<IntPtr, RefCountObject> HandleDictionary = new();
         private static int _lastHandle;
-        private static readonly object HandleSyncObj = new();
+        private static readonly Lock HandleSyncObj = new();
 
         public static IntPtr AddHandle(object obj)
         {
@@ -47,7 +42,7 @@ namespace TcPluginBase {
         public static object? GetObject(IntPtr handle)
         {
             lock (HandleSyncObj) {
-                return HandleDictionary.ContainsKey(handle) ? HandleDictionary[handle].Obj : null;
+                return HandleDictionary.TryGetValue(handle, out var value) ? value.Obj : null;
             }
         }
 

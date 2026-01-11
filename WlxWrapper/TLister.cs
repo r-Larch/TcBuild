@@ -6,9 +6,6 @@ namespace WlxWrapper {
     /// <summary>
     /// Generic Type Placeholder (not included in generated code)
     /// </summary>
-    internal class TLister : WpfLister<UserControl> {
-        public TLister(ParentWindow parent, UserControl control) : base(parent, control)
-        {
-        }
-    }
+    // ReSharper disable once InconsistentNaming
+    internal class TLister(ParentWindow parent, UserControl control) : WpfLister<UserControl>(parent, control);
 }

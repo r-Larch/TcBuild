@@ -4,8 +4,7 @@ using System.Runtime.InteropServices;
 
 
 namespace TcPluginBase.Content {
-    [Serializable]
-    public class ContentValue {
+    public ref struct ContentValue {
         private bool _changed;
         private string? _strValue;
 
@@ -47,18 +46,18 @@ namespace TcPluginBase.Content {
                         _strValue = Marshal.ReadInt64(ptr).ToString(CultureInfo.InvariantCulture);
                         break;
                     case ContentFieldType.NumericFloating:
-                        Double[] dv = new Double[1];
+                        var dv = new double[1];
                         Marshal.Copy(ptr, dv, 0, 1);
                         _strValue = dv[0].ToString(CultureInfo.InvariantCulture);
                         break;
                     case ContentFieldType.Date:
-                        Int16[] date = new Int16[3];
+                        var date = new short[3];
                         Marshal.Copy(ptr, date, 0, 3);
                         // convert to standard short date format ("d")
                         _strValue = (new DateTime(date[0], date[1], date[2])).ToString(CultureInfo.InvariantCulture);
                         break;
                     case ContentFieldType.Time:
-                        Int16[] time = new Int16[3];
+                        var time = new short[3];
                         Marshal.Copy(ptr, time, 0, 3);
                         // convert to standard long time format ("T")
                         _strValue = (new DateTime(1, 1, 1, time[0], time[1], time[2])).ToString(CultureInfo.InvariantCulture);
@@ -88,38 +87,38 @@ namespace TcPluginBase.Content {
             if (ptr != IntPtr.Zero && _changed) {
                 switch (FieldType) {
                     case ContentFieldType.Numeric32:
-                        Marshal.WriteInt32(ptr, Int32.Parse(_strValue!));
+                        Marshal.WriteInt32(ptr, int.Parse(_strValue!));
                         break;
                     case ContentFieldType.Numeric64:
-                        Marshal.WriteInt64(ptr, Int64.Parse(_strValue!));
+                        Marshal.WriteInt64(ptr, long.Parse(_strValue!));
                         break;
                     case ContentFieldType.NumericFloating:
                         string? altStr = null;
-                        string floatStr = _strValue!;
+                        var floatStr = _strValue!;
                         if (floatStr.Contains("|")) {
-                            int pos = floatStr.IndexOf("|", StringComparison.Ordinal);
-                            altStr = floatStr.Substring(pos + 1);
-                            floatStr = floatStr.Substring(0, pos);
+                            var pos = floatStr.IndexOf("|", StringComparison.Ordinal);
+                            altStr = floatStr[(pos + 1)..];
+                            floatStr = floatStr[..pos];
                         }
 
-                        Marshal.Copy(new[] {Double.Parse(floatStr)}, 0, ptr, 1);
-                        if (!String.IsNullOrEmpty(altStr)) {
+                        Marshal.Copy([double.Parse(floatStr)], 0, ptr, 1);
+                        if (!string.IsNullOrEmpty(altStr)) {
                             // ??? ANSI or Unicode
-                            IntPtr altOutput = new IntPtr(ptr.ToInt32() + sizeof(Double));
-                            Marshal.Copy((altStr + (Char) 0).ToCharArray(), 0, altOutput, altStr.Length + 1);
+                            var altOutput = new IntPtr(ptr.ToInt32() + sizeof(double));
+                            Marshal.Copy((altStr + (char) 0).ToCharArray(), 0, altOutput, altStr.Length + 1);
                         }
 
                         break;
                     case ContentFieldType.Date:
-                        DateTime date = DateTime.Parse(_strValue!);
-                        Marshal.Copy(new[] {(Int16) date.Year, (Int16) date.Month, (Int16) date.Day}, 0, ptr, 3);
+                        var date = DateTime.Parse(_strValue!);
+                        Marshal.Copy([(short) date.Year, (short) date.Month, (short) date.Day], 0, ptr, 3);
                         break;
                     case ContentFieldType.Time:
-                        DateTime time = DateTime.Parse(_strValue!);
-                        Marshal.Copy(new[] {(Int16) time.Hour, (Int16) time.Minute, (Int16) time.Second}, 0, ptr, 3);
+                        var time = DateTime.Parse(_strValue!);
+                        Marshal.Copy([(short) time.Hour, (short) time.Minute, (short) time.Second], 0, ptr, 3);
                         break;
                     case ContentFieldType.Boolean:
-                        Marshal.WriteInt32(ptr, Boolean.Parse(_strValue!) ? 1 : 0);
+                        Marshal.WriteInt32(ptr, bool.Parse(_strValue!) ? 1 : 0);
                         break;
                     case ContentFieldType.MultipleChoice:
                     case ContentFieldType.String:

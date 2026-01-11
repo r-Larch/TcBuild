@@ -187,7 +187,7 @@ namespace TcPluginBase.Tools {
 
         private static ContentProgressCallback? _contentProgressCallback;
 
-        public static void SetContentPluginCallback(ContentProgressCallback contentProgress)
+        public static void SetContentPluginCallback(ContentProgressCallback? contentProgress)
         {
             _contentProgressCallback = contentProgress;
         }

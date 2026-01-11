@@ -1,14 +1,13 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using Microsoft.Extensions.Configuration;
 
 
 namespace TcPluginBase.Lister {
-    public abstract class ListerPlugin<TLister> : TcPlugin, IListerPlugin<TLister> where TLister : ILister {
-        public Color BitmapBackgroundColor { get; set; }
+    public abstract class ListerPlugin<TLister>(IConfiguration pluginSettings) : TcPlugin(pluginSettings), IListerPlugin<TLister> where TLister : ILister {
+        public Color BitmapBackgroundColor { get; set; } = Color.White;
 
         /// <summary>
-        /// CanHandle should return a expression which allows Lister to find out whether
+        /// CanHandle should return an expression which allows Lister to find out whether
         /// your plugin can probably handle the file or not. You can use this as a first
         /// test - more thorough tests may be performed in ListLoad().
         ///
@@ -19,18 +18,12 @@ namespace TcPluginBase.Lister {
         public abstract SupportExpression CanHandle { get; }
 
 
-        protected ListerPlugin(IConfiguration pluginSettings) : base(pluginSettings)
-        {
-            BitmapBackgroundColor = Color.White;
-        }
-
-
         /// <summary>
-        /// This gets called as a entry point
+        /// This gets called as an entry point
         /// </summary>
         /// <remarks>
         /// Load is called when a user opens lister with F3 or the Quick View Panel with Ctrl+Q, and when the DetectString string either doesn't exist, or its evaluation returns true.
-        /// Please note that multiple Lister windows can be open at the same time! Therefore you cannot save settings in global variables.
+        /// Please note that multiple Lister windows can be open at the same time! Therefore, you cannot save settings in global variables.
         /// When lister is activated, it will set the focus to your window.If your window contains child windows, then make sure that you set the focus to the correct child when your main window receives the focus!
         /// If <see cref="ShowFlags.ForceShow"/> is defined, you may try to load the file even if the plugin wasn't made for it.
         /// Example: A plugin with line numbers may only show the file as such when the user explicitly chooses 'Image/Multimedia' from the menu.

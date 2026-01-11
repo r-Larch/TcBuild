@@ -25,7 +25,7 @@ namespace TcPluginBase.Lister {
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public static SupportExpression Create(Expression<Func<x, bool>> expression)
+        public static SupportExpression Create(Expression<Func<X, bool>> expression)
         {
             var visitor = new MyExpressionParser();
             var value = visitor.Parse(expression);
@@ -67,8 +67,8 @@ namespace TcPluginBase.Lister {
         protected override Expression VisitConstant(ConstantExpression node)
         {
             var value = node.Value switch {
-                string v => $@"""{v}""",
-                char v => $@"""{v}""",
+                string v => $"\"{v}\"",
+                char v => $"\"{v}\"",
                 int v => v.ToString(),
                 long v => v.ToString(),
                 _ => null,
@@ -85,14 +85,14 @@ namespace TcPluginBase.Lister {
         {
             var expression = (MethodCallExpression) base.VisitMethodCall(node);
 
-            if (expression is {Arguments: {Count: 1} arguments} && arguments[0] is var parameter) {
+            if (expression is { Arguments: { Count: 1 } arguments } && arguments[0] is var parameter) {
                 var arg = Parse(parameter);
 
                 var result = node.Method.Name switch {
-                    nameof(x.HasExt) => $@"EXT = {arg.ToUpper()}",
-                    nameof(x.NotHasExt) => $@"EXT != {arg.ToUpper()}",
-                    nameof(x.Find) => $@"FIND({arg})",
-                    nameof(x.FindI) => $@"FINDI({arg})",
+                    nameof(X.HasExt) => $@"EXT = {arg.ToUpper()}",
+                    nameof(X.NotHasExt) => $@"EXT != {arg.ToUpper()}",
+                    nameof(X.Find) => $@"FIND({arg})",
+                    nameof(X.FindI) => $@"FINDI({arg})",
                     "get_Item" => $@"[{arg}]",
                     _ => null,
                 };
@@ -155,7 +155,7 @@ namespace TcPluginBase.Lister {
         {
             var expression = (MemberExpression) base.VisitMember(node);
 
-            if (expression.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType == typeof(x)) {
+            if (expression.NodeType == ExpressionType.MemberAccess && expression.Member.DeclaringType == typeof(X)) {
                 return new ResultExpression(node.Member.Name.ToUpper(), node.Type);
             }
 
@@ -202,7 +202,7 @@ namespace TcPluginBase.Lister {
     }
 
 
-    public class x {
+    public class X {
         /// <summary>
         /// The size of the file to be loaded.
         /// </summary>
@@ -222,7 +222,7 @@ namespace TcPluginBase.Lister {
         public bool Multimedia => false;
 
         /// <summary>
-        /// The extension of the file to be loaded (case insensitive).
+        /// The extension of the file to be loaded (case-insensitive).
         /// </summary>
         public bool HasExt(string ext) => false;
 

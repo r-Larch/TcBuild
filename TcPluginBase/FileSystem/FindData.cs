@@ -6,12 +6,11 @@ using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace TcPluginBase.FileSystem {
     /// <summary> Used as parameter type for <see cref="FsPlugin.FindFirst"/> and <see cref="FsPlugin.FindNext"/> methods </summary>
-    [Serializable]
-    public class FindData {
+    public class FindData(string fileName) {
         #region Properties
 
         /// <summary> Local file name relative to the directory (without the path) </summary>
-        public string FileName { get; private set; }
+        public string FileName { get; private set; } = fileName;
 
         /// <summary> File attributes. Use at least the <see cref="FileAttributes.Directory"/> flag to distinguish between files and directories. Links should be returned as files. </summary>
         public FileAttributes Attributes { get; private set; }
@@ -34,11 +33,6 @@ namespace TcPluginBase.FileSystem {
         #endregion Properties
 
         #region Constructors
-
-        public FindData(string fileName)
-        {
-            FileName = fileName;
-        }
 
         public FindData(string fileName, ulong fileSize) : this(fileName)
         {
@@ -133,10 +127,8 @@ namespace TcPluginBase.FileSystem {
             public uint FileSizeLow;
             public uint Reserved0;
             public uint Reserved1;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH_UNI)]
-            public string FileName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
-            public string AlternateFileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH_UNI)] public string FileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)] public string AlternateFileName;
         }
 
         [Serializable]
@@ -150,10 +142,8 @@ namespace TcPluginBase.FileSystem {
             public uint FileSizeLow;
             public uint Reserved0;
             public uint Reserved1;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH_ANSI)]
-            public string FileName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
-            public string AlternateFileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = NativeMethods.MAX_PATH_ANSI)] public string FileName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)] public string AlternateFileName;
         }
 
         #endregion TC Structures

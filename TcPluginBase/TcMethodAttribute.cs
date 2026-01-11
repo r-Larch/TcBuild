@@ -22,27 +22,27 @@ namespace TcPluginBase {
 
         public TcMethodAttribute(string method)
         {
-            MethodNames = new[] {method};
+            MethodNames = [method];
         }
 
         public TcMethodAttribute(string method1, string method2)
         {
-            MethodNames = new[] {method1, method2};
+            MethodNames = [method1, method2];
         }
 
         public TcMethodAttribute(string method1, string method2, string method3)
         {
-            MethodNames = new[] {method1, method2, method3};
+            MethodNames = [method1, method2, method3];
         }
 
         public TcMethodAttribute(string method1, string method2, string method3, string method4)
         {
-            MethodNames = new[] {method1, method2, method3, method4};
+            MethodNames = [method1, method2, method3, method4];
         }
 
         public TcMethodAttribute(string method1, string method2, string method3, string method4, string method5)
         {
-            MethodNames = new[] {method1, method2, method3, method4, method5};
+            MethodNames = [method1, method2, method3, method4, method5];
         }
     }
 }

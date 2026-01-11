@@ -2,7 +2,7 @@
 
 
 namespace TcPluginBase.Content {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // Enumerations below are managed wrappers for corresponding integer flags described in
     // TC "FS-Plugin writer's guide" and "Content-Plugin writer's guide" (www.ghisler.com/plugins.htm)
 
     // Used as result type for CompareFiles method

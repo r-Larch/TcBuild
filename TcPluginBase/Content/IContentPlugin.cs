@@ -33,7 +33,7 @@
         // functions used in WDX plugins only
 
         [TcMethod("ContentEditValue")]
-        SetValueResult EditValue(TcWindow parentWin, int fieldIndex, int unitIndex, ContentFieldType fieldType, ref string fieldValue, int maxLen, EditValueFlags flags, string langIdentifier);
+        SetValueResult EditValue(TcWindow parentWin, int fieldIndex, int unitIndex, ContentFieldType fieldType, ref string? fieldValue, int maxLen, EditValueFlags flags, string langIdentifier);
 
         [TcMethod("ContentSendStateInformation", "ContentSendStateInformationW")]
         void SendStateInformation(StateChangeInfo state, string path);

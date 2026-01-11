@@ -2,7 +2,7 @@
 
 
 namespace TcPluginBase.Lister {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // Enumerations below are managed wrappers for corresponding integer flags described in
     // TC "LS-Plugin writer's guide" (www.ghisler.com/plugins.htm)
 
     /// <summary>

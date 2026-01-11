@@ -1,22 +1,7 @@
-﻿using System;
-
-
-namespace TcPluginBase.FileSystem {
-    [Serializable]
-    public class LogEventArgs : PluginEventArgs {
-        #region Properties
-
-        public int PluginNumber { get; private set; }
-        public int MessageType { get; private set; }
-        public string LogText { get; private set; }
-
-        #endregion Properties
-
-        public LogEventArgs(int pluginNumber, int messageType, string logText)
-        {
-            PluginNumber = pluginNumber;
-            MessageType = messageType;
-            LogText = logText;
-        }
+﻿namespace TcPluginBase.FileSystem {
+    public class LogEventArgs(int pluginNumber, int messageType, string logText) : PluginEventArgs {
+        public int PluginNumber { get; private set; } = pluginNumber;
+        public int MessageType { get; private set; } = messageType;
+        public string LogText { get; private set; } = logText;
     }
 }

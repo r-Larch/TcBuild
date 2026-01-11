@@ -42,12 +42,12 @@ namespace TcPluginBase.Tools {
 
             var settings = GetSettings(pluginClass.Assembly);
 
-            var ctor = pluginClass.GetConstructor(new[] {typeof(IConfiguration)});
+            var ctor = pluginClass.GetConstructor([typeof(IConfiguration)]);
             if (ctor == null) {
                 throw new PluginException($"Failed to Load Plugin '{pluginClass.FullName}'! Constructor missing! Please implement public constructor which accepts the 'IConfiguration' as single parameter.");
             }
 
-            var tcPlugin = (TPlugin) ctor.Invoke(new object[] {settings});
+            var tcPlugin = (TPlugin) ctor.Invoke([settings]);
             return tcPlugin;
         }
 
@@ -56,7 +56,7 @@ namespace TcPluginBase.Tools {
         {
             var root = new ConfigurationBuilder()
                 .Add(new JsonConfigurationSource {
-                    FileProvider = new PhysicalFileProvider(Path.GetDirectoryName(assembly.Location)),
+                    FileProvider = new PhysicalFileProvider(Path.GetDirectoryName(assembly.Location) ?? throw new Exception("Failed to get assembly location")),
                     Path = $"settings.json",
                     Optional = true,
                 })

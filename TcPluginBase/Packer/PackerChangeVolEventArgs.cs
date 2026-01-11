@@ -1,18 +1,6 @@
-﻿using System;
-
-
-namespace TcPluginBase.Packer {
-    [Serializable]
-    public class PackerChangeVolEventArgs : PluginEventArgs {
-        public string ArcName { get; }
-        public int Mode { get; }
-
-
-        public PackerChangeVolEventArgs(string arcName, int mode)
-        {
-            ArcName = arcName;
-            Mode = mode;
-            this.Result = 0;
-        }
+﻿namespace TcPluginBase.Packer {
+    public class PackerChangeVolEventArgs(string arcName, int mode) : PluginEventArgs {
+        public string ArcName { get; } = arcName;
+        public int Mode { get; } = mode;
     }
 }

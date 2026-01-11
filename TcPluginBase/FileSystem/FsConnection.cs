@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 
 namespace TcPluginBase.FileSystem {
@@ -53,11 +52,10 @@ namespace TcPluginBase.FileSystem {
             _data.AddOrUpdate(key, data, (k, v) => data);
         }
 
-        [return: MaybeNull]
-        public T GetData<T>(string key)
+        public T? GetData<T>(string key)
         {
             if (_data.TryGetValue(key, out var data)) {
-                return (T) data;
+                return (T?) data;
             }
 
             return default;

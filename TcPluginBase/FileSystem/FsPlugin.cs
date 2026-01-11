@@ -493,7 +493,7 @@ namespace TcPluginBase.FileSystem {
 
         #endregion Callback Procedures
 
-        protected ConcurrentDictionary<RemotePath, FsConnection> Connections = new();
+        protected ConcurrentDictionary<RemotePath, FsConnection> Connections = new(RemotePathComparer.Instance);
 
         protected FsConnection GetConnection(RemotePath connectionRoot)
         {

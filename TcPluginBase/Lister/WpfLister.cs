@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 // Integration with WinForms
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
@@ -9,20 +8,15 @@ using System.Windows.Input;
 
 
 namespace TcPluginBase.Lister {
-    public class WpfLister<TControl> : ILister where TControl : System.Windows.Controls.UserControl {
-        public TControl Control { get; }
+    public class WpfLister<TControl>(ParentWindow parent, TControl control) : ILister
+        where TControl : System.Windows.Controls.UserControl {
+        public TControl Control { get; } = control;
         private ElementHost? _elementHost;
 
-        public ParentWindow Parent { get; }
+        public ParentWindow Parent { get; } = parent;
 
         private IntPtr? _handle;
         public IntPtr Handle => _handle ??= GetHandle();
-
-        public WpfLister(ParentWindow parent, TControl control)
-        {
-            Control = control;
-            Parent = parent;
-        }
 
 
         private IntPtr GetHandle()
@@ -38,17 +32,15 @@ namespace TcPluginBase.Lister {
         }
 
 
-        private static readonly List<Key> SentToParentKeys = new() {
+        private static readonly List<Key> SentToParentKeys = [
             Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, Key.D6, Key.D7, Key.D8, // Options.Mode
             Key.N, Key.P,
             Key.A, Key.S, Key.V, Key.W, // Options.Text
             Key.F, Key.L, Key.C, // Options.Images
             Key.F2, Key.F5, Key.F7
-        };
+        ];
 
-        private static readonly List<Key> SentToParentCtrlKeys = new() {
-            Key.P //, Key.A, Key.C,
-        };
+        private static readonly List<Key> SentToParentCtrlKeys = [Key.P];
 
 
         private void wpfControl_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

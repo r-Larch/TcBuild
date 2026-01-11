@@ -1014,15 +1014,15 @@ namespace WfxWrapper {
             GetValueResult result;
             var fieldType = ContentFieldType.NoMoreFields;
             var gvFlags = (GetValueFlags) flags;
-            fileName = fileName.Substring(1);
+            fileName = fileName[1..];
             _callSignature = $"ContentGetValue '{fileName}' ({fieldIndex}/{unitIndex}/{gvFlags})";
             try {
                 result = ContentPlugin!.GetValue(fileName, fieldIndex, unitIndex, maxLen, gvFlags, out var fieldValueStr, out fieldType);
-                if (
-                    result == GetValueResult.Success ||
-                    result == GetValueResult.Delayed ||
-                    result == GetValueResult.OnDemand
-                ) {
+                if (result is
+                    GetValueResult.Success or
+                    GetValueResult.Delayed or
+                    GetValueResult.OnDemand
+                   ) {
                     var resultType = result == GetValueResult.Success ? fieldType : ContentFieldType.WideString;
                     new ContentValue(fieldValueStr, resultType).CopyTo(fieldValue);
                 }
@@ -1060,7 +1060,7 @@ namespace WfxWrapper {
         {
             _callSignature = "ContentStopGetValue";
             try {
-                fileName = fileName.Substring(1);
+                fileName = fileName[1..];
                 ContentPlugin!.StopGetValue(fileName);
 
                 TraceCall(TraceLevel.Info, null);
@@ -1155,7 +1155,7 @@ namespace WfxWrapper {
             SetValueResult result;
             var fldType = (ContentFieldType) fieldType;
             var svFlags = (SetValueFlags) flags;
-            fileName = fileName.Substring(1);
+            fileName = fileName[1..];
             _callSignature = $"ContentSetValue '{fileName}' ({fieldIndex}/{unitIndex}/{svFlags})";
             try {
                 var value = new ContentValue(fieldValue, fldType);

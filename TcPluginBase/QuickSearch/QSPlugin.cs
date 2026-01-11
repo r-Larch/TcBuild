@@ -2,12 +2,7 @@
 
 
 namespace TcPluginBase.QuickSearch {
-    public abstract class QuickSearchPlugin : TcPlugin, IQuickSearchPlugin {
-        protected QuickSearchPlugin(IConfiguration pluginSettings) : base(pluginSettings)
-        {
-        }
-
-
+    public abstract class QuickSearchPlugin(IConfiguration pluginSettings) : TcPlugin(pluginSettings), IQuickSearchPlugin {
         public virtual bool MatchFile(string filter, string fileName)
         {
             return false;

@@ -1,20 +1,12 @@
-using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 
 
 namespace TcPluginBase.Packer {
-    public abstract class PackerPlugin : TcPlugin, IPackerPlugin {
-        public PackerCapabilities Capabilities { get; set; }
-        public PackBackgroundFlags BackgroundFlags { get; set; }
+    public abstract class PackerPlugin(IConfiguration pluginSettings) : TcPlugin(pluginSettings), IPackerPlugin {
+        public PackerCapabilities Capabilities { get; set; } = PackerCapabilities.None;
+        public PackBackgroundFlags BackgroundFlags { get; set; } = PackBackgroundFlags.None;
         public PackerPassword? PasswordManager { get; set; }
-
-
-        protected PackerPlugin(IConfiguration pluginSettings) : base(pluginSettings)
-        {
-            BackgroundFlags = PackBackgroundFlags.None;
-            Capabilities = PackerCapabilities.None;
-        }
 
 
         #region IPackerPlugin Members

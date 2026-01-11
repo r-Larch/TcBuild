@@ -6,17 +6,10 @@ namespace TcPluginBase {
     // retrieve them back, or copy them to a new store.
     // It's a parent class for FsPassword and PackerPassword classes.
     [Serializable]
-    public abstract class PluginPassword {
-        private readonly TcPlugin _plugin;
-        private readonly int _cryptoNumber;
-        private readonly CryptFlags _flags;
-
-        protected PluginPassword(TcPlugin plugin, int cryptoNumber, int flags)
-        {
-            _plugin = plugin;
-            _cryptoNumber = cryptoNumber;
-            _flags = (CryptFlags) flags;
-        }
+    public abstract class PluginPassword(TcPlugin plugin, int cryptoNumber, int flags) {
+        private readonly TcPlugin _plugin = plugin;
+        private readonly int _cryptoNumber = cryptoNumber;
+        private readonly CryptFlags _flags = (CryptFlags) flags;
 
         public bool TcMasterPasswordDefined => _flags.HasFlag(CryptFlags.MasterPassSet);
 

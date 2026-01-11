@@ -1,14 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.IO;
 
 
 namespace TcPluginBase.FileSystem {
-    // Enumerations below are managed wrappers for corresponding integer flags discribed in
+    // Enumerations below are managed wrappers for corresponding integer flags described in
     // TC "FS-Plugin writer's guide" (www.ghisler.com/plugins.htm)
 
-    // Some enum members are marked "!!! Used for .NET interface only !!!").
+    // Some enum members are marked "!!! Used for .NET interface only !!!".
     // They are processed in WfxWrapper and doesn't return to TC.
 
     /// <summary> Type for property BackgroundFlags used to return value for FsGetBackgroundFlags WFX wrapper method </summary>
@@ -53,19 +52,17 @@ namespace TcPluginBase.FileSystem {
 
         /// <summary>
         /// It was a (symbolic) link or .lnk file pointing to another file or directory.
-        /// You can also switch to a directory on the local harddisk! To do this,
-        /// return a path starting either with a drive letter, or an UNC location (\\server\share).
+        /// You can also switch to a directory on the local hard disk! To do this,
+        /// return a path starting either with a drive letter, or a UNC location (\\server\share).
         /// The maximum allowed length of such a path is MAX_PATH-1 = 259 characters!
         /// </summary>
         /// <param name="symlinkTarget">The file or directory where the symlink points to.</param>
         public static ExecResult SymLink(string symlinkTarget) => new(ExecEnum.SymLink, symlinkTarget);
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public readonly ExecEnum Type;
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public readonly string? SymlinkTarget;
+        [EditorBrowsable(EditorBrowsableState.Never)] public readonly ExecEnum Type;
+        [EditorBrowsable(EditorBrowsableState.Never)] public readonly string? SymlinkTarget;
 
-        private ExecResult(ExecEnum type, string? symlinkTarget = default)
+        private ExecResult(ExecEnum type, string? symlinkTarget = null)
         {
             Type = type;
             SymlinkTarget = symlinkTarget;

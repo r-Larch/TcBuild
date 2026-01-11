@@ -2,14 +2,9 @@
 
 
 namespace TcPluginBase.Content {
-    public abstract class ContentPlugin : TcPlugin, IContentPlugin {
+    public abstract class ContentPlugin(IConfiguration pluginSettings) : TcPlugin(pluginSettings), IContentPlugin {
         public virtual string? DetectString { get; set; }
         public override string TraceTitle => Title;
-
-
-        protected ContentPlugin(IConfiguration pluginSettings) : base(pluginSettings)
-        {
-        }
 
 
         #region IContentPlugin Members
@@ -65,7 +60,7 @@ namespace TcPluginBase.Content {
         }
 
         // methods used in WDX plugins only
-        public virtual SetValueResult EditValue(TcWindow parentWin, int fieldIndex, int unitIndex, ContentFieldType fieldType, ref string fieldValue, int maxLen, EditValueFlags flags, string langIdentifier)
+        public virtual SetValueResult EditValue(TcWindow parentWin, int fieldIndex, int unitIndex, ContentFieldType fieldType, ref string? fieldValue, int maxLen, EditValueFlags flags, string langIdentifier)
         {
             return SetValueResult.NoSuchField;
         }

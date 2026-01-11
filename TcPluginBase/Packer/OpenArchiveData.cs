@@ -65,7 +65,7 @@ namespace TcPluginBase.Packer {
 
         [Serializable]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        struct TcOpenArchiveDataW {
+        private struct TcOpenArchiveDataW {
             [MarshalAs(UnmanagedType.LPWStr)] public string ArchiveName;
             public int Mode;
             public int Result;
@@ -77,7 +77,7 @@ namespace TcPluginBase.Packer {
 
         [Serializable]
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        struct TcOpenArchiveData {
+        private struct TcOpenArchiveData {
             [MarshalAs(UnmanagedType.LPStr)] public string ArchiveName;
             public int Mode;
             public int Result;

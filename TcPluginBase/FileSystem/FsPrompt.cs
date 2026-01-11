@@ -3,16 +3,9 @@
     /// FsPrompt wraps calls to RequestProc, which is a callback function that can be called to request input from the user.
     /// When using one of the standard methods, the request will be in the selected language.
     /// </summary>
-    public class FsPrompt {
-        private readonly FsPlugin _plugin;
-
-        public FsPrompt(FsPlugin plugin)
-        {
-            _plugin = plugin;
-        }
-
+    public class FsPrompt(FsPlugin plugin) {
         /// <summary>
-        /// Ask for the user name, e.g. for a connection
+        /// Ask for the username, e.g. for a connection
         /// </summary>
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
@@ -20,7 +13,7 @@
         public string? AskUserName(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.UserName, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.UserName, title, null, ref value, 2048)) {
                 return value;
             }
 
@@ -34,21 +27,21 @@
         public string? AskPassword(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.Password, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.Password, title, null, ref value, 2048)) {
                 return value;
             }
 
             return null;
         }
 
-        /// <summary>User name for a firewall</summary>
+        /// <summary>Username for a firewall</summary>
         /// <param name="title">Custom title for the dialog box. If NULL or empty, it will be "Total Commander"</param>
         /// <param name="preValue">This string contains the default text presented to the user, set this to <c>string.Empty</c> to have no default text.</param>
         /// <returns>The string which the user enters</returns>
         public string? AskUserNameFirewall(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.UserNameFirewall, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.UserNameFirewall, title, null, ref value, 2048)) {
                 return value;
             }
 
@@ -62,7 +55,7 @@
         public string? AskPasswordFirewall(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.PasswordFirewall, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.PasswordFirewall, title, null, ref value, 2048)) {
                 return value;
             }
 
@@ -76,7 +69,7 @@
         public string? AskAccount(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.Account, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.Account, title, null, ref value, 2048)) {
                 return value;
             }
 
@@ -90,7 +83,7 @@
         public string? AskTargetDir(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.TargetDir, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.TargetDir, title, null, ref value, 2048)) {
                 return value;
             }
 
@@ -104,7 +97,7 @@
         public string? AskUrl(string? title = null, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.Url, title, null, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.Url, title, null, ref value, 2048)) {
                 return value;
             }
 
@@ -121,7 +114,7 @@
         public string? AskOther(string title, string text, string preValue = "")
         {
             var value = preValue;
-            if (_plugin.RequestProc(RequestType.Other, title, text, ref value, 2048)) {
+            if (plugin.RequestProc(RequestType.Other, title, text, ref value, 2048)) {
                 return value;
             }
 
@@ -135,7 +128,7 @@
         public void MsgOk(string title, string text)
         {
             string? _ = null;
-            _plugin.RequestProc(RequestType.MsgOk, title, text, ref _, 45);
+            plugin.RequestProc(RequestType.MsgOk, title, text, ref _, 45);
         }
 
 
@@ -146,7 +139,7 @@
         public bool MsgYesNo(string title, string text)
         {
             string? _ = null;
-            if (_plugin.RequestProc(RequestType.MsgYesNo, title, text, ref _, 45)) {
+            if (plugin.RequestProc(RequestType.MsgYesNo, title, text, ref _, 45)) {
                 return true;
             }
 
@@ -161,7 +154,7 @@
         public bool MsgOkCancel(string title, string text)
         {
             string? _ = null;
-            if (_plugin.RequestProc(RequestType.MsgOkCancel, title, text, ref _, 45)) {
+            if (plugin.RequestProc(RequestType.MsgOkCancel, title, text, ref _, 45)) {
                 return true;
             }
 

@@ -24,7 +24,7 @@ namespace TcPluginBase {
             _mainThreadId = Thread.CurrentThread.ManagedThreadId;
 
             if (pluginSettings != null) {
-                Title = pluginSettings["pluginTitle"];
+                Title = pluginSettings["pluginTitle"] ?? this.GetType().Name;
                 ShowErrorDialog = !Convert.ToBoolean(pluginSettings["hideErrorDialog"]);
                 WriteTrace = Convert.ToBoolean(pluginSettings["writeTrace"]);
             }

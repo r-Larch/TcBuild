@@ -54,7 +54,7 @@ namespace TcPluginBase {
 
 
     public class WpfDispatcher : IDisposable {
-        private static readonly object Lock = new();
+        private static readonly Lock Lock = new();
         private static volatile int _count;
         private static Dispatcher? _dispatcher;
         private static Dispatcher Dispatcher {

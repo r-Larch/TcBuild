@@ -3,13 +3,14 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using TcPluginBase;
 using TcPluginBase.Content;
+using TcPluginBase.Packer;
 using TcPluginBase.Tools;
 
 
 namespace WdxWrapper {
     public class ContentWrapper {
-        private static string _callSignature;
-        private static ContentPlugin _plugin;
+        private static string? _callSignature;
+        private static ContentPlugin? _plugin;
         private static ContentPlugin Plugin => _plugin ??= TcPluginLoader.GetTcPlugin<ContentPlugin>(typeof(PluginClassPlaceholder));
 
 
@@ -56,13 +57,18 @@ namespace WdxWrapper {
         #region ContentGetValue
 
         [UnmanagedCallersOnly(EntryPoint = "ContentGetValue")]
-        public static int GetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
+        public static int GetValue([MarshalAs(UnmanagedType.LPStr)] IntPtr fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
-            return GetValueW(fileName, fieldIndex, unitIndex, fieldValue, maxLen, flags);
+            return GetValueInternal(Marshal.PtrToStringAnsi(fileName)!, fieldIndex, unitIndex, fieldValue, maxLen, flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ContentGetValueW")]
-        public static int GetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
+        public static int GetValueW([MarshalAs(UnmanagedType.LPWStr)] IntPtr fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
+        {
+            return GetValueInternal(Marshal.PtrToStringUni(fileName)!, fieldIndex, unitIndex, fieldValue, maxLen, flags);
+        }
+
+        public static int GetValueInternal(string fileName, int fieldIndex, int unitIndex, IntPtr fieldValue, int maxLen, int flags)
         {
             GetValueResult result;
             var fieldType = ContentFieldType.NoMoreFields;
@@ -71,11 +77,13 @@ namespace WdxWrapper {
             try {
                 // TODO: add - comments where .NET plugin interface differs from TC
                 result = Plugin.GetValue(fileName, fieldIndex, unitIndex, maxLen, gvFlags, out var fieldValueStr, out fieldType);
-                if (result == GetValueResult.Success
-                    || result == GetValueResult.Delayed
-                    || result == GetValueResult.OnDemand) {
+                if (result is
+                    GetValueResult.Success or
+                    GetValueResult.Delayed or
+                    GetValueResult.OnDemand
+                   ) {
                     var resultType = result == GetValueResult.Success ? fieldType : ContentFieldType.WideString;
-                    (new ContentValue(fieldValueStr, resultType)).CopyTo(fieldValue);
+                    new ContentValue(fieldValueStr, resultType).CopyTo(fieldValue);
                 }
 
                 // !!! may produce much trace info !!!
@@ -94,13 +102,18 @@ namespace WdxWrapper {
         #region ContentStopGetValue
 
         [UnmanagedCallersOnly(EntryPoint = "ContentStopGetValue")]
-        public static void StopGetValue([MarshalAs(UnmanagedType.LPStr)] string fileName)
+        public static void StopGetValue([MarshalAs(UnmanagedType.LPStr)] IntPtr fileName)
         {
-            StopGetValueW(fileName);
+            StopGetValueInternal(Marshal.PtrToStringAnsi(fileName)!);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ContentStopGetValueW")]
-        public static void StopGetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName)
+        public static void StopGetValueW([MarshalAs(UnmanagedType.LPWStr)] IntPtr fileName)
+        {
+            StopGetValueInternal(Marshal.PtrToStringUni(fileName)!);
+        }
+
+        public static void StopGetValueInternal(string fileName)
         {
             _callSignature = "ContentStopGetValue";
             try {
@@ -178,13 +191,18 @@ namespace WdxWrapper {
         #region ContentSetValue
 
         [UnmanagedCallersOnly(EntryPoint = "ContentSetValue")]
-        public static int SetValue([MarshalAs(UnmanagedType.LPStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
+        public static int SetValue([MarshalAs(UnmanagedType.LPStr)] IntPtr fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
-            return SetValueW(fileName, fieldIndex, unitIndex, fieldType, fieldValue, flags);
+            return SetValueInternal(Marshal.PtrToStringAnsi(fileName)!, fieldIndex, unitIndex, fieldType, fieldValue, flags);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ContentSetValueW")]
-        public static int SetValueW([MarshalAs(UnmanagedType.LPWStr)] string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
+        public static int SetValueW([MarshalAs(UnmanagedType.LPWStr)] IntPtr fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
+        {
+            return SetValueInternal(Marshal.PtrToStringUni(fileName)!, fieldIndex, unitIndex, fieldType, fieldValue, flags);
+        }
+
+        public static int SetValueInternal(string fileName, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int flags)
         {
             SetValueResult result;
             var fldType = (ContentFieldType) fieldType;
@@ -231,11 +249,11 @@ namespace WdxWrapper {
 
         // ContentSetDefaultParams functionality is implemented here, not included to Content Plugin interface.
         [UnmanagedCallersOnly(EntryPoint = "ContentSetDefaultParams")]
-        public static void SetDefaultParams(ref PluginDefaultParams defParams)
+        public static void SetDefaultParams(IntPtr defParams)
         {
             _callSignature = "SetDefaultParams";
             try {
-                Plugin.DefaultParams = defParams;
+                Plugin.DefaultParams = Marshal.PtrToStructure<PluginDefaultParams>(defParams);
 
                 TraceCall(TraceLevel.Info, null);
             }
@@ -249,8 +267,9 @@ namespace WdxWrapper {
         #region ContentEditValue
 
         [UnmanagedCallersOnly(EntryPoint = "ContentEditValue")]
-        public static int EditValue(IntPtr parentWin, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int maxLen, int flags, [MarshalAs(UnmanagedType.LPStr)] string langIdentifier)
+        public static int EditValue(IntPtr parentWin, int fieldIndex, int unitIndex, int fieldType, IntPtr fieldValue, int maxLen, int flags, [MarshalAs(UnmanagedType.LPStr)] IntPtr langIdentifier)
         {
+            var langIdentifierString = Marshal.PtrToStringAnsi(langIdentifier)!;
             SetValueResult result;
             var fldType = (ContentFieldType) fieldType;
             var evFlags = (EditValueFlags) flags;
@@ -259,7 +278,7 @@ namespace WdxWrapper {
                 var tcWin = new TcWindow(parentWin);
                 var value = new ContentValue(fieldValue, fldType);
                 var strValue = value.StrValue;
-                result = Plugin.EditValue(tcWin, fieldIndex, unitIndex, fldType, ref strValue, maxLen, evFlags, langIdentifier);
+                result = Plugin.EditValue(tcWin, fieldIndex, unitIndex, fldType, ref strValue, maxLen, evFlags, langIdentifierString);
                 if (result == SetValueResult.Success) {
                     value.StrValue = strValue;
                     value.CopyTo(fieldValue);
@@ -280,13 +299,18 @@ namespace WdxWrapper {
         #region ContentSendStateInformation
 
         [UnmanagedCallersOnly(EntryPoint = "ContentSendStateInformation")]
-        public static void SendStateInformation(int state, [MarshalAs(UnmanagedType.LPStr)] string path)
+        public static void SendStateInformation(int state, [MarshalAs(UnmanagedType.LPStr)] IntPtr path)
         {
-            SendStateInformationW(state, path);
+            SendStateInformationInternal(state, Marshal.PtrToStringAnsi(path)!);
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ContentSendStateInformationW")]
-        public static void SendStateInformationW(int state, [MarshalAs(UnmanagedType.LPWStr)] string path)
+        public static void SendStateInformationW(int state, [MarshalAs(UnmanagedType.LPWStr)] IntPtr path)
+        {
+            SendStateInformationInternal(state, Marshal.PtrToStringUni(path)!);
+        }
+
+        public static void SendStateInformationInternal(int state, [MarshalAs(UnmanagedType.LPWStr)] string path)
         {
             _callSignature = "ContentSendStateInformation";
             try {
@@ -304,19 +328,36 @@ namespace WdxWrapper {
         #region ContentCompareFiles
 
         [UnmanagedCallersOnly(EntryPoint = "ContentCompareFiles")]
-        public static int CompareFiles(ContentProgressCallback progressCallback, int compareIndex,
-            [MarshalAs(UnmanagedType.LPStr)] string fileName1,
-            [MarshalAs(UnmanagedType.LPStr)] string fileName2,
-            ref ContentFileDetails contentFileDetails)
+        public static int CompareFiles(IntPtr progressCallback, int compareIndex,
+            [MarshalAs(UnmanagedType.LPStr)] IntPtr fileName1,
+            [MarshalAs(UnmanagedType.LPStr)] IntPtr fileName2,
+            IntPtr contentFileDetails)
         {
-            return CompareFilesW(progressCallback, compareIndex, fileName1, fileName2, ref contentFileDetails);
+            return CompareFilesInternal(
+                Marshal.GetDelegateForFunctionPointer<ContentProgressCallback>(progressCallback),
+                compareIndex,
+                Marshal.PtrToStringAnsi(fileName1)!,
+                Marshal.PtrToStringAnsi(fileName2)!,
+                Marshal.PtrToStructure<ContentFileDetails>(contentFileDetails)
+            );
         }
 
         [UnmanagedCallersOnly(EntryPoint = "ContentCompareFilesW")]
-        public static int CompareFilesW(ContentProgressCallback progressCallback, int compareIndex,
-            [MarshalAs(UnmanagedType.LPWStr)] string fileName1,
-            [MarshalAs(UnmanagedType.LPWStr)] string fileName2,
-            ref ContentFileDetails contentFileDetails)
+        public static int CompareFilesW(IntPtr progressCallback, int compareIndex,
+            [MarshalAs(UnmanagedType.LPWStr)] IntPtr fileName1,
+            [MarshalAs(UnmanagedType.LPWStr)] IntPtr fileName2,
+            IntPtr contentFileDetails)
+        {
+            return CompareFilesInternal(
+                Marshal.GetDelegateForFunctionPointer<ContentProgressCallback>(progressCallback),
+                compareIndex,
+                Marshal.PtrToStringUni(fileName1)!,
+                Marshal.PtrToStringUni(fileName2)!,
+                Marshal.PtrToStructure<ContentFileDetails>(contentFileDetails)
+            );
+        }
+
+        public static int CompareFilesInternal(ContentProgressCallback progressCallback, int compareIndex, string fileName1, string fileName2, ContentFileDetails contentFileDetails)
         {
             _callSignature = $"ContentCompareFiles '{fileName1}' => '{fileName2}' ({compareIndex})";
             TcCallback.SetContentPluginCallback(progressCallback);
@@ -351,7 +392,7 @@ namespace WdxWrapper {
             TcPluginLoader.ProcessException(_plugin, _callSignature, ex);
         }
 
-        public static void TraceCall(TraceLevel level, string result)
+        public static void TraceCall(TraceLevel level, string? result)
         {
             TcTrace.TraceCall(_plugin, level, _callSignature, result);
             _callSignature = null;

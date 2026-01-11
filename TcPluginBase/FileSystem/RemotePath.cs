@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 
 namespace TcPluginBase.FileSystem {
@@ -32,7 +33,7 @@ namespace TcPluginBase.FileSystem {
         /// </summary>
         public RemotePath SetFileName(string fileName)
         {
-            var newPath = Path.Substring(0, Path.IndexOf(FileName, StringComparison.Ordinal)) + fileName;
+            var newPath = Path[..Path.IndexOf(FileName, StringComparison.Ordinal)] + fileName;
             return newPath;
         }
 
@@ -44,7 +45,7 @@ namespace TcPluginBase.FileSystem {
 
         /// <summary>Returns a new RemotePath consisting of the current Path without trailing slash.</summary>
         public RemotePath PathWithoutTrailingSlash => TrailingSlash
-            ? Path[0..^1]
+            ? Path[..^1]
             : Path;
 
         public RemotePath(string? path)
@@ -78,13 +79,8 @@ namespace TcPluginBase.FileSystem {
         public string[] Segments {
             get {
                 var path = Path;
-                path = TrailingSlash
-                    ? path.Substring(1, path.Length - 1)
-                    : path.Substring(1);
-
-                return string.IsNullOrEmpty(path)
-                    ? Array.Empty<string>()
-                    : path.Split('\\');
+                path = TrailingSlash ? path[1..^1] : path[1..];
+                return string.IsNullOrEmpty(path) ? [] : path.Split('\\');
             }
         }
 
@@ -119,5 +115,11 @@ namespace TcPluginBase.FileSystem {
         {
             return Path;
         }
+    }
+
+    public class RemotePathComparer : IEqualityComparer<RemotePath> {
+        public static RemotePathComparer Instance { get; } = new();
+        public bool Equals(RemotePath x, RemotePath y) => x.Path == y.Path;
+        public int GetHashCode(RemotePath obj) => obj.Path.GetHashCode();
     }
 }

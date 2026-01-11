@@ -3,11 +3,7 @@
 
 namespace TcPluginBase.FileSystem {
     [Serializable]
-    public class FsPassword : PluginPassword {
-        public FsPassword(TcPlugin plugin, int cryptoNumber, int flags) : base(plugin, cryptoNumber, flags)
-        {
-        }
-
+    public class FsPassword(TcPlugin plugin, int cryptoNumber, int flags) : PluginPassword(plugin, cryptoNumber, flags) {
         protected override CryptResult GetCryptResult(int tcCryptResult)
         {
             return (FileSystemExitCode) tcCryptResult switch {
