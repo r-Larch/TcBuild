@@ -1,0 +1,89 @@
+﻿<Window x:Class="FsAzureStorage.Windows.PropertiesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FsAzureStorage.Windows"
+        d:DataContext="{d:DesignInstance local:DesignTimePropertiesViewModel, IsDesignTimeCreatable=True}"
+        mc:Ignorable="d"
+        Title="PropertiesWindow" Height="600" Width="450">
+    <Grid>
+
+        <TabControl Name="TabControl">
+            
+            <TabItem Header="_Properties">
+                
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="5" />
+                        <RowDefinition Height="60" />
+                    </Grid.RowDefinitions>
+
+                    <ListView Grid.Row="0" Name="Properties" ItemsSource="{Binding Path=Properties}" KeyDown="Properties_OnKeyDown">
+
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Setter Property="ToolTip" Value="{Binding Path=Desc}" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                        <ListView.View>
+
+                            <GridView AllowsColumnReorder="true" ColumnHeaderToolTip="Employee Information">
+                                <GridViewColumn Header="Property" DisplayMemberBinding="{Binding Path=Name}" Width="170" />
+                                <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Path=Value}" Width="225" />
+                            </GridView>
+
+                        </ListView.View>
+                    </ListView>
+
+                    <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" />
+
+                    <DockPanel Grid.Row="2" LastChildFill="True">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Background="#f2f2f2">
+                            <TextBlock Padding="5" Text="{Binding Path=SelectedItem.Desc, ElementName=Properties}" TextWrapping="WrapWithOverflow"></TextBlock>
+                        </ScrollViewer>
+                    </DockPanel>
+
+                </Grid>
+
+            </TabItem>
+
+            <TabItem Header="_Metadata">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <DataGrid Grid.Row="0" Name="Metadata" ItemsSource="{Binding Path=Metadata}" AutoGenerateColumns="False" 
+                              DataGridCell.Selected="DataGridCell_Selected" 
+                              SelectionUnit="Cell"
+                              CanUserAddRows="True"
+                              CanUserDeleteRows="True"
+                              CanUserReorderColumns="True"
+                              CanUserSortColumns="False"
+                              CanUserResizeRows="False"
+                              CanUserResizeColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Key}" Width="170" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="225" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <DockPanel Grid.Row="1" Margin="10" LastChildFill="False">
+                        <Button DockPanel.Dock="Right" Padding="15 5 15 5" Margin="10 0 0 0" Click="SaveMetadata_OnClick" >_Save and Close</Button>
+                        <Button DockPanel.Dock="Right" Padding="15 5 15 5" Click="ResetMetadata_OnClick" >_Reset</Button>
+                    </DockPanel>
+
+                </Grid>
+
+            </TabItem>
+
+        </TabControl>
+
+    </Grid>
+</Window>

@@ -1,0 +1,43 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="Mixed Platforms" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="appveyor.yml" />
+    <File Path="Directory.Build.props" />
+    <File Path="kill-msbuild.cmd" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Plugins/">
+    <Project Path="Plugins/FsAzureStorage/FsAzureStorage.csproj" />
+    <Project Path="Plugins/FsAzureStorage.Test/FsAzureStorage.Test.csproj" />
+    <Project Path="Plugins/FsPlugin2/FsPlugin2.csproj" />
+    <Project Path="Plugins/MyListerPlugin/MyListerPlugin.csproj" />
+  </Folder>
+  <Folder Name="/Wrapper/">
+    <Project Path="Wrapper/QSWrapper/QSWrapper.csproj">
+      <Build Solution="*|x86" Project="false" />
+    </Project>
+    <Project Path="Wrapper/WcxWrapper/WcxWrapper.csproj">
+      <Build Solution="*|x86" Project="false" />
+    </Project>
+    <Project Path="Wrapper/WdxWrapper/WdxWrapper.csproj">
+      <Build Solution="*|x86" Project="false" />
+    </Project>
+    <Project Path="Wrapper/WfxWrapper/WfxWrapper.csproj" />
+    <Project Path="Wrapper/WlxWrapper/WlxWrapper.csproj">
+      <Build Solution="*|x86" Project="false" />
+    </Project>
+  </Folder>
+  <Folder Name="/TcBuild/">
+    <Project Path="TcBuild/TcBuild/TcBuild.csproj" />
+    <Project Path="TcBuild/TcBuildGenerator/TcBuildGenerator.csproj" />
+    <Project Path="TcBuild/TcBuildGenerator.Tests/TcBuildGenerator.Tests.csproj" />
+    <Project Path="TcBuild/TcBuildTask/TcBuildTask.csproj" />
+    <Project Path="TcBuild/TcBuildTask.Tests/TcBuildTask.Tests.csproj" />
+    <Project Path="TcBuild/TcPluginBase/TcPluginBase.csproj" />
+    <Project Path="TcBuild/TcPluginBase.Test/TcPluginBase.Test.csproj" />
+  </Folder>
+</Solution>

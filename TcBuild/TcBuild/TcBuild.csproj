@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows7.0</TargetFramework>
+    <OutputPath>bin\</OutputPath>
+    <Description>Tool to build Total Commander Plugins</Description>
+    <Nullable>enable</Nullable>
+
+    <!--<NoBuild>true</NoBuild>-->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DNNE" Version="2.0.8" PrivateAssets="none" ExcludeAssets="Build">
+      <IncludeAssets>runtime; compile; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <!---->
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TcBuildGenerator\TcBuildGenerator.csproj" PrivateAssets="None" />
+    <ProjectReference Include="..\TcBuildTask\TcBuildTask.csproj" PrivateAssets="All" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" PrivateAssets="All" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeFilesInPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+  <Target Name="IncludeFilesInPackage">
+    <ItemGroup>
+      <!-- build.targets -->
+      <TfmSpecificPackageFile Include="..\TcBuildTask\build\**\*.*" PackagePath="build\" />
+
+      <!-- bin's for build target -->
+      <TfmSpecificPackageFile Include="..\TcBuildTask\bin\**\*.*" Exclude="Microsoft.Build.*;Microsoft.VisualStudio.*" PackagePath="bin\" />
+
+      <!-- references for target project -->
+      <TfmSpecificPackageFile Include="..\TcPluginBase\bin\**\*" PackagePath="lib\" />
+    </ItemGroup>
+  </Target>
+
+</Project>

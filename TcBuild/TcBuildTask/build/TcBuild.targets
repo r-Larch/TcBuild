@@ -1,0 +1,61 @@
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <TcBuildPath Condition="$(TcBuildPath) == ''">$(MSBuildThisFileDirectory)..\</TcBuildPath>
+    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\netstandard2.0</TcBuildAssemblyDirectory>
+    <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuildTask.dll</TcBuildAssembly>
+
+    <TcBuildDependsOnTargets>DnneBuildNativeExports</TcBuildDependsOnTargets>
+    <TcBuild_GeneratedFiles></TcBuild_GeneratedFiles>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Target Project Configuration">
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+
+  <UsingTask
+    TaskName="TcBuild.TcBuildTask"
+    AssemblyFile="$(TcBuildAssembly)" />
+
+  <!-- look https://github.com/3F/DllExport/blob/master/tools/net.r_eg.DllExport.targets -->
+  <Target
+    Name="TcBuildTarget"
+    AfterTargets="Build"
+    DependsOnTargets="$(TcBuildDependsOnTargets)"
+    Condition="$(DesignTimeBuild) != true">
+
+    <PropertyGroup>
+      <TcBuild_DnneNativeOutputFile>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName)$(DnneNativeBinaryExt)</TcBuild_DnneNativeOutputFile>
+      <TcBuild_DnneNativeSourceFiles>$(DnneNativeExportsBinaryPath)$(DnneNativeExportsBinaryName).h;$(DnneNativeExportsBinaryPath)dnne.h</TcBuild_DnneNativeSourceFiles>
+
+      <DnneRuntimeIdentifier>$(RuntimeIdentifier)</DnneRuntimeIdentifier>
+      <DnneRuntimeIdentifier Condition="'$(DnneRuntimeIdentifier)'==''">$(NETCoreSdkRuntimeIdentifier)</DnneRuntimeIdentifier>
+    </PropertyGroup>
+
+    <Message Text="Info: $(TcBuild_DnneNativeOutputFile)" Importance="high" />
+
+    <Delete Files="$(TcBuild_DnneNativeSourceFiles)" />
+
+    <TcBuild.TcBuildTask
+      AssemblyFile="$(TargetPath)"
+      NativeAssemblyFile="$(TcBuild_DnneNativeOutputFile)"
+      OutputDirectory="$(TargetDir)"
+      ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)"
+
+      RuntimeId="$(DnneRuntimeIdentifier)"
+      Architecture="$(TargetedSDKArchitecture)">
+
+      <Output TaskParameter="GeneratedFiles" PropertyName="TcBuild_GeneratedFiles" />
+
+    </TcBuild.TcBuildTask>
+
+  </Target>
+
+  <PropertyGroup>
+    <CleanDependsOn>TcBuildClean;$(CleanDependsOn);</CleanDependsOn>
+  </PropertyGroup>
+  <Target Name="TcBuildClean">
+    <Delete Files="$(TcBuild_GeneratedFiles)" />
+  </Target>
+
+</Project>
