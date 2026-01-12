@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <TcBuildPath Condition="$(TcBuildPath) == ''">$(MSBuildThisFileDirectory)..\</TcBuildPath>
-    <TcBuildAssemblyDirectory Condition="$(MSBuildRuntimeType) == 'Core'">$(TcBuildPath)bin\netstandard2.0</TcBuildAssemblyDirectory>
-    <TcBuildAssemblyDirectory Condition="$(MSBuildRuntimeType) != 'Core'">$(TcBuildPath)bin\net472</TcBuildAssemblyDirectory>
+    <TcBuildAssemblyDirectory>$(TcBuildPath)bin\netstandard2.0</TcBuildAssemblyDirectory>
     <TcBuildAssembly Condition="$(TcBuildAssembly) == ''">$(TcBuildAssemblyDirectory)\TcBuildTask.dll</TcBuildAssembly>
 
     <TcBuildDependsOnTargets>DnneBuildNativeExports</TcBuildDependsOnTargets>

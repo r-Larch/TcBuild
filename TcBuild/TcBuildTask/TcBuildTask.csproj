@@ -12,12 +12,12 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>-->
 
     <IsPackable>false</IsPackable>
-
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
     <!--<PackageReference Include="DNNE" Version="1.0.19" PrivateAssets="None" ExcludeAssets="Build" />-->
-    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="10.0.1" PrivateAssets="All" GeneratePathProperty="true" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="10.0.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" PrivateAssets="All" />
     <PackageReference Include="PolySharp" Version="1.15.0">
