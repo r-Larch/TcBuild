@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TcPluginBase\TcPluginBase.csproj" />
+    <ProjectReference Include="..\..\TcBuild\TcPluginBase\TcPluginBase.csproj" />
   </ItemGroup>
 
 </Project>

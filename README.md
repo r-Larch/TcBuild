@@ -27,7 +27,7 @@ See [Total Commander plugin types](https://www.ghisler.ch/wiki/index.php/Plugin#
 
 # Create a plugin
 
-Create a .NET Library Project targeting net472 or newer and install `TcBuild` nuget package.
+Create a .NET Library Project targeting net10.0 or newer and install `TcBuild` nuget package.
 The TcBuild nuget comes with some base classes and interfaces to get you started.
 So you just have to create a class inheriting from 
 one of the following plugin base classes:
