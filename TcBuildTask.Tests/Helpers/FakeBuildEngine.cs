@@ -30,7 +30,7 @@ public class FakeBuildEngine(ITestOutputHelper output) : IBuildEngine {
         Write("custom", e.Message);
     }
 
-    private void Write(string type, string msg)
+    private void Write(string type, string? msg)
     {
         //Console.WriteLine($"{type} - {msg}");
         output.WriteLine($"{type} - {msg}");
@@ -44,5 +44,5 @@ public class FakeBuildEngine(ITestOutputHelper output) : IBuildEngine {
     public bool ContinueOnError { get; set; }
     public int LineNumberOfTaskNode { get; set; }
     public int ColumnNumberOfTaskNode { get; set; }
-    public string ProjectFileOfTaskNode { get; set; }
+    public string ProjectFileOfTaskNode { get; set; } = null!;
 }

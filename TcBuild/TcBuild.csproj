@@ -6,7 +6,7 @@
     <Description>Tool to build Total Commander Plugins</Description>
     <Nullable>enable</Nullable>
 
-    <NoBuild>true</NoBuild>
+    <!--<NoBuild>true</NoBuild>-->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>

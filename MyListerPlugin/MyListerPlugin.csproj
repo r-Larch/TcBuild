@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
 
     <UseWpf>true</UseWpf>
+    <Description>My Lister Plugin Description</Description>
   </PropertyGroup>
 
   <ItemGroup>

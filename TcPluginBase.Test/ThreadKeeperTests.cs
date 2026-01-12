@@ -9,7 +9,8 @@ using Xunit.Abstractions;
 namespace TcPluginBase.Test {
     public class ThreadKeeperTests {
         private readonly ITestOutputHelper _output;
-        [ThreadStatic] private static ThreadKeeper _exec;
+        // ReSharper disable once ThreadStaticFieldHasInitializer
+        [ThreadStatic] private static ThreadKeeper _exec = null!;
 
         public ThreadKeeperTests(ITestOutputHelper output)
         {
